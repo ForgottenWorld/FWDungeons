@@ -1,0 +1,18 @@
+name: FWDungeons
+version: "1.0"
+description: Adds commands for teleporting players up and down
+main: it.forgottenworld.updown.it.forgottenworld.dungeons.UpDownPlugin
+commands:
+  updown:
+    description: Teleports the player to first available space above or below them.
+    usage: /updown [up|down|back]
+permissions:
+  fwupdown.command.up:
+    description: Allows the player to use /updown up
+    default: op
+  updown.command.down:
+    description: Allows the player to use /updown down
+    default: op
+  updown.command.back:
+    description: Allows the player to use /updown back
+    default: op
