@@ -1,7 +1,7 @@
 name: FWDungeons
 version: "0.1"
-description: Adds commands for teleporting players up and down
-main: it.forgottenworld.updown.UpDownPlugin
+description: Create dungeons in your minecraft server
+main: it.forgottenworld.dungeons.FWDungeonsPlugin
 commands:
   fwdungeons:
     description: Access FWDungeons functions.
@@ -9,5 +9,5 @@ commands:
     aliases: [fwdungeons,fwd]
 permissions:
   fwdungeons.command:
-    description: Allows the player to use /updown up
+    description: Allows the player to use /fwdungeons
     default: op
