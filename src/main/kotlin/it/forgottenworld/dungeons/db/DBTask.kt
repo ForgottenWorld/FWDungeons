@@ -26,6 +26,7 @@ private class DBTask(
                         is Float -> s.setFloat(i, it)
                         is Date -> s.setDate(i, it)
                         is Boolean -> s.setBoolean(i, it)
+                        else -> throw Exception("ERROR: DBTask.run() - Invalid parameter type")
                     }
                 }
                 s.executeQuery()

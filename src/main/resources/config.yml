@@ -1,5 +1,5 @@
 dbHost: "localhost"
 dbPort: 3306
-dbDatabase: "BukkitCoding"
-dbUsername: "root"
-dbPassword: "123"
+dbDatabase: "FWDungeons"
+dbUsername: "fwdUser"
+dbPassword: "forgottenworld"
