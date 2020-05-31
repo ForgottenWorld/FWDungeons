@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.db
 
+import org.bukkit.Bukkit.getLogger
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -29,11 +30,14 @@ private class DBTask(
                         else -> throw Exception("ERROR: DBTask.run() - Invalid parameter type")
                     }
                 }
-                s.executeQuery()
-                if (isQuery)
+
+                if (isQuery) {
+                    s.executeQuery()
                     callbackRes?.invoke(s.resultSet)
-                else
+                } else {
+                    s.executeUpdate()
                     callbackCount?.invoke(s.updateCount)
+                }
             }
         } catch(e: Exception) {
             e.printStackTrace()
@@ -42,17 +46,27 @@ private class DBTask(
 }
 
 fun executeQuery(context: Plugin,
-                 conn: Connection,
                  sql: String,
                  vararg parameters: Any,
                  callback: (ResultSet) -> Unit) {
-    DBTask(conn,true, sql, parameters, callback, null).runTaskAsynchronously(context)
+    DBHandler.connect()?.let {
+        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(context)
+    } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
 fun executeUpdate(context: Plugin,
-                 conn: Connection,
                  sql: String,
                  vararg parameters: Any,
                  callback: (Int) -> Unit) {
-    DBTask(conn,false, sql, parameters, null, callback).runTaskAsynchronously(context)
+    DBHandler.connect()?.let {
+        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(context)
+    } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
+}
+
+fun executeUpdate(context: Plugin,
+                  sql: String,
+                  vararg parameters: Any) {
+    DBHandler.connect()?.let {
+        DBTask(it,false, sql, parameters, null, { }).runTaskAsynchronously(context)
+    } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }

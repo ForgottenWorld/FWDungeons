@@ -4,6 +4,4 @@ class Dungeon(
         val id: Int,
         val name: String,
         val instances: List<DungeonInstance>) {
-
-
 }

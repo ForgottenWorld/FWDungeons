@@ -1,12 +1,15 @@
 package it.forgottenworld.dungeons.db
 
+import it.forgottenworld.dungeons.FWDungeonsPlugin
 import org.bukkit.Bukkit.getLogger
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
 
+
 object DBHandler {
+
 
     private var connection: Connection? = null
     private lateinit var host: String
@@ -37,17 +40,18 @@ object DBHandler {
                             DBHandler.username,
                             DBHandler.password)
         }
+
         return connection
     }
 
-    fun connect() {
+    fun connect(): Connection? {
         if (!isConfigured()) {
             getLogger().warning("ERROR: DBHandler.Connect() needs to be called with arguments at least once.")
-            return
+            return null
         }
 
-        connect(host, database, username, password, port)
+        return connect(host, database, username, password, port)
     }
-
+    
     fun isConfigured() = port != -1
 }
