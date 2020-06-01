@@ -7,7 +7,26 @@ commands:
     description: Access FWDungeons functions.
     usage: /fwdungeons
     aliases: [fwdungeons,fwd]
+  fwdungeonsedit:
+      description: Access FWDungeons functions.
+      usage: /fwdungeonsedit
+      aliases: [fwdungeonsedit,fwde]
 permissions:
-  fwdungeons.command:
-    description: Allows the player to use /fwdungeons
+  fwdungeonsedit.command.dungeon.create:
+    description: Allows the player to use /fwdungeonsedit dungeon create
+    default: op
+  fwdungeonsedit.command.dungeon.edit:
+    description: Allows the player to use /fwdungeonsedit dungeon edit
+    default: op
+  fwdungeonsedit.command.dungeon.pos1:
+    description: Allows the player to use /fwdungeonsedit dungeon pos1
+    default: op
+  fwdungeonsedit.command.dungeon.pos2:
+    description: Allows the player to use /fwdungeonsedit dungeon pos2
+    default: op
+  fwdungeonsedit.command.dungeon.instadd:
+    description: Allows the player to use /fwdungeonsedit dungeon instadd
+    default: op
+  fwdungeonsedit.command.dungeon.instremove:
+    description: Allows the player to use /fwdungeonsedit dungeon instremove
     default: op

@@ -53,5 +53,5 @@ object DBHandler {
         return connect(host, database, username, password, port)
     }
     
-    fun isConfigured() = port != -1
+    private fun isConfigured() = port != -1
 }

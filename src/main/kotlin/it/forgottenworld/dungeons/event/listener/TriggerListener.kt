@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.events.listener
+package it.forgottenworld.dungeons.event.listener
 
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

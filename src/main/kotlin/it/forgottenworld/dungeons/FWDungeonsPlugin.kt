@@ -1,19 +1,20 @@
 package it.forgottenworld.dungeons
 
+import it.forgottenworld.dungeons.command.CommandFWDungeons
+import it.forgottenworld.dungeons.command.CommandFWDungeonsEdit
 import it.forgottenworld.dungeons.db.DBHandler
 import it.forgottenworld.dungeons.db.executeUpdate
-import it.forgottenworld.dungeons.events.listener.TriggerListener
-import org.bukkit.Bukkit
+import it.forgottenworld.dungeons.event.listener.TriggerListener
 import org.bukkit.plugin.java.JavaPlugin
+
+lateinit var pluginInstance : FWDungeonsPlugin
 
 class FWDungeonsPlugin : JavaPlugin() {
 
-    val requiredTables = listOf(
-            "fwd_dungeons"
-    )
-
     override fun onEnable() {
         logger.info("Enabling FWDungeons...")
+
+        pluginInstance = this
 
         logger.info("Connecting to DB...")
 
@@ -28,7 +29,17 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         initTables()
 
+        logger.info("Registering commands...")
+
+        getCommand("fwdungeonsedit")?.setExecutor(
+                CommandFWDungeonsEdit()
+        )
+        getCommand("fwdungeons")?.setExecutor(
+                CommandFWDungeons()
+        )
+
         logger.info("Registering events...")
+
         server.pluginManager.registerEvents(TriggerListener(), this)
     }
 
@@ -37,8 +48,7 @@ class FWDungeonsPlugin : JavaPlugin() {
     }
 
     private fun initTables() {
-            executeUpdate(this,
-                    "CREATE TABLE IF NOT EXISTS fwdungeons.fwd_dungeons (\n" +
+            executeUpdate("CREATE TABLE IF NOT EXISTS fwdungeons.fwd_dungeons (\n" +
                             "  id INT NOT NULL AUTO_INCREMENT,\n" +
                             "  name VARCHAR(60) NOT NULL,\n" +
                             "  PRIMARY KEY (id),\n" +
