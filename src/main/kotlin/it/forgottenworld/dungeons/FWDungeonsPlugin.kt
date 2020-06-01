@@ -7,6 +7,7 @@ import it.forgottenworld.dungeons.db.DBHandler
 import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.event.listener.TriggerListener
 import org.bukkit.plugin.java.JavaPlugin
+import sun.security.krb5.Config
 
 var pluginInstance : FWDungeonsPlugin? = null
 
@@ -17,6 +18,7 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         pluginInstance = this
         ConfigManager.loadConfig(config)
+        ConfigManager.loadDungeonConfigs(dataFolder)
 
         logger.info("Connecting to DB...")
 

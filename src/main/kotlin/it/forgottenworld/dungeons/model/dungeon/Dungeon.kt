@@ -11,7 +11,11 @@ class Dungeon(val id: Int) {
 
     fun hasBox() = ::box.isInitialized
 
-    constructor(id: Int, name: String, box: Box, triggers: MutableList<Trigger>, instances: MutableList<DungeonInstance>) : this(id) {
+    constructor(id: Int,
+                name: String,
+                box: Box,
+                triggers: MutableList<Trigger>,
+                instances: MutableList<DungeonInstance>) : this(id) {
         this.name = name
         this.box = box
         this.triggers = triggers

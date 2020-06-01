@@ -2,7 +2,6 @@ package it.forgottenworld.dungeons.db
 
 import it.forgottenworld.dungeons.pluginInstance
 import org.bukkit.Bukkit.getLogger
-import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
 
 import java.sql.Connection

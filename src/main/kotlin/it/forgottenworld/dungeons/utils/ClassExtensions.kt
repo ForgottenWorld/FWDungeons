@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.utils
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.model.party.Party
 import org.bukkit.Material

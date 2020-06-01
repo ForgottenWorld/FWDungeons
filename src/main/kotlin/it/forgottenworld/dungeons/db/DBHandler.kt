@@ -1,11 +1,9 @@
 package it.forgottenworld.dungeons.db
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import org.bukkit.Bukkit.getLogger
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
-
 
 
 object DBHandler {

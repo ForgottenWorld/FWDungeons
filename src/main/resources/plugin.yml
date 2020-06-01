@@ -8,9 +8,9 @@ commands:
     usage: /fwdungeons
     aliases: [fwdungeons,fwd]
   fwdungeonsedit:
-      description: Access FWDungeons functions.
-      usage: /fwdungeonsedit
-      aliases: [fwdungeonsedit,fwde]
+    description: Access FWDungeons functions.
+    usage: /fwdungeonsedit [dungeon [create id|edit id|name name|pos1|pos2|instadd|instremove]|trigger [pos1|pos2]]
+    aliases: [fwdungeonsedit,fwde]
 permissions:
   fwdungeonsedit.command.dungeon.create:
     description: Allows the player to use /fwdungeonsedit dungeon create
@@ -29,4 +29,13 @@ permissions:
     default: op
   fwdungeonsedit.command.dungeon.instremove:
     description: Allows the player to use /fwdungeonsedit dungeon instremove
+    default: op
+  fwdungeonsedit.command.dungeon.name:
+    description: Allows the player to use /fwdungeonsedit dungeon name
+    default: op
+  fwdungeonsedit.command.trigger.pos1:
+    description: Allows the player to use /fwdungeonsedit trigger pos1
+    default: op
+  fwdungeonsedit.command.trigger.pos2:
+    description: Allows the player to use /fwdungeonsedit trigger pos2
     default: op

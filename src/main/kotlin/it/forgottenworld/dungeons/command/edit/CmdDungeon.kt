@@ -36,7 +36,7 @@ fun cmdDungeonEdit(sender: CommandSender, command: Command, label: String, args:
             return true
         }
 
-        if (FWDungeonsEditController.playerStartEditing(sender, id))
+        if (FWDungeonsEditController.playerEditDungeon(sender, id))
             sender.sendMessage("Now editing dungeon with id $id")
         else
             sender.sendMessage("No dungeons found with id $id")
@@ -118,6 +118,23 @@ fun cmdDungeonInstanceRemove(sender: CommandSender, command: Command, label: Str
                     -3 -> "Dungeon has no instances"
                     -4 -> "No instances at this location"
                     else -> "Removed instance with id $ret"
+                }
+        )
+    }
+
+    return true
+}
+
+fun cmdDungeonName(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        if (args.count() == 0) {
+            sender.sendMessage("Not enough arguments: please provide a name")
+        }
+        sender.sendMessage(
+                when (FWDungeonsEditController.playerNameDungeon(sender, args[0])) {
+                    0 -> "Dungeon name changed"
+                    -1 -> "You're not editing any dungeons"
+                    else -> ""
                 }
         )
     }

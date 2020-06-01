@@ -19,7 +19,7 @@ object FWDungeonsEditController {
     private val wipTriggerPos2s = mutableMapOf<UUID, Block>()
     private val wipDungeonOrigins = mutableMapOf<UUID, BlockVector>()
 
-    fun playerStartEditing(player: Player, dungeonId: Int) : Boolean {
+    fun playerEditDungeon(player: Player, dungeonId: Int) : Boolean {
         return FWDungeonsController.getDungeonById(dungeonId)?.let {d ->
             if (dungeonEditors.containsValue(d))
                 false
@@ -139,22 +139,23 @@ object FWDungeonsEditController {
         }
 
         val id = dungeon.instances.maxBy { it.id }?.id?.plus(1) ?: 0
-        dungeon.instances.add(DungeonInstance(
-                id,
-                dungeon,
-                block.location.toVector().toBlockVector(),
-                dungeon.triggers.map {
-                    Trigger(it.id,
-                            it.dungeon,
-                            it.box.withOrigin(
-                                    block.location
-                                            .toVector()
-                                            .add(it.origin)
-                                            .toBlockVector()),
-                            it.effect,
-                            it.requiresWholeParty
-                    )
-                }
+        dungeon.instances.add(
+                DungeonInstance(
+                        id,
+                        dungeon,
+                        block.location.toVector().toBlockVector(),
+                        dungeon.triggers.map {
+                            Trigger(it.id,
+                                    it.dungeon,
+                                    it.box.withOrigin(
+                                            block.location
+                                                    .toVector()
+                                                    .add(it.origin)
+                                                    .toBlockVector()),
+                                    it.effect,
+                                    it.requiresWholeParty
+                            )
+                        }
         ))
 
         return id
@@ -180,5 +181,13 @@ object FWDungeonsEditController {
         }
 
         return id
+    }
+
+    fun playerNameDungeon(player: Player, name: String) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        dungeon.name = name
+
+        return 0
     }
 }
