@@ -2,12 +2,13 @@ package it.forgottenworld.dungeons
 
 import it.forgottenworld.dungeons.command.CommandFWDungeons
 import it.forgottenworld.dungeons.command.CommandFWDungeonsEdit
+import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.db.DBHandler
 import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.event.listener.TriggerListener
 import org.bukkit.plugin.java.JavaPlugin
 
-lateinit var pluginInstance : FWDungeonsPlugin
+var pluginInstance : FWDungeonsPlugin? = null
 
 class FWDungeonsPlugin : JavaPlugin() {
 
@@ -15,6 +16,7 @@ class FWDungeonsPlugin : JavaPlugin() {
         logger.info("Enabling FWDungeons...")
 
         pluginInstance = this
+        ConfigManager.loadConfig(config)
 
         logger.info("Connecting to DB...")
 
@@ -45,6 +47,7 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")
+        pluginInstance = null
     }
 
     private fun initTables() {

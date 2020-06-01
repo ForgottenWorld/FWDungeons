@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.controller
 
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
+import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.minBlockVector
 import org.bukkit.block.Block
@@ -30,7 +31,7 @@ object FWDungeonsEditController {
     }
 
     fun playerCreateDungeon(player: Player) : Int {
-        var newId: Int = FWDungeonsController.getMaxDungeonId() ?: 0
+        var newId: Int = FWDungeonsController.getMaxDungeonId() + 1
         while (wipDungeons.find{ it.id == newId } != null) {
             newId += 1
         }
@@ -42,8 +43,7 @@ object FWDungeonsEditController {
     }
 
     fun playerSetDungeonPos1(player: Player, block: Block) : Int {
-        if (dungeonEditors.containsKey(player.uniqueId)) return -1 //player not editing a dungeon
-        val dungeon = dungeonEditors[player.uniqueId]!!
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
         return if (wipDungeonPos2s.containsKey(player.uniqueId)) {
             dungeon.box = Box(block, wipDungeonPos2s[player.uniqueId]!!).withOriginZero()
@@ -57,8 +57,7 @@ object FWDungeonsEditController {
     }
 
     fun playerSetDungeonPos2(player: Player, block: Block) : Int {
-        if (dungeonEditors.containsKey(player.uniqueId)) return -1 //player not editing a dungeon
-        val dungeon = dungeonEditors[player.uniqueId]!!
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
         wipDungeonPos1s[player.uniqueId] = block
         return if (wipDungeonPos1s.containsKey(player.uniqueId)) {
@@ -73,15 +72,14 @@ object FWDungeonsEditController {
     }
 
     fun playerSetTriggerPos1(player: Player, block: Block) : Int {
-        if (dungeonEditors.containsKey(player.uniqueId)) return -1 //player not editing a dungeon
-        val dungeon = dungeonEditors[player.uniqueId]!!
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
         if (wipDungeonOrigins[player.uniqueId]?.let {
                     dungeon.box.withOrigin(it).containsBlock(block)
                 } != true) {
-            if (!dungeon.hasBox()) return -4 //player is outside of dungeon box
+            return -4 //target is outside of dungeon box
         }
 
         wipTriggerPos1s[player.uniqueId] = block
@@ -90,6 +88,7 @@ object FWDungeonsEditController {
             dungeon.triggers.add(
                     Trigger(
                             id,
+                            dungeon,
                             Box(block, wipTriggerPos2s[player.uniqueId]!!),
                             {},
                             false
@@ -103,15 +102,14 @@ object FWDungeonsEditController {
     }
 
     fun playerSetTriggerPos2(player: Player, block: Block) : Int {
-        if (dungeonEditors.containsKey(player.uniqueId)) return -1 //player not editing a dungeon
-        val dungeon = dungeonEditors[player.uniqueId]!!
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
         if (wipDungeonOrigins[player.uniqueId]?.let {
                     dungeon.box.withOrigin(it).containsBlock(block)
                 } != true) {
-            if (!dungeon.hasBox()) return -4 //player is outside of dungeon box
+            return -4 //target is outside of dungeon box
         }
 
         wipTriggerPos1s[player.uniqueId] = block
@@ -120,6 +118,7 @@ object FWDungeonsEditController {
             dungeon.triggers.add(
                     Trigger(
                             id,
+                            dungeon,
                             Box(wipTriggerPos1s[player.uniqueId]!!, block),
                             {},
                             false
@@ -130,5 +129,56 @@ object FWDungeonsEditController {
         } else {
             -2 //other position still needs to be selected
         }
+    }
+
+    fun playerAddInstance(player: Player, block: Block) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        if (wipDungeons.contains(dungeon)) {
+            return -2 //dungeon is still being created
+        }
+
+        val id = dungeon.instances.maxBy { it.id }?.id?.plus(1) ?: 0
+        dungeon.instances.add(DungeonInstance(
+                id,
+                dungeon,
+                block.location.toVector().toBlockVector(),
+                dungeon.triggers.map {
+                    Trigger(it.id,
+                            it.dungeon,
+                            it.box.withOrigin(
+                                    block.location
+                                            .toVector()
+                                            .add(it.origin)
+                                            .toBlockVector()),
+                            it.effect,
+                            it.requiresWholeParty
+                    )
+                }
+        ))
+
+        return id
+    }
+
+    fun playerRemoveInstance(player: Player) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        if (wipDungeons.contains(dungeon)) {
+            return -2 //dungeon is still being created
+        }
+
+        if (dungeon.instances.isEmpty()) {
+            return -3 //dungeon has no instances
+        }
+
+        var id : Int = -4 //defaults to instance not found
+        dungeon.instances.removeIf {
+            if (it.box.containsPlayer(player)) {
+                id = it.id
+                true
+            } else false
+        }
+
+        return id
     }
 }

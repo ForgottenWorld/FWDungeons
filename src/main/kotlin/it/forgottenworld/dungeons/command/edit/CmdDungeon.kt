@@ -87,11 +87,40 @@ fun cmdDungeonPos2(sender: CommandSender, command: Command, label: String, args:
 }
 
 fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        val block = sender.getTargetBlock()
+
+        if (block == null) {
+            sender.sendMessage("You need to be targeting a block within 5 blocks of you before calling this")
+            return true
+        }
+
+        val ret = FWDungeonsEditController.playerAddInstance(sender, block)
+        sender.sendMessage(
+                when (ret) {
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "Dungeon instances may only be created for fully protoyped dungeons"
+                    else -> "Created instance with id $ret"
+                }
+        )
+    }
 
     return true
 }
 
 fun cmdDungeonInstanceRemove(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        val ret = FWDungeonsEditController.playerRemoveInstance(sender)
+        sender.sendMessage(
+                when (ret) {
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "Dungeon instances may only be removed from fully protoyped dungeons"
+                    -3 -> "Dungeon has no instances"
+                    -4 -> "No instances at this location"
+                    else -> "Removed instance with id $ret"
+                }
+        )
+    }
 
     return true
 }

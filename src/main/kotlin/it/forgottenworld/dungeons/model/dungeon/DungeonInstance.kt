@@ -3,13 +3,13 @@ package it.forgottenworld.dungeons.model.dungeon
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
-import org.bukkit.block.Block
 import org.bukkit.util.BlockVector
 
 class DungeonInstance(
         val id: Int,
         val dungeon: Dungeon,
-        val origin: BlockVector) {
+        val origin: BlockVector,
+        val triggers: List<Trigger>) {
     var party: Party? = null
     private val resolvedTriggers = mutableMapOf<Trigger, Boolean>().apply {
         dungeon.triggers.forEach {
@@ -23,6 +23,7 @@ class DungeonInstance(
     fun isInstanceBusy() = party != null
 
     fun startInstance(party: Party) {
+        party.instance = this
         this.party = party
     }
 

@@ -1,11 +1,16 @@
 package it.forgottenworld.dungeons.controller
 
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
+import it.forgottenworld.dungeons.model.party.Party
+import it.forgottenworld.dungeons.model.trigger.Trigger
+import java.util.*
 
 object FWDungeonsController {
-    val dungeons = listOf<Dungeon>()
+    val dungeons = mutableMapOf<Int, Dungeon>()
+    val parties = mutableMapOf<Int, Party>()
 
-    fun getDungeonById(id: Int) = dungeons.find { it.id == id }
+    val playersTriggering = mutableMapOf<UUID, Trigger>()
 
-    fun getMaxDungeonId() = dungeons.maxBy { it.id }?.id
+    fun getDungeonById(id: Int) = dungeons[id]
+    fun getMaxDungeonId() = dungeons.keys.max() ?: -1
 }

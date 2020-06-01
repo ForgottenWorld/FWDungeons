@@ -21,12 +21,9 @@ class CommandFWDungeons : CommandExecutor {
                 return true
             }
 
-            if (commandBindings.containsKey(args[0]) &&
-                    commandBindings[args[0]]?.containsKey(args[1]) == true) {
-                return commandBindings[args[0]]?.get(args[1])?.invoke(sender, command, label, args)!!
-            }
-
-            return false
+            return commandBindings[args[0]]?.get(args[1])?.let {
+                it(sender, command, label, args)
+            } ?: false
         }
 
         return false
