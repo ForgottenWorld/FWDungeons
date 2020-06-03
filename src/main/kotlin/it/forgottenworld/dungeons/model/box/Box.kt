@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.util.BlockIterator
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
+import kotlin.random.Random
 
 class Box {
     var origin : BlockVector
@@ -73,8 +74,27 @@ class Box {
 
     fun withOrigin(origin: BlockVector) : Box = Box(origin, width, height, depth)
 
+    fun randomLocationOnFloor() =
+        Location(getWorld(ConfigManager.dungeonWorld),
+                Random.nextDouble(origin.x, origin.x + width),
+                origin.y,
+                Random.nextDouble(origin.z, origin.z + depth))
+
     fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) =
             Box(this.origin.clone().subtract(oldContainerOrigin).add(newOrigin).toBlockVector(), width, height, depth)
+
+    fun getAllBlocks(): Set<Block> {
+        val blocks = mutableSetOf<Block>()
+        val world = getWorld(ConfigManager.dungeonWorld)
+        for (x in 0..width) {
+            for (y in 0..height) {
+                for (z in 0..depth) {
+                    blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
+                }
+            }
+        }
+        return blocks
+    }
 
     fun highlightFrame() {
         val world = getWorld(ConfigManager.dungeonWorld) ?: return

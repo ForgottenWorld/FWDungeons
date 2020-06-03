@@ -39,4 +39,10 @@ class Dungeon(val id: Int) {
         if (activeAreas.isEmpty()) res += "at least one active area, "
         return res.dropLast(2)
     }
+
+    fun getActiveAreaById(id: Int): ActiveArea? =
+            activeAreas.find { it.id == id }
+
+    fun getTriggerById(id: Int): Trigger? =
+            triggers.find { it.id == id }
 }

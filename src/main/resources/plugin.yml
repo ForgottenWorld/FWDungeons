@@ -40,6 +40,9 @@ permissions:
   fwdungeonsedit.dungeon.writeout:
     description: Allows the player to use /fwdungeonsedit dungeon writeout
     default: op
+  fwdungeonsedit.dungeon.discard:
+    description: Allows the player to use /fwdungeonsedit dungeon discard
+    default: op
   fwdungeonsedit.trigger.pos1:
     description: Allows the player to use /fwdungeonsedit trigger pos1
     default: op

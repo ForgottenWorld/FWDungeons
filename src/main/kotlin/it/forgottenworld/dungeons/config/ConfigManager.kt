@@ -5,7 +5,9 @@ import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.trigger.Trigger
+import it.forgottenworld.dungeons.utils.parseEffectCode
 import it.forgottenworld.dungeons.utils.toVector
+import org.bukkit.Material
 import org.bukkit.configuration.InvalidConfigurationException
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -63,7 +65,7 @@ object ConfigManager {
                                                                 conf.getInt("triggers.$k.depth")
                                                         ),
                                                         { p ->
-                                                            parseEffectFromConfig(p, conf.getString("triggers.$k.effect")!!)},
+                                                            parseEffectFromConfig(p, this, conf.getString("triggers.$k.effect")!!)},
                                                         conf.getBoolean("triggers.$k.requiresWholeParty")
                                                 )
                                             }
@@ -79,7 +81,8 @@ object ConfigManager {
                                                                 conf.getInt("activeAreas.$k.width"),
                                                                 conf.getInt("activeAreas.$k.height"),
                                                                 conf.getInt("activeAreas.$k.depth")
-                                                        )
+                                                        ),
+                                                        conf.getObject("activeAreas.$k.startingMaterial", Material::class.java) ?: Material.AIR
                                                 )
                                             }
                             )
@@ -121,6 +124,7 @@ object ConfigManager {
                     set("activeAreas.${it.id}.width", it.box.width)
                     set("activeAreas.${it.id}.height", it.box.height)
                     set("activeAreas.${it.id}.depth", it.box.depth)
+                    set("activeAreas.${it.id}.startingMaterial", it.startingMaterial)
                 }
                 save(file)
             }
@@ -131,7 +135,7 @@ object ConfigManager {
         }
     }
 
-    private fun parseEffectFromConfig(player: Player, code: String) {
-
+    private fun parseEffectFromConfig(player: Player, dungeon: Dungeon, code: String) {
+        parseEffectCode(player, dungeon, code.split(";").map{ it.trim() })
     }
 }

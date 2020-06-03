@@ -33,5 +33,6 @@ class DungeonInstance(
         resolvedTriggers.forEach{
             resolvedTriggers[it.key] = false
         }
+        activeAreas.forEach { it.fillWithMaterial(it.startingMaterial) }
     }
 }

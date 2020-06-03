@@ -16,7 +16,8 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
                 "instadd" to ::cmdDungeonInstanceAdd,
                 "instremove" to ::cmdDungeonInstanceRemove,
                 "writeout" to ::cmdDungeonWriteOut,
-                "setstart" to ::cmdDungeonSetStart
+                "setstart" to ::cmdDungeonSetStart,
+                "discard" to ::cmdDungeonDiscard
         )
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -166,6 +167,19 @@ fun cmdDungeonSetStart(sender: CommandSender, command: Command, label: String, a
                     -1 -> "You're not editing any dungeons"
                     -2 -> "Dungeon box should be set before adding a starting location"
                     -3 -> "You're outside of the dungeon box"
+                    else -> ""
+                })
+    }
+
+    return true
+}
+
+fun cmdDungeonDiscard(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        sender.sendMessage(
+                when (FWDungeonsEditController.playerDiscardDungeon(sender)) {
+                    0 -> "Dungeon discarded"
+                    -1 -> "You're not editing any dungeons"
                     else -> ""
                 })
     }

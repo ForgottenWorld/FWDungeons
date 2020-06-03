@@ -17,6 +17,9 @@ fun Player.getParty() : Party? =
             it.players.contains(this)
         }
 
+fun Block.getBlockVector() : BlockVector =
+        BlockVector(this.x, this.y, this.z)
+
 fun Player.idEquals(player: Player) =
         this.uniqueId == player.uniqueId
 
