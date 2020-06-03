@@ -10,10 +10,13 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
         mapOf(
                 "create" to ::cmdDungeonCreate,
                 "edit" to ::cmdDungeonEdit,
+                "name" to ::cmdDungeonName,
                 "pos1" to ::cmdDungeonPos1,
                 "pos2" to ::cmdDungeonPos2,
                 "instadd" to ::cmdDungeonInstanceAdd,
-                "instremove" to ::cmdDungeonInstanceRemove
+                "instremove" to ::cmdDungeonInstanceRemove,
+                "writeout" to ::cmdDungeonWriteOut,
+                "setstart" to ::cmdDungeonSetStart
         )
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -131,12 +134,39 @@ fun cmdDungeonName(sender: CommandSender, command: Command, label: String, args:
             sender.sendMessage("Not enough arguments: please provide a name")
         }
         sender.sendMessage(
-                when (FWDungeonsEditController.playerNameDungeon(sender, args[0])) {
+                when (FWDungeonsEditController.playerNameDungeon(sender, args.joinToString(" "))) {
                     0 -> "Dungeon name changed"
                     -1 -> "You're not editing any dungeons"
+                    -2 -> "Antoher dungeon with the same name already exists"
+                    -3 -> "Antoher dungeon with the same name is being created by someone"
                     else -> ""
                 }
         )
+    }
+
+    return true
+}
+
+fun cmdDungeonWriteOut(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        sender.sendMessage(
+                 FWDungeonsEditController.playerWriteOutDungeon(sender)
+        )
+    }
+
+    return true
+}
+
+fun cmdDungeonSetStart(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        sender.sendMessage(
+                when (FWDungeonsEditController.playerSetStartDungeon(sender)) {
+                    0 -> "Dungeon starting location set succesfully"
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "Dungeon box should be set before adding a starting location"
+                    -3 -> "You're outside of the dungeon box"
+                    else -> ""
+                })
     }
 
     return true

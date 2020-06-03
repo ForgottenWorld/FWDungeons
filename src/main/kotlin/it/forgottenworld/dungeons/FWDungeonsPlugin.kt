@@ -8,15 +8,20 @@ import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.event.listener.TriggerListener
 import org.bukkit.plugin.java.JavaPlugin
 import sun.security.krb5.Config
-
-var pluginInstance : FWDungeonsPlugin? = null
+import java.io.File
 
 class FWDungeonsPlugin : JavaPlugin() {
+    companion object {
+        lateinit var instance: FWDungeonsPlugin
+        lateinit var dataFolder: File
+    }
 
     override fun onEnable() {
         logger.info("Enabling FWDungeons...")
 
-        pluginInstance = this
+        instance = this
+        FWDungeonsPlugin.dataFolder = dataFolder
+        saveDefaultConfig()
         ConfigManager.loadConfig(config)
         ConfigManager.loadDungeonConfigs(dataFolder)
 
@@ -49,15 +54,16 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")
-        pluginInstance = null
     }
 
     private fun initTables() {
-            executeUpdate("CREATE TABLE IF NOT EXISTS fwdungeons.fwd_dungeons (\n" +
+            executeUpdate("CREATE TABLE IF NOT EXISTS fwdungeons.fwd_instance_locations (\n" +
                             "  id INT NOT NULL AUTO_INCREMENT,\n" +
-                            "  name VARCHAR(60) NOT NULL,\n" +
-                            "  PRIMARY KEY (id),\n" +
-                            "  UNIQUE INDEX name_UNIQUE (name ASC) VISIBLE);\n")
+                            "  dungeon_id INT NOT NULL,\n" +
+                            "  x INT NOT NULL,\n" +
+                            "  y INT NOT NULL,\n" +
+                            "  z INT NOT NULL,\n" +
+                            "  PRIMARY KEY (id));")
     }
 
 }

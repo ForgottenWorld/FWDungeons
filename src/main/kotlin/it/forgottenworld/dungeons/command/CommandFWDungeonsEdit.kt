@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command
 
+import it.forgottenworld.dungeons.command.edit.activeAreaCmdBindings
 import it.forgottenworld.dungeons.command.edit.dungeonCmdBindings
 import it.forgottenworld.dungeons.command.edit.triggerCmdBindings
 import org.bukkit.command.Command
@@ -12,13 +13,14 @@ class CommandFWDungeonsEdit : CommandExecutor {
 
     private val commandBindings = mapOf(
             "dungeon" to dungeonCmdBindings,
-            "trigger" to triggerCmdBindings
+            "trigger" to triggerCmdBindings,
+            "activearea" to activeAreaCmdBindings
     )
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean{
 
         if (sender is Player) {
-            if (!sender.hasPermission("fwdungeonsedit.command.${args[0]}.${args[1]}")) {
+            if (!sender.hasPermission("fwdungeonsedit.${args[0]}.${args[1]}")) {
                 sender.sendMessage("You don't have permission to use this command.")
                 return true
             }

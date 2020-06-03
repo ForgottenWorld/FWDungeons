@@ -16,7 +16,7 @@ class CommandFWDungeons : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean{
 
         if (sender is Player) {
-            if (!sender.hasPermission("fwdungeons.command.${args[0]}.${args[1]}")) {
+            if (!sender.hasPermission("fwdungeons.${args[0]}.${args[1]}")) {
                 sender.sendMessage("You don't have permission to use this command.")
                 return true
             }

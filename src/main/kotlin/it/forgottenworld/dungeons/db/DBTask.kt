@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.db
 
-import it.forgottenworld.dungeons.pluginInstance
+import it.forgottenworld.dungeons.FWDungeonsPlugin
 import org.bukkit.Bukkit.getLogger
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -48,26 +48,22 @@ private class DBTask(
 fun executeQuery(sql: String,
                  vararg parameters: Any,
                  callback: (ResultSet) -> Unit) {
-    pluginInstance ?: return
     DBHandler.connect()?.let {
-        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(pluginInstance!!)
+        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(FWDungeonsPlugin.instance!!)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
 fun executeUpdate(sql: String,
                  vararg parameters: Any,
                  callback: (Int) -> Unit) {
-
-    pluginInstance ?: return
     DBHandler.connect()?.let {
-        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(pluginInstance!!)
+        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(FWDungeonsPlugin.instance!!)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
 fun executeUpdate(sql: String,
                   vararg parameters: Any) {
-    pluginInstance ?: return
     DBHandler.connect()?.let {
-        DBTask(it,false, sql, parameters, null, { }).runTaskAsynchronously(pluginInstance!!)
+        DBTask(it,false, sql, parameters, null, { }).runTaskAsynchronously(FWDungeonsPlugin.instance!!)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }

@@ -1,5 +1,6 @@
 name: FWDungeons
 version: "0.1"
+api-version: "1.15"
 description: Create dungeons in your minecraft server
 main: it.forgottenworld.dungeons.FWDungeonsPlugin
 commands:
@@ -9,33 +10,45 @@ commands:
     aliases: [fwdungeons,fwd]
   fwdungeonsedit:
     description: Access FWDungeons functions.
-    usage: /fwdungeonsedit [dungeon [create id|edit id|name name|pos1|pos2|instadd|instremove]|trigger [pos1|pos2]]
+    usage: /fwdungeonsedit [dungeon [create id|edit id|name name|pos1|pos2|instadd|instremove]|trigger [pos1|pos2]|activearea [pos1|pos2]]
     aliases: [fwdungeonsedit,fwde]
 permissions:
-  fwdungeonsedit.command.dungeon.create:
+  fwdungeonsedit.dungeon.create:
     description: Allows the player to use /fwdungeonsedit dungeon create
     default: op
-  fwdungeonsedit.command.dungeon.edit:
+  fwdungeonsedit.dungeon.edit:
     description: Allows the player to use /fwdungeonsedit dungeon edit
     default: op
-  fwdungeonsedit.command.dungeon.pos1:
+  fwdungeonsedit.dungeon.pos1:
     description: Allows the player to use /fwdungeonsedit dungeon pos1
     default: op
-  fwdungeonsedit.command.dungeon.pos2:
+  fwdungeonsedit.dungeon.pos2:
     description: Allows the player to use /fwdungeonsedit dungeon pos2
     default: op
-  fwdungeonsedit.command.dungeon.instadd:
-    description: Allows the player to use /fwdungeonsedit dungeon instadd
+  fwdungeonsedit.dungeon.setstart:
+    description: Allows the player to use /fwdungeonsedit dungeon setstart
     default: op
-  fwdungeonsedit.command.dungeon.instremove:
-    description: Allows the player to use /fwdungeonsedit dungeon instremove
-    default: op
-  fwdungeonsedit.command.dungeon.name:
+  fwdungeonsedit.dungeon.name:
     description: Allows the player to use /fwdungeonsedit dungeon name
     default: op
-  fwdungeonsedit.command.trigger.pos1:
+  fwdungeonsedit.dungeon.instadd:
+    description: Allows the player to use /fwdungeonsedit dungeon instadd
+    default: op
+  fwdungeonsedit.dungeon.instremove:
+    description: Allows the player to use /fwdungeonsedit dungeon instremove
+    default: op
+  fwdungeonsedit.dungeon.writeout:
+    description: Allows the player to use /fwdungeonsedit dungeon writeout
+    default: op
+  fwdungeonsedit.trigger.pos1:
     description: Allows the player to use /fwdungeonsedit trigger pos1
     default: op
-  fwdungeonsedit.command.trigger.pos2:
+  fwdungeonsedit.trigger.pos2:
+    description: Allows the player to use /fwdungeonsedit trigger pos2
+    default: op
+  fwdungeonsedit.activearea.pos1:
+    description: Allows the player to use /fwdungeonsedit trigger pos1
+    default: op
+  fwdungeonsedit.activearea.pos2:
     description: Allows the player to use /fwdungeonsedit trigger pos2
     default: op
