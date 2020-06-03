@@ -4,10 +4,11 @@ import it.forgottenworld.dungeons.command.edit.dungeonCmdBindings
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 
 
-class CommandFWDungeons : CommandExecutor {
+class CommandFWDungeons : CommandExecutor, TabExecutor {
 
     private val commandBindings = mapOf(
             "dungeon" to dungeonCmdBindings
@@ -29,4 +30,14 @@ class CommandFWDungeons : CommandExecutor {
         return false
     }
 
+    override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<String>): List<String>? {
+        return if (cmd.name.equals("fwdungeons", true) && sender is Player) {
+            when (args.count()) {
+                0 -> commandBindings.keys.toList()
+                1 -> commandBindings.keys.filter { it.startsWith(args[0], true) }
+                2 -> commandBindings[args[0]]?.keys?.filter { it.startsWith(args[1], true) }
+                else -> null
+            }
+        } else null
+    }
 }
