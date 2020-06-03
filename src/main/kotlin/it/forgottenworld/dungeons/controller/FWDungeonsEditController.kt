@@ -8,7 +8,10 @@ import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.minBlockVector
+import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import it.forgottenworld.dungeons.utils.toVector
+import org.bukkit.Location
+import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
@@ -82,12 +85,9 @@ object FWDungeonsEditController {
 
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
-        var newBlock: Block? = null
+        var wipOrigin: BlockVector? = null
         if (wipDungeonOrigins[player.uniqueId]?.let {
-                    newBlock = block.world.getBlockAt(
-                            block.location.subtract(
-                                    it.toVector())
-                    )
+                    wipOrigin = it
                     dungeon.box.withOrigin(it).containsBlock(block)
 
                 } != true) {
@@ -100,17 +100,17 @@ object FWDungeonsEditController {
                     Trigger(
                             id,
                             dungeon,
-                            Box(newBlock!!, p2),
+                            Box(block, p2).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
                             {},
                             false
                     ).apply {
-                        box.highlightAll()
+                        box.withContainerOrigin(BlockVector(0,0,0), wipOrigin!!).highlightAll()
                     }
             )
             wipTriggerPos2s.remove(player.uniqueId)
             id //return the trigger id
         } ?: ({
-            wipTriggerPos1s[player.uniqueId] = newBlock!!
+            wipTriggerPos1s[player.uniqueId] = block
             -2 //other position still needs to be selected
         })()
     }
@@ -120,12 +120,9 @@ object FWDungeonsEditController {
 
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
-        var newBlock: Block? = null
+        var wipOrigin: BlockVector? = null
         if (wipDungeonOrigins[player.uniqueId]?.let {
-                    newBlock = block.world.getBlockAt(
-                            block.location.subtract(
-                                    it.toVector())
-                    )
+                    wipOrigin = it
                     dungeon.box.withOrigin(it).containsBlock(block)
                 } != true) {
             return -4 //target is outside of dungeon box
@@ -138,17 +135,17 @@ object FWDungeonsEditController {
                     Trigger(
                             id,
                             dungeon,
-                            Box(p1, newBlock!!),
+                            Box(p1, block).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
                             {},
                             false
                     ).apply {
-                        box.highlightAll()
+                        box.withContainerOrigin(BlockVector(0,0,0),wipOrigin!!).highlightAll()
                     }
             )
             wipTriggerPos1s.remove(player.uniqueId)
             id //return the trigger id
         } ?: ({
-            wipTriggerPos2s[player.uniqueId] = newBlock!!
+            wipTriggerPos2s[player.uniqueId] = block
             -2 //other position still needs to be selected
         })()
     }

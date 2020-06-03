@@ -31,6 +31,7 @@ fun cmdDungeonEdit(sender: CommandSender, command: Command, label: String, args:
     if (sender is Player) {
         if (args.count() == 0) {
             sender.sendMessage("Not enough arguments: please provide a dungeon id")
+            return true
         }
 
         val id = args[0].toIntOrNull()

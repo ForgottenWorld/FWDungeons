@@ -1,6 +1,8 @@
 package it.forgottenworld.dungeons.model.box
 
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.model.trigger.Trigger
+import it.forgottenworld.dungeons.utils.minBlockVector
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import org.bukkit.Bukkit.getWorld
 import org.bukkit.Location
@@ -29,20 +31,30 @@ class Box {
 
     constructor(block1: Block, block2: Block) {
         val locs = listOf(block1.location, block2.location)
-        this.origin = BlockVector()
+        this.origin = minBlockVector(block1, block2)
         this.width = locs.map { it.blockX }.sorted().let {
-            this.origin.x = it[0].toDouble()
             it[1] - it[0] + 1
         }
         this.height = locs.map { it.blockY }.sorted().let {
-            this.origin.y = it[0].toDouble()
             it[1] - it[0] + 1
         }
         this.depth = locs.map { it.blockZ }.sorted().let {
-            this.origin.z = it[0].toDouble()
             it[1] - it[0] + 1
         }
-        origin = BlockVector(block1.location.toVector())
+    }
+
+    constructor(blockVector1: BlockVector, blockVector2: BlockVector) {
+        val locs = listOf(blockVector1, blockVector2)
+        this.origin = minBlockVector(blockVector1, blockVector2)
+        this.width = locs.map { it.blockX }.sorted().let {
+            it[1] - it[0] + 1
+        }
+        this.height = locs.map { it.blockY }.sorted().let {
+            it[1] - it[0] + 1
+        }
+        this.depth = locs.map { it.blockZ }.sorted().let {
+            it[1] - it[0] + 1
+        }
     }
 
     fun containsPlayer(player: Player) = player.location.let {
@@ -61,12 +73,15 @@ class Box {
 
     fun withOrigin(origin: BlockVector) : Box = Box(origin, width, height, depth)
 
+    fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) =
+            Box(this.origin.clone().subtract(oldContainerOrigin).add(newOrigin).toBlockVector(), width, height, depth)
+
     fun highlightFrame() {
         val world = getWorld(ConfigManager.dungeonWorld) ?: return
 
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                for (z in 0 until depth) {
+        for (x in 0..width) {
+            for (y in 0..height) {
+                for (z in 0..depth) {
                     var c = 0
                     if (x == origin.blockX || x == origin.blockX + width - 1) ++c
                     if (y == origin.blockY || y == origin.blockY + height - 1) ++c
@@ -74,7 +89,7 @@ class Box {
                     if (c > 1)
                         repeatedlySpawnParticles(
                                 Particle.COMPOSTER,
-                                Location(world, x.toDouble(), y.toDouble(), z.toDouble()),
+                                Location(world, origin.x + x.toDouble(), origin.y + y.toDouble(), origin.z + z.toDouble()),
                                 100,
                                 10,
                                 20
@@ -87,15 +102,15 @@ class Box {
     fun highlightAll() {
         val world = getWorld(ConfigManager.dungeonWorld) ?: return
 
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                for (z in 0 until depth) {
+        for (x in 0..width) {
+            for (y in 0..height) {
+                for (z in 0..depth) {
                     repeatedlySpawnParticles(
                             Particle.COMPOSTER,
-                            Location(world, x.toDouble(), y.toDouble(), z.toDouble()),
+                            Location(world, origin.x + x.toDouble(), origin.y + y.toDouble(), origin.z + z.toDouble()),
                             100,
-                            10,
-                            20
+                            20,
+                            10
                     )
                 }
             }
