@@ -1,11 +1,12 @@
 package it.forgottenworld.dungeons.command
 
-import it.forgottenworld.dungeons.command.edit.dungeonCmdBindings
+import it.forgottenworld.dungeons.command.play.dungeonCmdBindings
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
+import org.bukkit.util.ChatPaginator
 
 
 class CommandFWDungeons : CommandExecutor, TabExecutor {
@@ -15,15 +16,16 @@ class CommandFWDungeons : CommandExecutor, TabExecutor {
     )
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean{
+        if (args.count() < 2) return false
 
         if (sender is Player) {
-            if (!sender.hasPermission("fwdungeons.${args[0]}.${args[1]}")) {
+            if (!sender.hasPermission("fwdungeons.${args[0]}${args[1]}")) {
                 sender.sendMessage("You don't have permission to use this command.")
                 return true
             }
 
             return commandBindings[args[0]]?.get(args[1])?.let {
-                it(sender, command, label, args)
+                it(sender, command, label, args.sliceArray(IntRange(2, args.lastIndex)))
             } ?: false
         }
 

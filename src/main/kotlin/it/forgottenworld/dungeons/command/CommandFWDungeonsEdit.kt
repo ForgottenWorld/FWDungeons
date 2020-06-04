@@ -16,6 +16,7 @@ class CommandFWDungeonsEdit : CommandExecutor, TabExecutor {
     )
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+        if (args.count() < 2) return false
 
         if (sender is Player) {
             if (!sender.hasPermission("fwdungeonsedit.${args[0]}.${args[1]}")) {
@@ -25,11 +26,9 @@ class CommandFWDungeonsEdit : CommandExecutor, TabExecutor {
 
             if (commandBindings.containsKey(args[0]) &&
                     commandBindings[args[0]]?.containsKey(args[1]) == true) {
-                 return commandBindings[args[0]]?.get(args[1])?.invoke(
-                         sender,
-                         command,
-                         label,
-                         args.sliceArray(IntRange(2, args.lastIndex)))!!
+                return commandBindings[args[0]]?.get(args[1])?.let {
+                    it(sender, command, label, args.sliceArray(IntRange(2, args.lastIndex)))
+                } ?: false
             }
 
             return false

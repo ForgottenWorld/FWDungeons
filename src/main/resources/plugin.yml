@@ -64,3 +64,6 @@ permissions:
   fwdungeonsedit.activearea.pos2:
     description: Allows the player to use /fwdungeonsedit trigger pos2
     default: op
+  fwdungeons.dungeon.list:
+    description: Allows the player to use /fwdungeons dungeon list
+    default: op

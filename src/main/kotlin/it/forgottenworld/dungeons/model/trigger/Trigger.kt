@@ -11,7 +11,7 @@ class Trigger(
         val id: Int,
         val dungeon: Dungeon,
         val box: Box,
-        val effect: (Player) -> Unit,
+        val effect: () -> Unit,
         val requiresWholeParty: Boolean = false) {
 
     val playersCurrentlyInside = mutableListOf<Player>()

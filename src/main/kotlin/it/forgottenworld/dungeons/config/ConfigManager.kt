@@ -50,10 +50,14 @@ object ConfigManager {
                                         conf.getInt("depth")
                                 ),
                                 conf.getVector("startingLocation")!!.toBlockVector(),
+                                {},
                                 mutableListOf(),
                                 mutableListOf(),
                                 mutableListOf()
                         ).apply {
+                            startingEffect = { parseEffectCode(
+                                    this,
+                                    conf.getString("startingEffect")!!.split(";").map{ it.trim() }) }
                             triggers.addAll(
                                     conf.getConfigurationSection("triggers")
                                     !!.getKeys(false)
@@ -67,9 +71,7 @@ object ConfigManager {
                                                                 conf.getInt("triggers.$k.height"),
                                                                 conf.getInt("triggers.$k.depth")
                                                         ),
-                                                        { p ->
-                                                            parseEffectCode(p,
-                                                                    this,
+                                                        { parseEffectCode(this,
                                                                     conf.getString("triggers.$k.effect")!!.split(";").map{ it.trim() })},
                                                         conf.getBoolean("triggers.$k.requiresWholeParty")
                                                 )
@@ -91,6 +93,7 @@ object ConfigManager {
                                                 )
                                             }
                             )
+                            FWDungeonsController.activeDungeons[id] = true
                         }
             } catch (e : Exception) {
                 e.printStackTrace()
@@ -116,6 +119,8 @@ object ConfigManager {
                 set("height", dungeon.box.height)
                 set("depth", dungeon.box.depth)
                 set("startingLocation", dungeon.startingLocation.toVector())
+                if (eraseEffects)
+                    set("startingEffect", "")
                 dungeon.triggers.forEach {
                     set("triggers.${it.id}.id", it.id)
                     set("triggers.${it.id}.origin", it.origin.toVector())

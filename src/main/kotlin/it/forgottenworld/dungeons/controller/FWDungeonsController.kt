@@ -7,6 +7,7 @@ import java.util.*
 
 object FWDungeonsController {
     val dungeons = mutableMapOf<Int, Dungeon>()
+    val activeDungeons = mutableMapOf<Int, Boolean>()
     val parties = mutableMapOf<Int, Party>()
     val playersTriggering = mutableMapOf<UUID, Trigger>()
 

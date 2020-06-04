@@ -35,6 +35,7 @@ object FWDungeonsEditController {
             if (dungeonEditors.containsValue(d))
                 false
             else {
+                playerDiscardDungeon(player)
                 dungeonEditors[player.uniqueId] = d
                 true
             }
@@ -104,10 +105,9 @@ object FWDungeonsEditController {
                             box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
                             {},
                             false
-                    ).apply {
-                        box.highlightAll()
-                    }
+                    )
             )
+            box.highlightAll()
             wipTriggerPos2s.remove(player.uniqueId)
             id //return the trigger id
         } ?: ({
@@ -132,17 +132,17 @@ object FWDungeonsEditController {
 
         return wipTriggerPos1s[player.uniqueId]?.let { p1 ->
             val id = (dungeon.triggers.maxBy { it.id }?.id?.plus(1)) ?: 0
+            val box = Box(p1, block)
             dungeon.triggers.add(
                     Trigger(
                             id,
                             dungeon,
-                            Box(p1, block).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
+                            box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
                             {},
                             false
-                    ).apply {
-                        box.withContainerOrigin(BlockVector(0,0,0),wipOrigin!!).highlightAll()
-                    }
+                    )
             )
+            box.highlightAll()
             wipTriggerPos1s.remove(player.uniqueId)
             id //return the trigger id
         } ?: ({
@@ -166,12 +166,14 @@ object FWDungeonsEditController {
 
         return wipActiveAreaPos2s[player.uniqueId]?.let { p2 ->
             val id = (dungeon.activeAreas.maxBy { it.id }?.id?.plus(1)) ?: 0
+            val box = Box(block, p2)
             dungeon.activeAreas.add(
                     ActiveArea(
                             id,
                             Box(block, p2).withContainerOrigin(wipOrigin!!, BlockVector(0,0,0))
                     )
             )
+            box.highlightAll()
             wipActiveAreaPos2s.remove(player.uniqueId)
             id //return the trigger id
         } ?: ({
@@ -195,12 +197,14 @@ object FWDungeonsEditController {
 
         return wipActiveAreaPos1s[player.uniqueId]?.let { p1 ->
             val id = (dungeon.activeAreas.maxBy { it.id }?.id?.plus(1)) ?: 0
+            val box = Box(p1, block)
             dungeon.activeAreas.add(
                     ActiveArea(
                             id,
                             Box(p1, block).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0))
                     )
             )
+            box.highlightAll()
             wipActiveAreaPos1s.remove(player.uniqueId)
             id //return the trigger id
         } ?: ({

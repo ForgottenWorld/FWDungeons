@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.utils
 
+import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import org.bukkit.Bukkit.*
@@ -11,11 +12,11 @@ const val CODE_SPAWN_MOB = "spawn"
 const val CODE_FILL_ACTIVE_AREA = "fill"
 const val CODE_EXECUTE_COMMAND = "exec"
 
-fun parseEffectCode(player: Player, dungeon: Dungeon, lines: List<String>) {
+fun parseEffectCode(dungeon: Dungeon, lines: List<String>) {
     lines.forEach { line ->
         val sl = line.split(" ")
         when (sl.first()) {
-            CODE_SPAWN_MOB -> player.world.spawnEntity(
+            CODE_SPAWN_MOB -> getWorld(ConfigManager.dungeonWorld)!!.spawnEntity(
                     dungeon.getActiveAreaById(sl[1].toInt())!!.box.randomLocationOnFloor(),
                     EntityType.valueOf(sl[2])
             )

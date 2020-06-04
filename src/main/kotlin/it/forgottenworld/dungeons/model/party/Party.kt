@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 class Party(
         val id: Int,
         val players: MutableList<Player> = mutableListOf(),
+        val leader: Player,
         val instance: DungeonInstance
 ) {
     var inGame = false
