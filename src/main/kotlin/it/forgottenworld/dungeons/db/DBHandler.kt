@@ -7,8 +7,6 @@ import java.sql.SQLException
 
 
 object DBHandler {
-
-
     private var connection: Connection? = null
     private lateinit var host: String
     private lateinit var database: String
@@ -34,7 +32,7 @@ object DBHandler {
             Class.forName("com.mysql.jdbc.Driver")
             connection =
                     DriverManager.getConnection(
-                            "jdbc:mysql://${DBHandler.host}:${DBHandler.port}/${DBHandler.database}",
+                            "jdbc:mysql://${DBHandler.host}:${DBHandler.port}/${DBHandler.database}?autoReconnect=true&useSSL=false",
                             DBHandler.username,
                             DBHandler.password)
         }

@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.command.edit
 
 import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.utils.getTargetBlock
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -17,7 +18,10 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
                 "instremove" to ::cmdDungeonInstanceRemove,
                 "writeout" to ::cmdDungeonWriteOut,
                 "setstart" to ::cmdDungeonSetStart,
-                "discard" to ::cmdDungeonDiscard
+                "discard" to ::cmdDungeonDiscard,
+                "difficulty" to ::cmdDungeonDifficulty,
+                "description" to ::cmdDungeonDescription,
+                "players" to ::cmdDungeonNumberOfPlayers
         )
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -134,9 +138,10 @@ fun cmdDungeonName(sender: CommandSender, command: Command, label: String, args:
     if (sender is Player) {
         if (args.count() == 0) {
             sender.sendMessage("Not enough arguments: please provide a name")
+            return true
         }
         sender.sendMessage(
-                when (FWDungeonsEditController.playerNameDungeon(sender, args.joinToString(" "))) {
+                when (FWDungeonsEditController.playerSetNameDungeon(sender, args.joinToString(" "))) {
                     0 -> "Dungeon name changed"
                     -1 -> "You're not editing any dungeons"
                     -2 -> "Antoher dungeon with the same name already exists"
@@ -144,6 +149,76 @@ fun cmdDungeonName(sender: CommandSender, command: Command, label: String, args:
                     else -> ""
                 }
         )
+    }
+
+    return true
+}
+
+fun cmdDungeonDescription(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        if (args.count() == 0) {
+            sender.sendMessage("Not enough arguments: please provide a description")
+            return true
+        }
+        sender.sendMessage(
+                when (FWDungeonsEditController.playerSetDescriptionDungeon(sender, args.joinToString(" "))) {
+                    0 -> "Dungeon description changed"
+                    -1 -> "You're not editing any dungeons"
+                    else -> ""
+                }
+        )
+    }
+
+    return true
+}
+
+fun cmdDungeonDifficulty(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        if (args.count() == 0) {
+            sender.sendMessage("Not enough arguments: please provide a difficulty")
+            return true
+        }
+
+        Dungeon.Difficulty.values().map { it.toString() }.let {
+            if (!it.contains(args[0].toLowerCase())) {
+                sender.sendMessage("Invalid argument, possible arguments: ${it.joinToString(", ")}")
+                return true
+            }
+
+            sender.sendMessage(
+                    when (FWDungeonsEditController.playerSetDifficultyDungeon(sender, Dungeon.Difficulty.fromString(args[0].toLowerCase())!!)) {
+                        0 -> "Dungeon difficulty changed"
+                        -1 -> "You're not editing any dungeons"
+                        else -> ""
+                    }
+            )
+        }
+    }
+
+    return true
+}
+
+fun cmdDungeonNumberOfPlayers(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        if (args.count() < 2) {
+            sender.sendMessage("Not enough arguments: please provide minimum and maximum players")
+            return true
+        }
+
+        val r1 = args[0].toIntOrNull()
+        val r2 = args[1].toIntOrNull()
+        if (r1 == null || r2 == null) {
+            sender.sendMessage("Please minimum and maximum players as integers")
+            return true
+        } else {
+            sender.sendMessage(
+                    when (FWDungeonsEditController.playerSetNumberOfPlayersDungeon(sender, IntRange(r1, r2))) {
+                        0 -> "Dungeon number of players changed"
+                        -1 -> "You're not editing any dungeons"
+                        else -> ""
+                    }
+            )
+        }
     }
 
     return true

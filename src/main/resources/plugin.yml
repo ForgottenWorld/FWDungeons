@@ -28,6 +28,15 @@ permissions:
   fwdungeonsedit.dungeon.setstart:
     description: Allows the player to use /fwdungeonsedit dungeon setstart
     default: op
+  fwdungeonsedit.dungeon.difficulty:
+    description: Allows the player to use /fwdungeonsedit dungeon difficulty
+    default: op
+  fwdungeonsedit.dungeon.description:
+    description: Allows the player to use /fwdungeonsedit dungeon description
+    default: op
+  fwdungeonsedit.dungeon.players:
+    description: Allows the player to use /fwdungeonsedit dungeon players
+    default: op
   fwdungeonsedit.dungeon.name:
     description: Allows the player to use /fwdungeonsedit dungeon name
     default: op

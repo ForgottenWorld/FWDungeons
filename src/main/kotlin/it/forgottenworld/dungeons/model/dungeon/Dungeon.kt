@@ -7,22 +7,52 @@ import org.bukkit.util.BlockVector
 
 class Dungeon(val id: Int) {
     var name = ""
+    var description = ""
+    lateinit var difficulty: Difficulty
+    lateinit var numberOfPlayers: IntRange
     lateinit var box: Box
     lateinit var startingLocation: BlockVector
     var triggers = mutableListOf<Trigger>()
     var activeAreas = mutableListOf<ActiveArea>()
     var instances = mutableListOf<DungeonInstance>()
 
+    enum class Difficulty {
+        EASY, MEDIUM, HARD;
+
+        companion object {
+            fun fromString(value: String) =
+                 when (value) {
+                     "easy" -> EASY
+                     "medium" -> MEDIUM
+                     "hard" -> HARD
+                     else -> null
+                 }
+        }
+
+        override fun toString() =
+            when (this) {
+                EASY -> "easy"
+                MEDIUM -> "medium"
+                HARD -> "hard"
+            }
+    }
+
     fun hasBox() = ::box.isInitialized
 
     constructor(id: Int,
                 name: String,
+                description: String,
+                difficulty: Difficulty,
+                numberOfPlayers: IntRange,
                 box: Box,
                 startingLocation: BlockVector,
                 triggers: MutableList<Trigger>,
                 activeAreas: MutableList<ActiveArea>,
                 instances: MutableList<DungeonInstance>) : this(id) {
         this.name = name
+        this.description = description
+        this.difficulty = difficulty
+        this.numberOfPlayers = numberOfPlayers
         this.box = box
         this.startingLocation = startingLocation
         this.triggers = triggers
@@ -33,7 +63,9 @@ class Dungeon(val id: Int) {
     fun whatIsMissingForWriteout(): String {
         var res = ""
         if (name == "") res += "name, "
-        if (!::box.isInitialized) res += "box, "
+        if (!::difficulty.isInitialized) res += "difficulty, "
+        if (!::numberOfPlayers.isInitialized) res += "number of players, "
+        if (!hasBox()) res += "box, "
         if (!::startingLocation.isInitialized) res += "starting location, "
         if (triggers.isEmpty()) res += "at least one trigger, "
         if (activeAreas.isEmpty()) res += "at least one active area, "

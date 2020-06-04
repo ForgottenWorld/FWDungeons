@@ -40,6 +40,9 @@ object ConfigManager {
                         Dungeon(
                                 conf.getInt("id"),
                                 conf.getString("name")!!,
+                                conf.getString("description")!!,
+                                Dungeon.Difficulty.fromString(conf.getString("difficulty")!!)!!,
+                                conf.getIntegerList("numberOfPlayers").let{ IntRange(it.first(), it.last()) },
                                 Box(
                                         BlockVector(0,0,0),
                                         conf.getInt("width"),
@@ -65,7 +68,9 @@ object ConfigManager {
                                                                 conf.getInt("triggers.$k.depth")
                                                         ),
                                                         { p ->
-                                                            parseEffectFromConfig(p, this, conf.getString("triggers.$k.effect")!!)},
+                                                            parseEffectCode(p,
+                                                                    this,
+                                                                    conf.getString("triggers.$k.effect")!!.split(";").map{ it.trim() })},
                                                         conf.getBoolean("triggers.$k.requiresWholeParty")
                                                 )
                                             }
@@ -82,7 +87,7 @@ object ConfigManager {
                                                                 conf.getInt("activeAreas.$k.height"),
                                                                 conf.getInt("activeAreas.$k.depth")
                                                         ),
-                                                        conf.getObject("activeAreas.$k.startingMaterial", Material::class.java) ?: Material.AIR
+                                                        Material.getMaterial(conf.getString("activeAreas.$k.startingMaterial")!!) ?: Material.AIR
                                                 )
                                             }
                             )
@@ -93,7 +98,7 @@ object ConfigManager {
         }
     }
 
-    fun saveDungeonConfig(dataFolder: File, dungeon: Dungeon, generateEmptyEffects: Boolean = false) {
+    fun saveDungeonConfig(dataFolder: File, dungeon: Dungeon, eraseEffects: Boolean = false) {
         try {
             val dir = File(dataFolder, "dungeons")
             if (!dir.exists() && !dir.mkdir()) return
@@ -104,6 +109,9 @@ object ConfigManager {
                 load(file)
                 set("id", dungeon.id)
                 set("name", dungeon.name)
+                set("description", dungeon.description)
+                set("difficulty", dungeon.difficulty.toString())
+                set("numberOfPlayers", listOf(dungeon.numberOfPlayers.first, dungeon.numberOfPlayers.last))
                 set("width", dungeon.box.width)
                 set("height", dungeon.box.height)
                 set("depth", dungeon.box.depth)
@@ -114,7 +122,7 @@ object ConfigManager {
                     set("triggers.${it.id}.width", it.box.width)
                     set("triggers.${it.id}.height", it.box.height)
                     set("triggers.${it.id}.depth", it.box.depth)
-                    if (generateEmptyEffects)
+                    if (eraseEffects)
                         set("triggers.${it.id}.effect", "")
                     set("triggers.${it.id}.requiresWholeParty", it.requiresWholeParty)
                 }
@@ -124,7 +132,7 @@ object ConfigManager {
                     set("activeAreas.${it.id}.width", it.box.width)
                     set("activeAreas.${it.id}.height", it.box.height)
                     set("activeAreas.${it.id}.depth", it.box.depth)
-                    set("activeAreas.${it.id}.startingMaterial", it.startingMaterial)
+                    set("activeAreas.${it.id}.startingMaterial", it.startingMaterial.name)
                 }
                 save(file)
             }
@@ -133,9 +141,5 @@ object ConfigManager {
         } catch (e: InvalidConfigurationException) {
             e.printStackTrace()
         }
-    }
-
-    private fun parseEffectFromConfig(player: Player, dungeon: Dungeon, code: String) {
-        parseEffectCode(player, dungeon, code.split(";").map{ it.trim() })
     }
 }

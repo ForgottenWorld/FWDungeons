@@ -9,7 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable
 
 fun repeatedlySpawnParticles(
         particle: Particle,
-        location: Location,
+        locations: Set<Location>,
         count: Int,
         interval: Long,
         iterations: Int) {
@@ -17,11 +17,13 @@ fun repeatedlySpawnParticles(
     object : BukkitRunnable() {
         var i = 0
         override fun run() {
-            getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
-            world.spawnParticle(
-                    particle,
-                    location,
-                    count)
+            //getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
+            locations.forEach {
+                world.spawnParticle(
+                        particle,
+                        it,
+                        count)
+            }
             if (++i == iterations)
                 cancel()
         }

@@ -11,6 +11,7 @@ import it.forgottenworld.dungeons.utils.getBlockVector
 import it.forgottenworld.dungeons.utils.minBlockVector
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import it.forgottenworld.dungeons.utils.toVector
+import org.bukkit.Difficulty
 import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.block.Block
@@ -89,22 +90,22 @@ object FWDungeonsEditController {
         if (wipDungeonOrigins[player.uniqueId]?.let {
                     wipOrigin = it
                     dungeon.box.withOrigin(it).containsBlock(block)
-
                 } != true) {
             return -4 //target is outside of dungeon box
         }
 
         return wipTriggerPos2s[player.uniqueId]?.let { p2 ->
             val id = (dungeon.triggers.maxBy { it.id }?.id?.plus(1)) ?: 0
+            val box = Box(block, p2)
             dungeon.triggers.add(
                     Trigger(
                             id,
                             dungeon,
-                            Box(block, p2).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
+                            box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
                             {},
                             false
                     ).apply {
-                        box.withContainerOrigin(BlockVector(0,0,0), wipOrigin!!).highlightAll()
+                        box.highlightAll()
                     }
             )
             wipTriggerPos2s.remove(player.uniqueId)
@@ -168,7 +169,7 @@ object FWDungeonsEditController {
             dungeon.activeAreas.add(
                     ActiveArea(
                             id,
-                            Box(block, p2).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0))
+                            Box(block, p2).withContainerOrigin(wipOrigin!!, BlockVector(0,0,0))
                     )
             )
             wipActiveAreaPos2s.remove(player.uniqueId)
@@ -261,7 +262,7 @@ object FWDungeonsEditController {
         return id
     }
 
-    fun playerNameDungeon(player: Player, name: String) : Int {
+    fun playerSetNameDungeon(player: Player, name: String) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
         FWDungeonsController.dungeons.values.find {
@@ -272,6 +273,27 @@ object FWDungeonsEditController {
         }?.let { return -3 } //another dungeon with the same name is being created
 
         dungeon.name = name
+        return 0
+    }
+
+    fun playerSetDescriptionDungeon(player: Player, description: String) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        dungeon.description = description
+        return 0
+    }
+
+    fun playerSetDifficultyDungeon(player: Player, difficulty: Dungeon.Difficulty) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        dungeon.difficulty = difficulty
+        return 0
+    }
+
+    fun playerSetNumberOfPlayersDungeon(player: Player, numberOfPlayers: IntRange) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        dungeon.numberOfPlayers = numberOfPlayers
         return 0
     }
 

@@ -28,7 +28,7 @@ fun minBlockVector(blockVector1: BlockVector, blockVector2: BlockVector) : Block
 
 fun maxBlockVector(blockVector1: BlockVector, blockVector2: BlockVector) : BlockVector =
         BlockVector(
-                max(blockVector1.x.toInt(), blockVector2.x.toInt()),
-                max(blockVector1.y.toInt(), blockVector2.y.toInt()),
-                max(blockVector1.z.toInt(), blockVector2.z.toInt())
+                max(blockVector1.blockX, blockVector2.blockX),
+                max(blockVector1.blockY, blockVector2.blockY),
+                max(blockVector1.blockZ, blockVector2.blockZ)
         )
