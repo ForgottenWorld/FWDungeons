@@ -17,17 +17,17 @@ private fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked:
                     full -> "FULL"
                     else -> "JOIN"
                 }).apply {
-            color = when {
-                full -> ChatColor.RED
-                locked -> ChatColor.GOLD
-                else -> ChatColor.GREEN
-            }
-            if (!full && !locked)
-                clickEvent =
-                        ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/fwdungeons joininst ${instance.dungeon.id} ${instance.id} ${player.name}")
-        }
+                    color = when {
+                        full -> ChatColor.RED
+                        locked -> ChatColor.GOLD
+                        else -> ChatColor.GREEN
+                    }
+                    if (!full && !locked)
+                    clickEvent =
+                            ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/fwdungeons dungeon join ${instance.dungeon.id} ${instance.id}")
+                }
 
 private fun getPageClickable(text: String, page: Int) =
         TextComponent(text).apply {
@@ -56,7 +56,7 @@ fun getInteractiveDungeonList(player: Player, page: Int) =
     TextComponent().apply {
         if (page >= 0 && page <= FWDungeonsController.dungeons.count() - 1) {
             val d = FWDungeonsController.dungeons.values.toList()[page]
-            addExtra(TextComponent("====================[ FWDungeons ]====================\n\n").apply {
+            addExtra(TextComponent("====================[ ${ChatColor.DARK_PURPLE}FWDungeons${ChatColor.WHITE} ]====================\n\n").apply {
                 addExtra(getCarets(3))
                 addExtra("DUNGEON: ${d.name}\n")
                 addExtra(getCarets(3))
@@ -75,16 +75,17 @@ fun getInteractiveDungeonList(player: Player, page: Int) =
                     addExtra(getCarets(1))
                     addExtra("Room ${ii+1} | Leader: ")
                     addExtra(TextComponent(party?.leader?.name ?: "none")
-                            .apply { if (text != "none") color = ChatColor.GOLD })
-                    addExtra("    [ ")
-                    party?.let{ addExtra("  [ ${party.playerCount}/${party.maxPlayers} ]") }
+                            .apply { if (text != "none") color = ChatColor.LIGHT_PURPLE })
+                    addExtra("  [ ")
                     addExtra(getJoinClickable(
                             inst,
                             party == null,
                             party?.isLocked == true,
                             party?.isFull == true,
                             player))
-                    addExtra(" ]\n")
+                    addExtra(" ]")
+                    party?.let{ addExtra("  [ ${party.playerCount}/${party.maxPlayers} ]\n") }
+                            ?: addExtra("\n")
                 }
                 addExtra("\n".repeat(13 - d.instances.count() - ceil((d.description.length + 17) / 55.0).toInt()))
                 if (page > 0) {

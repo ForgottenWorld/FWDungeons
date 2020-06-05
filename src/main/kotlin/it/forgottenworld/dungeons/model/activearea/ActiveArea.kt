@@ -13,4 +13,8 @@ class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Mater
         }
     }
 
+    fun getRandomPositionOnFloor() {
+
+    }
+
 }

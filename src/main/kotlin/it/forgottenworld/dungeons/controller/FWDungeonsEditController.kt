@@ -243,8 +243,8 @@ object FWDungeonsEditController {
         ))
 
         executeUpdate(
-                "INSERT INTO fwd_instance_locations (dungeon_id, instance_id, x, y, z)\n" +
-                    "   VALUES (?, ?, ?, ?, ?);", dungeon.id, id, block.x, block.y, block.z)
+                "INSERT INTO fwd_instance_locations (dungeon_id, instance_id, x, y, z) VALUES (?, ?, ?, ?, ?);",
+                dungeon.id, id, block.x, block.y, block.z)
 
         return id
     }

@@ -2,7 +2,11 @@ name: FWDungeons
 version: "0.1"
 api-version: "1.15"
 description: Create dungeons in your minecraft server
+author: Shivs (OhMeMuffin)
 main: it.forgottenworld.dungeons.FWDungeonsPlugin
+softdepend:
+- Boss
+- MythicMobs
 commands:
   fwdungeons:
     description: Access FWDungeons functions.
@@ -66,4 +70,25 @@ permissions:
     default: op
   fwdungeons.dungeon.list:
     description: Allows the player to use /fwdungeons dungeon list
-    default: op
+    default: true
+  fwdungeons.dungeon.join:
+    description: Allows the player to use /fwdungeons dungeon join
+    default: true
+  fwdungeons.dungeon.invite:
+    description: Allows the player to use /fwdungeons dungeon list
+    default: true
+  fwdungeons.dungeon.leave:
+    description: Allows the player to use /fwdungeons dungeon leave
+    default: true
+  fwdungeons.dungeon.start:
+    description: Allows the player to use /fwdungeons dungeon start
+    default: true
+  fwdungeons.dungeon.escape:
+    description: Allows the player to use /fwdungeons dungeon escape
+    default: true
+  fwdungeons.dungeon.lock:
+    description: Allows the player to use /fwdungeons dungeon lock
+    default: true
+  fwdungeons.dungeon.unlock:
+    description: Allows the player to use /fwdungeons dungeon unlock
+    default: true

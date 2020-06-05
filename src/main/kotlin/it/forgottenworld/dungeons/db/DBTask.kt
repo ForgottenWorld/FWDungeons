@@ -21,12 +21,12 @@ private class DBTask(
             conn.prepareStatement(sql)?.let { s ->
                 parameters.forEachIndexed { i, it ->
                     when (it) {
-                        is String -> s.setString(i, it)
-                        is Int -> s.setInt(i, it)
-                        is Double -> s.setDouble(i, it)
-                        is Float -> s.setFloat(i, it)
-                        is Date -> s.setDate(i, it)
-                        is Boolean -> s.setBoolean(i, it)
+                        is String -> s.setString(i + 1, it)
+                        is Int -> s.setInt(i + 1, it)
+                        is Double -> s.setDouble(i + 1, it)
+                        is Float -> s.setFloat(i + 1, it)
+                        is Date -> s.setDate(i + 1, it)
+                        is Boolean -> s.setBoolean(i + 1, it)
                         else -> throw Exception("ERROR: DBTask.run() - Invalid parameter type")
                     }
                 }
@@ -49,7 +49,7 @@ fun executeQuery(sql: String,
                  vararg parameters: Any,
                  callback: (ResultSet) -> Unit) {
     DBHandler.connect()?.let {
-        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(FWDungeonsPlugin.instance!!)
+        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(FWDungeonsPlugin.instance)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
@@ -57,13 +57,13 @@ fun executeUpdate(sql: String,
                  vararg parameters: Any,
                  callback: (Int) -> Unit) {
     DBHandler.connect()?.let {
-        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(FWDungeonsPlugin.instance!!)
+        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(FWDungeonsPlugin.instance)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
 fun executeUpdate(sql: String,
                   vararg parameters: Any) {
     DBHandler.connect()?.let {
-        DBTask(it,false, sql, parameters, null, { }).runTaskAsynchronously(FWDungeonsPlugin.instance!!)
+        DBTask(it,false, sql, parameters, null, { }).runTaskAsynchronously(FWDungeonsPlugin.instance)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }

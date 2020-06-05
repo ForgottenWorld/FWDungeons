@@ -1,7 +1,6 @@
 package it.forgottenworld.dungeons.model.box
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.maxBlockVector
 import it.forgottenworld.dungeons.utils.minBlockVector
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
@@ -10,9 +9,7 @@ import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.util.BlockIterator
 import org.bukkit.util.BlockVector
-import org.bukkit.util.Vector
 import kotlin.random.Random
 
 class Box {
@@ -63,24 +60,25 @@ class Box {
 
     fun withOrigin(origin: BlockVector) : Box = Box(origin, width, height, depth)
 
-    fun randomLocationOnFloor() =
-        Location(getWorld(ConfigManager.dungeonWorld),
-                Random.nextDouble(origin.x, origin.x + width),
-                origin.y,
-                Random.nextDouble(origin.z, origin.z + depth))
-
-    fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) =
-            Box(BlockVector(
+    fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) = Box(
+            BlockVector(
                     origin.x - oldContainerOrigin.x + newOrigin.x,
                     origin.y - oldContainerOrigin.y + newOrigin.y,
-                    origin.z - oldContainerOrigin.z + newOrigin.z), width, height, depth)
+                    origin.z - oldContainerOrigin.z + newOrigin.z),
+            width, height, depth)
+
+    fun randomLocationOnFloor() = Location(
+            getWorld(ConfigManager.dungeonWorld),
+            Random.nextDouble(origin.x, origin.x + width),
+            origin.y,
+            Random.nextDouble(origin.z, origin.z + depth))
 
     fun getAllBlocks(): Set<Block> {
         val blocks = mutableSetOf<Block>()
         val world = getWorld(ConfigManager.dungeonWorld)
-        for (x in 0..width) {
-            for (y in 0..height) {
-                for (z in 0..depth) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                for (z in 0 until depth) {
                     blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
@@ -88,28 +86,51 @@ class Box {
         return blocks
     }
 
-    fun highlightFrame() {
-        val world = getWorld(ConfigManager.dungeonWorld) ?: return
-        val locs = mutableSetOf<Location>()
-
-        for (x in 0..width) {
-            for (y in 0..height) {
-                for (z in 0..depth) {
+    fun getFrontierBlocks() : Set<Block> {
+        val blocks = mutableSetOf<Block>()
+        val world = getWorld(ConfigManager.dungeonWorld)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                for (z in 0 until depth) {
                     var c = 0
                     if (x == origin.blockX || x == origin.blockX + width - 1) ++c
                     if (y == origin.blockY || y == origin.blockY + height - 1) ++c
                     if (z == origin.blockZ || z == origin.blockZ + depth - 1) ++c
                     if (c > 1)
-                        locs.add(
-                                Location(world, origin.x + x.toDouble(), origin.y + y.toDouble(), origin.z + z.toDouble()))
+                        blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
         }
+        return blocks
+    }
 
+    fun getFloorBlocks() : Set<Block> {
+        val blocks = mutableSetOf<Block>()
+        val world = getWorld(ConfigManager.dungeonWorld)
+        for (x in 0 until width) {
+            for (z in 0 until depth) {
+                blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY, origin.blockZ + z))
+            }
+        }
+        return blocks
+    }
+
+    fun getCeilingBlocks() : Set<Block> {
+        val blocks = mutableSetOf<Block>()
+        val world = getWorld(ConfigManager.dungeonWorld)
+        for (x in 0 until width) {
+            for (z in 0 until depth) {
+                blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + height - 1, origin.blockZ + z))
+            }
+        }
+        return blocks
+    }
+
+    fun highlightFrame() {
         repeatedlySpawnParticles(
                 Particle.COMPOSTER,
-                locs,
-                100,
+                getFrontierBlocks().map{ it.location }.toSet(),
+                1,
                 10,
                 20
         )

@@ -29,8 +29,6 @@ class DungeonInstance(
         }
     }
 
-    fun isInstanceBusy() = party != null
-
     fun resetInstance() {
         party = null
         resolvedTriggers.forEach{ resolvedTriggers[it.key] = false }

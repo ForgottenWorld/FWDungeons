@@ -21,11 +21,11 @@ fun repeatedlySpawnParticles(
             locations.forEach {
                 world.spawnParticle(
                         particle,
-                        it,
+                        it.clone().add(0.5,0.5,0.5),
                         count)
             }
             if (++i == iterations)
                 cancel()
         }
-    }.runTaskTimerAsynchronously(FWDungeonsPlugin.instance, 0L, interval)
+    }.runTaskTimer(FWDungeonsPlugin.instance, 0L, interval)
 }

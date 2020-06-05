@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.party.Party
 import org.bukkit.Location
 import org.bukkit.Material
@@ -14,9 +15,10 @@ fun Player.getTargetBlock() : Block? =
         this.getTargetBlock(null as Set<Material>?, 5)
 
 fun Player.getParty() : Party? =
-        FWDungeonsController.parties.values.find {
-            it.players.contains(this)
-        }
+        FWDungeonsController.playerParties[uniqueId]
+
+fun Player.getDungeonInstance() : DungeonInstance? =
+        FWDungeonsController.playerParties[uniqueId]?.instance
 
 fun Block.getBlockVector() : BlockVector =
         BlockVector(this.x, this.y, this.z)

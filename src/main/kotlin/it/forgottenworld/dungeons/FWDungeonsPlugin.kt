@@ -68,7 +68,7 @@ class FWDungeonsPlugin : JavaPlugin() {
     }
 
     private fun initTables() {
-        executeUpdate("CREATE TABLE fwd_instance_locations (\n" +
+        executeUpdate("CREATE TABLE IF NOT EXISTS fwd_instance_locations (\n" +
                 "id int NOT NULL AUTO_INCREMENT,\n" +
                 "dungeon_id int NOT NULL,\n" +
                 "instance_id int NOT NULL,\n" +
