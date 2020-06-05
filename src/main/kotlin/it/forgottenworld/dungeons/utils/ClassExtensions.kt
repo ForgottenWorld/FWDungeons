@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.model.party.Party
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -31,3 +32,9 @@ fun Iterable<Player>.findPlayerById(uuid: UUID) : Player? =
 
 fun BlockVector.toVector() : Vector =
         Vector(this.x, this.y, this.z)
+
+fun BlockVector.withRefSystemOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
+        BlockVector(
+                this.x - oldOrigin.x + newOrigin.x,
+                this.y - oldOrigin.y + newOrigin.y,
+                this.z - oldOrigin.z + newOrigin.z)
