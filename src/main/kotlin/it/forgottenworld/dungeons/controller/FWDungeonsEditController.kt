@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.controller
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
@@ -241,6 +242,10 @@ object FWDungeonsEditController {
                         }
         ))
 
+        executeUpdate(
+                "INSERT INTO fwd_instance_locations (dungeon_id, instance_id, x, y, z)\n" +
+                    "   VALUES (?, ?, ?, ?, ?);", dungeon.id, id, block.x, block.y, block.z)
+
         return id
     }
 
@@ -262,6 +267,12 @@ object FWDungeonsEditController {
                 true
             } else false
         }
+
+        executeUpdate(
+                "DELETE FROM fwd_instance_locations\n" +
+                        "WHERE (dungeon_id = ? AND instance_id = ?);",
+                dungeon.id, id
+        )
 
         return id
     }

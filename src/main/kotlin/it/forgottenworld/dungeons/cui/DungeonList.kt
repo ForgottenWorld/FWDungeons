@@ -7,8 +7,9 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.entity.Player
-import org.bukkit.util.ChatPaginator
-fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked: Boolean, full: Boolean, player: Player) =
+import kotlin.math.ceil
+
+private fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked: Boolean, full: Boolean, player: Player) =
         TextComponent(
                 when {
                     leader -> "CREATE"
@@ -28,7 +29,7 @@ fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked: Boolean
                                 "/fwdungeons joininst ${instance.dungeon.id} ${instance.id} ${player.name}")
         }
 
-fun getPageClickable(text: String, page: Int) =
+private fun getPageClickable(text: String, page: Int) =
         TextComponent(text).apply {
             color = ChatColor.AQUA
             clickEvent =
@@ -37,46 +38,67 @@ fun getPageClickable(text: String, page: Int) =
                             "/fwdungeons dungeon list $page")
         }
 
+private fun getCarets(count: Int) =
+        TextComponent("${">".repeat(count)} ").apply {
+            color = ChatColor.GRAY
+        }
+
+private fun getColoredDifficulty(difficulty: Dungeon.Difficulty) =
+        TextComponent("${difficulty.toString().toUpperCase()}\n").apply {
+            color = when (difficulty) {
+                Dungeon.Difficulty.EASY -> ChatColor.DARK_GREEN
+                Dungeon.Difficulty.MEDIUM -> ChatColor.GOLD
+                Dungeon.Difficulty.HARD -> ChatColor.DARK_RED
+            }
+        }
 
 fun getInteractiveDungeonList(player: Player, page: Int) =
     TextComponent().apply {
         if (page >= 0 && page <= FWDungeonsController.dungeons.count() - 1) {
             val d = FWDungeonsController.dungeons.values.toList()[page]
-            addExtra(TextComponent("======================[Dungeons]======================\n").apply {
-                addExtra("=== ${d.name}\n\n")
+            addExtra(TextComponent("====================[ FWDungeons ]====================\n\n").apply {
+                addExtra(getCarets(3))
+                addExtra("DUNGEON: ${d.name}\n")
+                addExtra(getCarets(3))
+                addExtra("DESCRIPTION: ${d.description}\n")
+                addExtra(getCarets(3))
+                addExtra("DIFFICULTY: ")
+                addExtra(getColoredDifficulty(d.difficulty))
+                addExtra(getCarets(3))
+                addExtra(
+                        "PLAYERS: ${d.numberOfPlayers.first.toString() +
+                            if (d.numberOfPlayers.last != d.numberOfPlayers.first) 
+                                "-" + d.numberOfPlayers.last.toString()
+                            else ""}\n\n")
                 d.instances.forEachIndexed { ii, inst ->
                     val party = inst.party
-                    var count = 0
-                    "Room $ii | Leader: ".let{ count += it.length; addExtra(it) }
-                    addExtra(
-                            TextComponent(party?.leader?.name ?: "none")
-                                    .apply {
-                                        if (text != "none") color = ChatColor.GOLD
-                                    }.also{ count += it.toPlainText().length })
-                    addExtra(" ".repeat(54 - count))
-                    addExtra("[")
-                    addExtra(
-                            getJoinClickable(
-                                    inst,
-                                    party == null,
-                                    party?.isLocked == true,
-                                    party?.isFull == true,
-                                    player).also { count += it.toPlainText().length } )
-                    text
-                    addExtra("]${"\n".repeat(15 - d.instances.count())}")
-                    if (page > 0) {
-                        addExtra("=[")
-                        addExtra(getPageClickable("PREVIOUS", page - 1))
-                        addExtra("]")
-                    } else addExtra("===========")
-                    addExtra("====================================")
-                    if (page < FWDungeonsController.dungeons.count() - 1) {
-                        addExtra("[")
-                        addExtra(getPageClickable("NEXT", page + 1))
-                        addExtra("]=\n")
-                    }
-                    else addExtra("=======\n")
+                    addExtra(getCarets(1))
+                    addExtra("Room ${ii+1} | Leader: ")
+                    addExtra(TextComponent(party?.leader?.name ?: "none")
+                            .apply { if (text != "none") color = ChatColor.GOLD })
+                    addExtra("    [ ")
+                    party?.let{ addExtra("  [ ${party.playerCount}/${party.maxPlayers} ]") }
+                    addExtra(getJoinClickable(
+                            inst,
+                            party == null,
+                            party?.isLocked == true,
+                            party?.isFull == true,
+                            player))
+                    addExtra(" ]\n")
                 }
+                addExtra("\n".repeat(13 - d.instances.count() - ceil((d.description.length + 17) / 55.0).toInt()))
+                if (page > 0) {
+                    addExtra("=[ ")
+                    addExtra(getPageClickable("PREVIOUS", page - 1))
+                    addExtra(" ]")
+                } else addExtra("=============")
+                addExtra("================================")
+                if (page < FWDungeonsController.dungeons.count() - 1) {
+                    addExtra("[ ")
+                    addExtra(getPageClickable("NEXT", page + 1))
+                    addExtra(" ]=")
+                }
+                else addExtra("=========")
             })
         }
     }
