@@ -40,15 +40,16 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
             -1 -> sender.sendMessage("Invalid dungeon id")
             -2 -> sender.sendMessage("Invalid instance id")
             -3 -> sender.sendMessage("You're already in a party")
-            -4 -> sender.sendMessage("This instance is full")
-            -5 -> sender.sendMessage("This party is private and you were not invited")
-            -6 -> sender.sendMessage("Couldn't join party")
+            -4 -> sender.sendMessage("This dungeon party is full")
+            -5 -> sender.sendMessage("This dungeon party is private and you were not invited")
+            -6 -> sender.sendMessage("Couldn't join dungeon party")
+            -7 -> sender.sendMessage("This dungeon party has already entered the dungeon")
             0 -> sender.spigot().sendMessage(
-                    TextComponent("Party created. If you want to make it private, click ")
+                    TextComponent("Dungeon party created. If you want to make it private, click ")
                             .apply {
                                 addExtra(getLockClickable())
                             })
-            1 -> sender.sendMessage("You joined the party!")
+            1 -> sender.sendMessage("You joined the dungeon party")
         }
     }
     return true
@@ -70,8 +71,8 @@ fun cmdDungeonInvite(sender: CommandSender, command: Command, label: String, arg
         }
 
         sender.sendMessage( when (FWDungeonsController.playerSendInvite(sender, args[0])) {
-            -1 -> "You're currently not in a party"
-            -2 -> "Only the party leader may invite others to join"
+            -1 -> "You're currently not in a dungeon party"
+            -2 -> "Only the dungeon party leader may invite others to join"
             -3 -> "No currently online player has this name"
             0 -> "Invite sent!"
             else -> ""
@@ -83,8 +84,8 @@ fun cmdDungeonInvite(sender: CommandSender, command: Command, label: String, arg
 fun cmdDungeonLeave(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( when (FWDungeonsController.playerLeaveParty(sender)) {
-            -1 -> "You're currently not in a party"
-            0 -> "You left the party"
+            -1 -> "You're currently not in a dungeon party"
+            0 -> "You left the dungeon party"
             else -> ""
         })
     }
@@ -94,10 +95,10 @@ fun cmdDungeonLeave(sender: CommandSender, command: Command, label: String, args
 fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
             sender.sendMessage( when (FWDungeonsController.playerLockParty(sender)) {
-                -1 -> "You're currently not in a party"
-                -2 -> "Only the party leader may make the party private"
-                -3 -> "This party is already private"
-                0 -> "The party is now private, invite players with /fwd invite"
+                -1 -> "You're currently not in a dungeon party"
+                -2 -> "Only the dungeon party leader may make the party private"
+                -3 -> "This dungeon party is already private"
+                0 -> "The dungeon party is now private, invite players with /fwd invite"
                 else -> ""
             })
     }
@@ -107,10 +108,10 @@ fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, 
 fun cmdDungeonUnlockParty(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( when (FWDungeonsController.playerUnlockParty(sender)) {
-            -1 -> "You're currently not in a party"
-            -2 -> "Only the party leader may make the party public"
-            -3 -> "This party is already public"
-            0 -> "The party is now public, anyone can join"
+            -1 -> "You're currently not in a dungeon party"
+            -2 -> "Only the dungeon party leader may make the party public"
+            -3 -> "This dungeon party is already public"
+            0 -> "This dungeon party is now public, anyone can join"
             else -> ""
         })
     }
@@ -119,7 +120,13 @@ fun cmdDungeonUnlockParty(sender: CommandSender, command: Command, label: String
 
 fun cmdDungeonStart(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
-
+        sender.sendMessage( when (FWDungeonsController.playerStart(sender)) {
+            -1 -> "You're currently not in a dungeon party"
+            -2 -> "Only the dungeon party leader may start the instance"
+            -3 -> "Not enough players for this dungeon"
+            0 -> "Dungeon party members have been teleported to the dungeon entrance"
+            else -> ""
+        })
     }
     return true
 }

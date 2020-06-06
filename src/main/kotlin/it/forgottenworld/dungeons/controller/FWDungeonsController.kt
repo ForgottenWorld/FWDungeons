@@ -1,11 +1,14 @@
 package it.forgottenworld.dungeons.controller
 
+import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.cui.formatInvitation
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getDungeonInstance
 import org.bukkit.Bukkit.getServer
+import org.bukkit.Bukkit.getWorld
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -15,6 +18,7 @@ object FWDungeonsController {
     val parties = mutableMapOf<Int, Party>()
     val playerParties = mutableMapOf<UUID, Party>()
     val playersTriggering = mutableMapOf<UUID, Trigger>()
+    val playerReturnPositions = mutableMapOf<UUID, Location>()
 
     fun getMaxDungeonId() = dungeons.keys.max() ?: -1
     private fun getMaxPartyId(): Int = parties.keys.max() ?: -1
@@ -44,6 +48,7 @@ object FWDungeonsController {
             return 0 //party created, player is leader
         } else {
             if (party.isFull) return -4 //party is full
+            if (party.inGame) return -7 //party is inside the dungeon
             if (instance.party!!.isLocked && partyKey != instance.party!!.partyKey) return -5 //wrong key
             return if (party.playerJoin(player)) 1  //party joines, player is not leader
             else -6 //join failed
@@ -81,8 +86,8 @@ object FWDungeonsController {
                     it.lock()
                     0 //party locked succesfully
                 }
-                else -> -2
-            } //player is not party leader
+                else -> -2 //player is not party leader
+            }
         } ?: -1 //player is not in a party
     }
 
@@ -95,6 +100,29 @@ object FWDungeonsController {
                     0 //party unlocked succesfully
                 }
                 else -> -2 //player is not party leader
+            }
+        } ?: -1 //player is not in a party
+    }
+
+    fun playerStart(player: Player): Int {
+        return playerParties[player.uniqueId]?.let {
+            when {
+                it.leader != player -> -2 //player is not party leader
+                it.players.count() < it.instance.dungeon.numberOfPlayers.first -> -3 //not enough players
+                else -> {
+                    it.inGame = true
+                    it.players.forEach { p ->
+                        playerReturnPositions[p.uniqueId] = p.location
+                        p.teleport(
+                                Location(
+                                        getWorld(ConfigManager.dungeonWorld),
+                                        it.instance.startingPostion.x,
+                                        it.instance.startingPostion.y,
+                                        it.instance.startingPostion.z))
+                        p.sendMessage("Good luck out there!")
+                    }
+                    0 //all players teleported to instance starting position
+                }
             }
         } ?: -1 //player is not in a party
     }

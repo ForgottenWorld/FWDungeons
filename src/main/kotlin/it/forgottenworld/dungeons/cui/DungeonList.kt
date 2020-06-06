@@ -9,20 +9,21 @@ import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.entity.Player
 import kotlin.math.ceil
 
-private fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked: Boolean, full: Boolean, player: Player) =
+private fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked: Boolean, full: Boolean, inGame: Boolean, player: Player) =
         TextComponent(
                 when {
                     leader -> "CREATE"
                     locked -> "PRIVATE"
                     full -> "FULL"
+                    inGame -> "IN DUNGEON"
                     else -> "JOIN"
                 }).apply {
                     color = when {
-                        full -> ChatColor.RED
+                        full || inGame -> ChatColor.RED
                         locked -> ChatColor.GOLD
                         else -> ChatColor.GREEN
                     }
-                    if (!full && !locked)
+                    if (!full && !locked && !inGame)
                     clickEvent =
                             ClickEvent(
                                     ClickEvent.Action.RUN_COMMAND,
@@ -82,6 +83,7 @@ fun getInteractiveDungeonList(player: Player, page: Int) =
                             party == null,
                             party?.isLocked == true,
                             party?.isFull == true,
+                            party?.inGame == true,
                             player))
                     addExtra(" ]")
                     party?.let{ addExtra("  [ ${party.playerCount}/${party.maxPlayers} ]\n") }
