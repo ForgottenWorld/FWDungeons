@@ -50,14 +50,10 @@ object ConfigManager {
                                         conf.getInt("depth")
                                 ),
                                 conf.getVector("startingLocation")!!.toBlockVector(),
-                                {},
                                 mutableListOf(),
                                 mutableListOf(),
                                 mutableListOf()
                         ).apply {
-                            startingEffect = { parseEffectCode(
-                                    this,
-                                    conf.getString("startingEffect")!!.split(";").map{ it.trim() }) }
                             triggers.addAll(
                                     conf.getConfigurationSection("triggers")
                                     !!.getKeys(false)
@@ -71,8 +67,7 @@ object ConfigManager {
                                                                 conf.getInt("triggers.$k.height"),
                                                                 conf.getInt("triggers.$k.depth")
                                                         ),
-                                                        { parseEffectCode(this,
-                                                                    conf.getString("triggers.$k.effect")!!.split(";").map{ it.trim() })},
+                                                        { inst -> parseEffectCode(inst, conf.getStringList("triggers.$k.effect")) },
                                                         conf.getBoolean("triggers.$k.requiresWholeParty")
                                                 )
                                             }
@@ -89,7 +84,7 @@ object ConfigManager {
                                                                 conf.getInt("activeAreas.$k.height"),
                                                                 conf.getInt("activeAreas.$k.depth")
                                                         ),
-                                                        Material.getMaterial(conf.getString("activeAreas.$k.startingMaterial")!!) ?: Material.AIR
+                                                        Material.getMaterial(conf.getString("activeAreas.$k.startingMaterial")!!)!!
                                                 )
                                             }
                             )

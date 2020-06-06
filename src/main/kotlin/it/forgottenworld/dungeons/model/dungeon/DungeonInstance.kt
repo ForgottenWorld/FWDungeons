@@ -4,16 +4,22 @@ import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
+import it.forgottenworld.dungeons.utils.toActiveAreaIdMap
+import it.forgottenworld.dungeons.utils.toTriggerIdMap
 import it.forgottenworld.dungeons.utils.withRefSystemOrigin
-import org.bukkit.Location
 import org.bukkit.util.BlockVector
 
 class DungeonInstance(
         val id: Int,
         val dungeon: Dungeon,
-        val origin: BlockVector,
+        private val origin: BlockVector,
         val triggers: List<Trigger>,
         val activeAreas: List<ActiveArea>) {
+    private val triggersIdMap = triggers.toTriggerIdMap()
+    private val activeAreasIdMap = activeAreas.toActiveAreaIdMap()
+
+    fun getTriggerById(id: Int) = triggersIdMap[id]
+    fun getActiveAreaById(id: Int) = activeAreasIdMap[id]
 
     var party: Party? = null
 
@@ -23,15 +29,9 @@ class DungeonInstance(
     val startingPostion: BlockVector
         get() = dungeon.startingLocation.withRefSystemOrigin(BlockVector(0,0,0), origin)
 
-    private val resolvedTriggers = mutableMapOf<Trigger, Boolean>().apply {
-        dungeon.triggers.forEach {
-            put(it, false)
-        }
-    }
-
     fun resetInstance() {
         party = null
-        resolvedTriggers.forEach{ resolvedTriggers[it.key] = false }
+        triggers.forEach{ it.procced = false }
         activeAreas.forEach { it.fillWithMaterial(it.startingMaterial) }
     }
 }

@@ -2,7 +2,6 @@ package it.forgottenworld.dungeons.model.party
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.utils.findPlayerById
 import it.forgottenworld.dungeons.utils.getRandomString
 import org.bukkit.entity.Player
 

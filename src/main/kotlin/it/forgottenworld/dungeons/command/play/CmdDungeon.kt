@@ -45,7 +45,7 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
             -6 -> sender.sendMessage("Couldn't join dungeon party")
             -7 -> sender.sendMessage("This dungeon party has already entered the dungeon")
             0 -> sender.spigot().sendMessage(
-                    TextComponent("Dungeon party created. If you want to make it private, click ")
+                    TextComponent("Dungeon party created. To make it private, click ")
                             .apply {
                                 addExtra(getLockClickable())
                             })
@@ -58,7 +58,7 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
 fun cmdDungeonList(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         val page = if (args.count() != 0 && args[0].toIntOrNull() != null) args[0].toInt() else 0
-        sender.spigot().sendMessage(getInteractiveDungeonList(sender, page))
+        sender.spigot().sendMessage(getInteractiveDungeonList(page))
     }
     return true
 }
@@ -98,7 +98,7 @@ fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, 
                 -1 -> "You're currently not in a dungeon party"
                 -2 -> "Only the dungeon party leader may make the party private"
                 -3 -> "This dungeon party is already private"
-                0 -> "The dungeon party is now private, invite players with /fwd invite"
+                0 -> "The dungeon party is now private, invite players with /fwd dungeon invite"
                 else -> ""
             })
     }

@@ -1,8 +1,7 @@
 package it.forgottenworld.dungeons.model.activearea
 
-import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.model.box.Box
-import org.bukkit.Bukkit.getWorld
+import org.bukkit.Location
 import org.bukkit.Material
 
 class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Material.AIR) {
@@ -13,8 +12,9 @@ class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Mater
         }
     }
 
-    fun getRandomPositionOnFloor() {
-
+    fun getRandomLocationOnFloor(): Location {
+        val floorBlocks = box.getFloorBlocks()
+        return floorBlocks.random().location.clone().add(0.0,1.0,0.0)
     }
 
 }

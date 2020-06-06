@@ -12,7 +12,6 @@ class Dungeon(val id: Int) {
     lateinit var numberOfPlayers: IntRange
     lateinit var box: Box
     lateinit var startingLocation: BlockVector
-    lateinit var startingEffect: () -> Unit
     var triggers = mutableListOf<Trigger>()
     var activeAreas = mutableListOf<ActiveArea>()
     var instances = mutableListOf<DungeonInstance>()
@@ -47,7 +46,6 @@ class Dungeon(val id: Int) {
                 numberOfPlayers: IntRange,
                 box: Box,
                 startingLocation: BlockVector,
-                startingEffect: () -> Unit,
                 triggers: MutableList<Trigger>,
                 activeAreas: MutableList<ActiveArea>,
                 instances: MutableList<DungeonInstance>) : this(id) {

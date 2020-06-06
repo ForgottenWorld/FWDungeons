@@ -102,10 +102,11 @@ class FWDungeonsPlugin : JavaPlugin() {
                                 },
                                 dungeon.activeAreas.map {
                                     ActiveArea(it.id,
-                                            it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin)
+                                            it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
+                                            it.startingMaterial
                                     )
                                 }
-                        )
+                        ).apply{ resetInstance() }
                 )
             }
         }

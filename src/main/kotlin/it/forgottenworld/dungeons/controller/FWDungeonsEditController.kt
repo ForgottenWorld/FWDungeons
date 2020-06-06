@@ -3,6 +3,7 @@ package it.forgottenworld.dungeons.controller
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.db.executeUpdate
+import it.forgottenworld.dungeons.db.executeUpdateAsync
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
@@ -104,7 +105,7 @@ object FWDungeonsEditController {
                             id,
                             dungeon,
                             box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
-                            {},
+                            { },
                             false
                     )
             )
@@ -139,7 +140,7 @@ object FWDungeonsEditController {
                             id,
                             dungeon,
                             box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
-                            {},
+                            { },
                             false
                     )
             )
@@ -237,12 +238,13 @@ object FWDungeonsEditController {
                         },
                         dungeon.activeAreas.map {
                             ActiveArea(it.id,
-                                    it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector())
+                                    it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector()),
+                                    it.startingMaterial
                             )
                         }
-        ))
+        ).apply { resetInstance() })
 
-        executeUpdate(
+        executeUpdateAsync(
                 "INSERT INTO fwd_instance_locations (dungeon_id, instance_id, x, y, z) VALUES (?, ?, ?, ?, ?);",
                 dungeon.id, id, block.x, block.y, block.z)
 
@@ -268,7 +270,7 @@ object FWDungeonsEditController {
             } else false
         }
 
-        executeUpdate(
+        executeUpdateAsync(
                 "DELETE FROM fwd_instance_locations\n" +
                         "WHERE (dungeon_id = ? AND instance_id = ?);",
                 dungeon.id, id

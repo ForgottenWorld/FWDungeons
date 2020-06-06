@@ -49,7 +49,7 @@ fun executeQuery(sql: String,
                  vararg parameters: Any,
                  callback: (ResultSet) -> Unit) {
     DBHandler.connect()?.let {
-        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(FWDungeonsPlugin.instance)
+        DBTask(it,true, sql, parameters, callback, null).runTask(FWDungeonsPlugin.instance)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
@@ -57,11 +57,34 @@ fun executeUpdate(sql: String,
                  vararg parameters: Any,
                  callback: (Int) -> Unit) {
     DBHandler.connect()?.let {
-        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(FWDungeonsPlugin.instance)
+        DBTask(it,false, sql, parameters, null, callback).runTask(FWDungeonsPlugin.instance)
     } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
 }
 
 fun executeUpdate(sql: String,
+                  vararg parameters: Any) {
+    DBHandler.connect()?.let {
+        DBTask(it,false, sql, parameters, null, { }).runTask(FWDungeonsPlugin.instance)
+    } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
+}
+
+fun executeQueryAsync(sql: String,
+                 vararg parameters: Any,
+                 callback: (ResultSet) -> Unit) {
+    DBHandler.connect()?.let {
+        DBTask(it,true, sql, parameters, callback, null).runTaskAsynchronously(FWDungeonsPlugin.instance)
+    } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
+}
+
+fun executeUpdateAsync(sql: String,
+                  vararg parameters: Any,
+                  callback: (Int) -> Unit) {
+    DBHandler.connect()?.let {
+        DBTask(it,false, sql, parameters, null, callback).runTaskAsynchronously(FWDungeonsPlugin.instance)
+    } ?: getLogger().warning("ERROR: Couldn't connect to DB.")
+}
+
+fun executeUpdateAsync(sql: String,
                   vararg parameters: Any) {
     DBHandler.connect()?.let {
         DBTask(it,false, sql, parameters, null, { }).runTaskAsynchronously(FWDungeonsPlugin.instance)

@@ -1,15 +1,22 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.party.Party
-import org.bukkit.Location
+import it.forgottenworld.dungeons.model.trigger.Trigger
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
 import java.util.*
+
+fun Iterable<Trigger>.toTriggerIdMap() =
+        map{ it.id }.zip(this).toMap()
+
+fun Iterable<ActiveArea>.toActiveAreaIdMap() =
+        map{ it.id }.zip(this).toMap()
 
 fun Player.getTargetBlock() : Block? =
         this.getTargetBlock(null as Set<Material>?, 5)
