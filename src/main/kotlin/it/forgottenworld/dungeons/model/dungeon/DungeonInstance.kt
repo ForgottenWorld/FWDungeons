@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.controller.MobTracker
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.party.Party
@@ -8,6 +9,7 @@ import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.toActiveAreaIdMap
 import it.forgottenworld.dungeons.utils.toTriggerIdMap
 import it.forgottenworld.dungeons.utils.withRefSystemOrigin
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.util.BlockVector
 
 class DungeonInstance(
@@ -15,7 +17,7 @@ class DungeonInstance(
         val dungeon: Dungeon,
         private val origin: BlockVector,
         val triggers: List<Trigger>,
-        val activeAreas: List<ActiveArea>) {
+        private val activeAreas: List<ActiveArea>) {
     private val triggersIdMap = triggers.toTriggerIdMap()
     private val activeAreasIdMap = activeAreas.toActiveAreaIdMap()
 
@@ -32,15 +34,22 @@ class DungeonInstance(
 
     fun resetInstance() {
         party = null
-        triggers.forEach{ it.procced = false }
+        triggers.forEach{
+            it.procced = false
+            it.clearCurrentlyInsidePlayers()
+        }
         activeAreas.forEach { it.fillWithMaterial(it.startingMaterial) }
+        MobTracker.instanceObjectives[id]?.abort()
+        @Suppress("ControlFlowWithEmptyBody")
+        while (MobTracker.instanceIdForTrackedMobs.values.remove(id)) {}
     }
 
     fun onInstanceFinish() {
         party?.players?.forEach {
-            it.sendMessage("Congratulations, you made it out alive!")
+            it.sendMessage("${ChatColor.GREEN}Congratulations, you made it out alive!")
             it.teleport(FWDungeonsController.playerReturnPositions[it.uniqueId]!!)
         }
+        party?.disband()
         resetInstance()
     }
 }

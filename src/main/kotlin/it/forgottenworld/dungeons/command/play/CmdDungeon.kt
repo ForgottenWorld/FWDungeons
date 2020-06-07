@@ -14,10 +14,11 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
                 "list" to ::cmdDungeonList,
                 "invite" to ::cmdDungeonInvite,
                 "leave" to ::cmdDungeonLeave,
-                "escape" to ::cmdDungeonEscape,
                 "lock" to ::cmdDungeonLockParty,
                 "unlock" to ::cmdDungeonUnlockParty,
-                "start" to ::cmdDungeonStart
+                "start" to ::cmdDungeonStart,
+                "evacuate" to ::cmdDungeonEvacuate,
+                "lookup" to ::cmdDungeonPlayerLookup
         )
 
 fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -131,9 +132,35 @@ fun cmdDungeonStart(sender: CommandSender, command: Command, label: String, args
     return true
 }
 
-fun cmdDungeonEscape(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender is Player) {
-
+fun cmdDungeonEvacuate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (args.count() < 2) {
+        sender.sendMessage("Please provide both a dungeon and instance id")
+        return true
     }
+
+    val dungeonId = args[0].toIntOrNull()
+    val instanceId = args[1].toIntOrNull()
+
+    if (dungeonId == null || instanceId == null) {
+        sender.sendMessage("Dungeon id and instance id should both be integers")
+        return true
+    }
+
+    sender.sendMessage(
+            if (FWDungeonsController.evacuateDungeon(dungeonId, instanceId))
+                "All adventurers were brought back to safety and the instance was reset"
+            else
+                "Dungeon instance not found")
+
+    return true
+}
+
+fun cmdDungeonPlayerLookup(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (args.count() == 0) {
+        sender.sendMessage("Please provide a player name")
+        return true
+    }
+
+    sender.sendMessage(FWDungeonsController.lookupPlayer(args[0]))
     return true
 }

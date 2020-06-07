@@ -100,3 +100,9 @@ permissions:
   fwdungeons.dungeon.unlock:
     description: Allows the player to use /fwdungeons dungeon unlock
     default: true
+  fwdungeons.dungeon.evacuate:
+    description: Allows the player to use /fwdungeons dungeon evacuate
+    default: op
+  fwdungeons.dungeon.lookup:
+    description: Allows the player to use /fwdungeons dungeon lookup
+    default: op

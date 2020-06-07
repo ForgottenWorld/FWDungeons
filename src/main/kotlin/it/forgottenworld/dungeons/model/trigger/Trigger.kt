@@ -22,6 +22,10 @@ class Trigger(
     val origin : BlockVector
         get() = box.origin
 
+    fun clearCurrentlyInsidePlayers() {
+        playersCurrentlyInside.clear()
+    }
+
     fun isPlayerInside(player: Player) = box.containsPlayer(player)
 
     fun onPlayerEnter(player: Player) {
@@ -46,7 +50,7 @@ class Trigger(
         effectParser?.invoke(instance)?.let { effect = it }
     }
 
-    fun proc() {
+    private fun proc() {
         if (playersCurrentlyInside.isEmpty() || procced) return
         if (requiresWholeParty && playersCurrentlyInside[0].getParty()?.playerCount != playersCurrentlyInside.count())
             return

@@ -8,7 +8,7 @@ import org.bukkit.entity.EntityType
 import java.util.*
 
 object MobTracker {
-    val trackedMobsForInstanceId = mutableMapOf<UUID, Int>()
+    val instanceIdForTrackedMobs = mutableMapOf<UUID, Int>()
     val instanceObjectives = mutableMapOf<Int, InstanceObjective>()
 
     fun attachNewObjectiveToInstance(
@@ -20,11 +20,21 @@ object MobTracker {
         if (instanceObjectives.contains(instanceId)) return
         instanceObjectives[instanceId] = InstanceObjective(
                 instanceId,
-                (mobs.mapNotNull { spawnMob(it, activeArea.getRandomLocationOnFloor())?.also { uuid ->
-                    trackedMobsForInstanceId[uuid] = instanceId
+                (mobs.mapNotNull {
+                    spawnMob(it,
+                            activeArea
+                                    .getRandomLocationOnFloor()
+                                    .clone()
+                                    .add(0.5, 0.5, 0.5))?.also { uuid ->
+                    instanceIdForTrackedMobs[uuid] = instanceId
                 } } +
-                    mythicMobs.mapNotNull { spawnMythicMob(it, activeArea.getRandomLocationOnFloor())?.also {uuid ->
-                        trackedMobsForInstanceId[uuid] = instanceId
+                    mythicMobs.mapNotNull {
+                        spawnMythicMob(it,
+                                activeArea
+                                        .getRandomLocationOnFloor()
+                                        .clone()
+                                        .add(0.5, 0.5, 0.5))?.also {uuid ->
+                        instanceIdForTrackedMobs[uuid] = instanceId
                     } }).toMutableList(),
                 onAllKilled
         )

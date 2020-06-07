@@ -43,10 +43,12 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
                             instance.getActiveAreaById(activeArea.value)!!,
                             whenDone) }
             }
-            CODE_FILL_ACTIVE_AREA ->
-                return { instance.getActiveAreaById(
+            CODE_FILL_ACTIVE_AREA -> {
+                val activeArea = instance.getActiveAreaById(
                         codeIterator.next().toInt())!!
-                        .fillWithMaterial(Material.getMaterial(codeIterator.next(), false)!!) }
+                val material = Material.getMaterial(codeIterator.next(), false)!!
+                return { activeArea.fillWithMaterial(material) }
+            }
             CODE_FINISH ->
                 return { instance.onInstanceFinish() }
             CODE_WHEN_DONE ->

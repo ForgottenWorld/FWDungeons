@@ -56,7 +56,8 @@ private fun getColoredDifficulty(difficulty: Dungeon.Difficulty) =
 fun getInteractiveDungeonList(page: Int) =
     TextComponent().apply {
         if (page >= 0 && page <= FWDungeonsController.dungeons.count() - 1) {
-            val d = FWDungeonsController.dungeons.values.toList()[page]
+            val d = FWDungeonsController.dungeons.values.filter{
+                FWDungeonsController.activeDungeons[it.id] == true }.toList()[page]
             addExtra(TextComponent("${ChatColor.DARK_GRAY}====================[ ${ChatColor.DARK_PURPLE}FWDungeons ${ChatColor.DARK_GRAY}]====================\n\n").apply {
                 addExtra(getCarets(3))
                 addExtra("${ChatColor.DARK_AQUA}DUNGEON:${ChatColor.WHITE} ${d.name}\n")

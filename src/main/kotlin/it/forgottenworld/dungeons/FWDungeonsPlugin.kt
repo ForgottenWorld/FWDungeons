@@ -8,10 +8,12 @@ import it.forgottenworld.dungeons.db.DBHandler
 import it.forgottenworld.dungeons.db.executeQuery
 import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.event.listener.EntityDeathListener
+import it.forgottenworld.dungeons.event.listener.PlayerListener
 import it.forgottenworld.dungeons.event.listener.TriggerListener
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.trigger.Trigger
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.BlockVector
 import java.io.File
@@ -61,6 +63,7 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         server.pluginManager.registerEvents(TriggerListener(), this)
         server.pluginManager.registerEvents(EntityDeathListener(), this)
+        server.pluginManager.registerEvents(PlayerListener(), this)
     }
 
     override fun onDisable() {

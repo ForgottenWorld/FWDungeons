@@ -6,22 +6,21 @@ import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getDungeonInstance
-import org.bukkit.Bukkit.getServer
-import org.bukkit.Bukkit.getWorld
+import it.forgottenworld.dungeons.utils.getParty
+import org.bukkit.Bukkit.*
 import org.bukkit.Location
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
 
 object FWDungeonsController {
     val dungeons = mutableMapOf<Int, Dungeon>()
     val activeDungeons = mutableMapOf<Int, Boolean>()
-    val parties = mutableMapOf<Int, Party>()
     val playerParties = mutableMapOf<UUID, Party>()
     val playersTriggering = mutableMapOf<UUID, Trigger>()
     val playerReturnPositions = mutableMapOf<UUID, Location>()
 
     fun getMaxDungeonId() = dungeons.keys.max() ?: -1
-    private fun getMaxPartyId(): Int = parties.keys.max() ?: -1
     fun getDungeonById(id: Int) = dungeons[id]
 
     fun playerJoinInstance(player: Player, instanceId: Int, dungeonId: Int, partyKey: String): Int {
@@ -35,14 +34,12 @@ object FWDungeonsController {
 
         if (party == null) {
             instance.party = Party(
-                    getMaxPartyId() + 1,
                     mutableListOf(player),
                     player,
                     dungeon.numberOfPlayers.last,
                     false,
                     instance
             ).also {
-                parties[it.id] = it
                 playerParties[player.uniqueId] = it
             }
             return 0 //party created, player is leader
@@ -125,5 +122,16 @@ object FWDungeonsController {
                 }
             }
         } ?: -1 //player is not in a party
+    }
+
+    fun evacuateDungeon(dungeonId: Int, instanceId: Int): Boolean {
+        dungeons[dungeonId]?.instances?.find { it.id == instanceId }?.onInstanceFinish() ?: return false
+        return true
+    }
+
+    fun lookupPlayer(playerName: String): String {
+        val player = getPlayer(playerName) ?: return "Player not found"
+        val party = player.getParty() ?: return "Player is not in a party or an instance"
+        return "Player $playerName is in a party for dungeon id ${party.instance.dungeon.id}, instance id ${party.instance.id}"
     }
 }

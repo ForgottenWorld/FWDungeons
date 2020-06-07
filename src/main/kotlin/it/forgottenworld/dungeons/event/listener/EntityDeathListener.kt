@@ -10,9 +10,9 @@ class EntityDeathListener: Listener {
     fun onEntityDeath(event: EntityDeathEvent?) {
         val entity = event?.entity ?: return
 
-        MobTracker.trackedMobsForInstanceId[entity.uniqueId]?.let {
+        MobTracker.instanceIdForTrackedMobs[entity.uniqueId]?.let {
             MobTracker.instanceObjectives[it]?.onMobKilled(entity.uniqueId)
-            MobTracker.trackedMobsForInstanceId.remove(entity.uniqueId)
+            MobTracker.instanceIdForTrackedMobs.remove(entity.uniqueId)
         }
     }
 }
