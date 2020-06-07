@@ -6,7 +6,6 @@ import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
-import org.bukkit.entity.Player
 import java.lang.Integer.max
 import kotlin.math.ceil
 

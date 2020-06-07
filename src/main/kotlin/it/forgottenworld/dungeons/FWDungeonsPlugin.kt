@@ -11,10 +11,8 @@ import it.forgottenworld.dungeons.event.listener.TriggerListener
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.trigger.Trigger
-import it.forgottenworld.dungeons.utils.getBlockVector
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.BlockVector
-import sun.security.krb5.Config
 import java.io.File
 
 class FWDungeonsPlugin : JavaPlugin() {
@@ -96,7 +94,7 @@ class FWDungeonsPlugin : JavaPlugin() {
                                     Trigger(it.id,
                                             dungeon,
                                             it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
-                                            it.effect,
+                                            it.effectParser,
                                             it.requiresWholeParty
                                     )
                                 },
@@ -106,7 +104,10 @@ class FWDungeonsPlugin : JavaPlugin() {
                                             it.startingMaterial
                                     )
                                 }
-                        ).apply{ resetInstance() }
+                        ).apply{
+                            triggers.forEach { it.parseEffect(this) }
+                            resetInstance()
+                        }
                 )
             }
         }

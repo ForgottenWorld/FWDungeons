@@ -61,11 +61,17 @@ permissions:
   fwdungeonsedit.trigger.pos2:
     description: Allows the player to use /fwdungeonsedit trigger pos2
     default: op
+  fwdungeonsedit.trigger.unmake:
+    description: Allows the player to use /fwdungeonsedit trigger unmake
+    default: op
   fwdungeonsedit.activearea.pos1:
     description: Allows the player to use /fwdungeonsedit trigger pos1
     default: op
   fwdungeonsedit.activearea.pos2:
     description: Allows the player to use /fwdungeonsedit trigger pos2
+    default: op
+  fwdungeonsedit.activearea.unmake:
+    description: Allows the player to use /fwdungeonsedit activearea unmake
     default: op
   fwdungeons.dungeon.list:
     description: Allows the player to use /fwdungeons dungeon list

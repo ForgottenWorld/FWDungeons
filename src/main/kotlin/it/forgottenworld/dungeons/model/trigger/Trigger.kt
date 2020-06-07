@@ -13,9 +13,11 @@ class Trigger(
         val id: Int,
         val dungeon: Dungeon,
         val box: Box,
-        val effect: (DungeonInstance) -> Unit,
+        val effectParser: ((DungeonInstance) -> () -> Unit)?,
         val requiresWholeParty: Boolean = false) {
     var procced = false
+    lateinit var effect: () -> Unit
+
     private val playersCurrentlyInside = mutableListOf<Player>()
     val origin : BlockVector
         get() = box.origin
@@ -29,6 +31,7 @@ class Trigger(
             if (ConfigManager.isInDebugMode)
                 player.sendMessage("Entered trigger zone id $id in dungeon id ${dungeon.id}")
             playersCurrentlyInside.add(player)
+            proc()
         }
     }
 
@@ -39,13 +42,17 @@ class Trigger(
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
     }
 
+    fun parseEffect(instance: DungeonInstance) {
+        effectParser?.invoke(instance)?.let { effect = it }
+    }
+
     fun proc() {
         if (playersCurrentlyInside.isEmpty() || procced) return
         if (requiresWholeParty && playersCurrentlyInside[0].getParty()?.playerCount != playersCurrentlyInside.count())
             return
         playersCurrentlyInside[0].getParty()?.let {
             procced = true
-            effect(it.instance)
+            effect()
         }
     }
 }

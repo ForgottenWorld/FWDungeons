@@ -2,7 +2,6 @@ package it.forgottenworld.dungeons.controller
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.db.executeUpdateAsync
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
@@ -11,11 +10,7 @@ import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getBlockVector
 import it.forgottenworld.dungeons.utils.minBlockVector
-import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import it.forgottenworld.dungeons.utils.toVector
-import org.bukkit.Difficulty
-import org.bukkit.Location
-import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
@@ -86,7 +81,7 @@ object FWDungeonsEditController {
 
     fun playerSetTriggerPos1(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
-
+        if (!wipDungeons.contains(dungeon)) return -5//dungeon is not wip
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
         var wipOrigin: BlockVector? = null
@@ -105,7 +100,7 @@ object FWDungeonsEditController {
                             id,
                             dungeon,
                             box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
-                            { },
+                            null,
                             false
                     )
             )
@@ -120,7 +115,7 @@ object FWDungeonsEditController {
 
     fun playerSetTriggerPos2(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
-
+        if (!wipDungeons.contains(dungeon)) return -5//dungeon is not wip
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
         var wipOrigin: BlockVector? = null
@@ -140,7 +135,7 @@ object FWDungeonsEditController {
                             id,
                             dungeon,
                             box.withContainerOrigin(wipOrigin!!,BlockVector(0,0,0)),
-                            { },
+                            null,
                             false
                     )
             )
@@ -153,9 +148,20 @@ object FWDungeonsEditController {
         })()
     }
 
+    fun playerUnmakeTrigger(player: Player) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+        if (!wipDungeons.contains(dungeon)) return -3 //dungeon is not wip
+        if (dungeon.triggers.isEmpty()) return -2 //dungeon has no triggers
+
+        return dungeon.triggers.last().let {
+            dungeon.triggers.remove(it)
+            it.id //return the trigger id
+        }
+    }
+
     fun playerSetActiveAreaPos1(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
-
+        if (!wipDungeons.contains(dungeon)) return -5//dungeon is not wip
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
         var wipOrigin: BlockVector? = null
@@ -186,7 +192,7 @@ object FWDungeonsEditController {
 
     fun playerSetActiveAreaPos2(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
-
+        if (!wipDungeons.contains(dungeon)) return -5//dungeon is not wip
         if (!dungeon.hasBox()) return -3 //dungeon has no box set yet
 
         var wipOrigin: BlockVector? = null
@@ -215,6 +221,17 @@ object FWDungeonsEditController {
         })()
     }
 
+    fun playerUnmakeActiveArea(player: Player) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+        if (!wipDungeons.contains(dungeon)) return -3 //dungeon is not wip
+        if (dungeon.activeAreas.isEmpty()) return -2 //dungeon has no active areas
+
+        return dungeon.activeAreas.last().let {
+            dungeon.activeAreas.remove(it)
+            it.id //return the active area id
+        }
+    }
+
     fun playerAddInstance(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
@@ -232,7 +249,7 @@ object FWDungeonsEditController {
                             Trigger(it.id,
                                     it.dungeon,
                                     it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector()),
-                                    it.effect,
+                                    it.effectParser,
                                     it.requiresWholeParty
                             )
                         },

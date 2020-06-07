@@ -1,35 +1,82 @@
 package it.forgottenworld.dungeons.utils
 
-import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.controller.FWDungeonsController
-import it.forgottenworld.dungeons.model.dungeon.Dungeon
+import it.forgottenworld.dungeons.controller.MobTracker
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.model.trigger.Trigger
-import org.bukkit.Bukkit.*
 import org.bukkit.Material
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.Player
 
-const val CODE_SPAWN_MOB = "spawn"
 const val CODE_FILL_ACTIVE_AREA = "fill"
-const val CODE_EXECUTE_COMMAND = "exec"
+const val CODE_SPAWN_TO_BE_KILLED_COMMAND = "spawntobekilled"
+const val CODE_WHEN_DONE = "whendone"
+const val CODE_FINISH = "exit"
+const val PREFIX_MYTHIC_MOB = "mm"
+const val PREFIX_MYTHIC_MOB_LENGTH = 2
+const val PREFIX_VANILLA_MOB = "v"
+const val PREFIX_VANILLA_MOB_LENGTH = 1
+const val PREFIX_ACTIVE_AREA = "aa"
+const val PREFIX_ACTIVE_AREA_LENGTH = 2
 
-fun parseEffectCode(instance: DungeonInstance, lines: List<String>) {
-    lines.forEach { line ->
-        val sl = line.split(" ")
-        when (sl.first()) {
-            CODE_SPAWN_MOB ->
-                getWorld(ConfigManager.dungeonWorld)!!.spawnEntity(
-                    instance.getActiveAreaById(sl[1].toInt())!!.box.randomLocationOnFloor(),
-                    EntityType.valueOf(sl[2])
-            ).apply {
-                entityId
+private data class TypeWrapper<T>(var value: T)
+
+fun parseEffectCode(instance: DungeonInstance, lines: List<String>): () -> Unit {
+    val parsedCodeLines =
+            lines.map {
+                parseCode(instance, it.split(" ").iterator())
+            }
+    return {
+        parsedCodeLines.forEach { it() }
+    }
+}
+
+private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>): () -> Unit {
+    while(codeIterator.hasNext()) {
+        when (val code = codeIterator.next()) {
+            CODE_SPAWN_TO_BE_KILLED_COMMAND -> {
+                val mobs = mutableListOf<String>()
+                val mythicMobs = mutableListOf<String>()
+                val activeArea = TypeWrapper(-1)
+                val whenDone = parseSpawnToBeKilled(instance, codeIterator, mobs, mythicMobs, activeArea)
+
+                return { MobTracker.attachNewObjectiveToInstance(
+                            instance.id,
+                            mobs,
+                            mythicMobs,
+                            instance.getActiveAreaById(activeArea.value)!!,
+                            whenDone) }
             }
             CODE_FILL_ACTIVE_AREA ->
-                instance.getActiveAreaById(
-                        sl[1].toInt())!!.fillWithMaterial(Material.getMaterial(sl[2], false)!!)
-            CODE_EXECUTE_COMMAND ->
-                dispatchCommand(getConsoleSender(), sl.drop(1).joinToString(" "))
+                return { instance.getActiveAreaById(
+                        code.toInt())!!.fillWithMaterial(Material.getMaterial(codeIterator.next(), false)!!) }
+            CODE_FINISH ->
+                return { instance.onInstanceFinish() }
+            CODE_WHEN_DONE ->
+                throw Exception("ERROR: whendone used outside of spawntobekilled statement")
         }
     }
+    return {}
+}
+
+private fun parseSpawnToBeKilled(
+        instance: DungeonInstance,
+        codeIterator: Iterator<String>,
+        mobs: MutableList<String>,
+        mythicMobs: MutableList<String>,
+        activeArea: TypeWrapper<Int>): () -> Unit {
+    while(codeIterator.hasNext()) {
+        val code = codeIterator.next()
+        when {
+            code.startsWith(PREFIX_MYTHIC_MOB) -> {
+                mythicMobs.add(code.drop(PREFIX_MYTHIC_MOB_LENGTH))
+            }
+            code.startsWith(PREFIX_VANILLA_MOB) -> {
+                mobs.add(code.drop(PREFIX_VANILLA_MOB_LENGTH))
+            }
+            code.startsWith(PREFIX_ACTIVE_AREA) -> {
+                activeArea.value = code.drop(PREFIX_ACTIVE_AREA_LENGTH).toInt()
+            }
+            code == CODE_WHEN_DONE -> {
+                return parseCode(instance, codeIterator)
+            }
+        }
+    }
+    return {}
 }

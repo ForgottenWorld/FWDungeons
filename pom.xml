@@ -42,6 +42,13 @@
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.lumine.xikage.mythicmobs</groupId>
+            <artifactId>MythicMobs</artifactId>
+            <version>4.9.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/MythicMobs-4.9.1.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

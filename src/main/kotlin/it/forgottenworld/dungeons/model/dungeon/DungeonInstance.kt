@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.model.dungeon
 
+import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.party.Party
@@ -33,5 +34,13 @@ class DungeonInstance(
         party = null
         triggers.forEach{ it.procced = false }
         activeAreas.forEach { it.fillWithMaterial(it.startingMaterial) }
+    }
+
+    fun onInstanceFinish() {
+        party?.players?.forEach {
+            it.sendMessage("Congratulations, you made it out alive!")
+            it.teleport(FWDungeonsController.playerReturnPositions[it.uniqueId]!!)
+        }
+        resetInstance()
     }
 }

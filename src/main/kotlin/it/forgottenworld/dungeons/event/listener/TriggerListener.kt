@@ -2,14 +2,13 @@ package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.controller.FWDungeonsController
-import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getParty
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 
 
-class TriggerListener : Listener {
+class TriggerListener: Listener {
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent?) {
         val player = event?.player ?: return

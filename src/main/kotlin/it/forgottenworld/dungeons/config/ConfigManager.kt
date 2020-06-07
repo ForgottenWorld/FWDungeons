@@ -11,7 +11,6 @@ import org.bukkit.Material
 import org.bukkit.configuration.InvalidConfigurationException
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import java.io.File
 import java.io.IOException
@@ -114,8 +113,6 @@ object ConfigManager {
                 set("height", dungeon.box.height)
                 set("depth", dungeon.box.depth)
                 set("startingLocation", dungeon.startingLocation.toVector())
-                if (eraseEffects)
-                    set("startingEffect", "")
                 dungeon.triggers.forEach {
                     set("triggers.${it.id}.id", it.id)
                     set("triggers.${it.id}.origin", it.origin.toVector())

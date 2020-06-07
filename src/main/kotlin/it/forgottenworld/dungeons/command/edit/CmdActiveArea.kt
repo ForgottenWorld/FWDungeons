@@ -9,7 +9,8 @@ import org.bukkit.entity.Player
 val activeAreaCmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> Boolean> =
         mapOf(
                 "pos1" to ::cmdActiveAreaPos1,
-                "pos2" to ::cmdActiveAreaPos2
+                "pos2" to ::cmdActiveAreaPos2,
+                "unmake" to ::cmdActiveAreaUnmake
         )
 
 
@@ -29,6 +30,7 @@ fun cmdActiveAreaPos1(sender: CommandSender, command: Command, label: String, ar
                     -2 -> "First position set, now pick another with /fwde activearea pos2"
                     -3 -> "Dungeon box should be set before adding active areas"
                     -4 -> "Target is not inside the dungeon box"
+                    -5 -> "This dungeon was already exported beforehand"
                     else -> "Created active area with id $ret"
                 }
         )
@@ -52,7 +54,24 @@ fun cmdActiveAreaPos2(sender: CommandSender, command: Command, label: String, ar
                     -2 -> "First position set, now pick another with /fwde activearea pos1"
                     -3 -> "Dungeon box should be set before adding active areas"
                     -4 -> "Target is not inside the dungeon box"
+                    -5 -> "This dungeon was already exported beforehand"
                     else -> "Created active area with id $ret"
+                }
+        )
+    }
+    return true
+}
+
+fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+
+        val ret = FWDungeonsEditController.playerUnmakeActiveArea(sender)
+        sender.sendMessage(
+                when (ret) {
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "This dungeon has no active areas yet"
+                    -3 -> "This dungeon was already exported beforehand"
+                    else -> "Deleted active area with id $ret"
                 }
         )
     }
