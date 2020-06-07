@@ -52,6 +52,9 @@ permissions:
   fwdungeonsedit.dungeon.writeout:
     description: Allows the player to use /fwdungeonsedit dungeon writeout
     default: op
+  fwdungeonsedit.dungeon.save:
+    description: Allows the player to use /fwdungeonsedit dungeon save
+    default: op
   fwdungeonsedit.dungeon.discard:
     description: Allows the player to use /fwdungeonsedit dungeon discard
     default: op

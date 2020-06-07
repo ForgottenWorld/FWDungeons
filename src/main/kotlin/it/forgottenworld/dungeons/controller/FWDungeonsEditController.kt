@@ -352,6 +352,19 @@ object FWDungeonsEditController {
         }
     }
 
+    fun playerSaveDungeon(player: Player) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player is not editing any dungeons
+        if (wipDungeons.contains(dungeon)) return -2 //dungeon is wip
+
+        ConfigManager.saveDungeonConfig(
+                    FWDungeonsPlugin.dataFolder,
+                    dungeon,
+                    false
+            )
+        dungeonEditors.remove(player.uniqueId)
+        return 0
+    }
+
     fun playerDiscardDungeon(player: Player) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?:
         return -1 //player is not editing any dungeons

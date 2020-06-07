@@ -21,7 +21,8 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
                 "discard" to ::cmdDungeonDiscard,
                 "difficulty" to ::cmdDungeonDifficulty,
                 "description" to ::cmdDungeonDescription,
-                "players" to ::cmdDungeonNumberOfPlayers
+                "players" to ::cmdDungeonNumberOfPlayers,
+                "save" to ::cmdDungeonSave
         )
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -242,6 +243,20 @@ fun cmdDungeonSetStart(sender: CommandSender, command: Command, label: String, a
                     -1 -> "You're not editing any dungeons"
                     -2 -> "Dungeon box should be set before adding a starting location"
                     -3 -> "You're outside of the dungeon box"
+                    else -> ""
+                })
+    }
+
+    return true
+}
+
+fun cmdDungeonSave(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        sender.sendMessage(
+                when (FWDungeonsEditController.playerSaveDungeon(sender)) {
+                    0 -> "Dungeon saved succesfully"
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "This dungeon was never exported, use /fwde dungeon writeout"
                     else -> ""
                 })
     }
