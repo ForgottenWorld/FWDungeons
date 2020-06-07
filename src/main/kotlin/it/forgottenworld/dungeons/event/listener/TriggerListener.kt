@@ -12,6 +12,7 @@ class TriggerListener: Listener {
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent?) {
         val player = event?.player ?: return
+        val party = player.getParty() ?: return
 
         FWDungeonsController.playersTriggering[player.uniqueId]?.let {
             if (!it.isPlayerInside(player))
@@ -20,7 +21,7 @@ class TriggerListener: Listener {
         }
         if (player.world.name != ConfigManager.dungeonWorld) return
 
-        val trigger = player.getParty()?.instance?.triggers?.find { it.isPlayerInside(player) } ?: return
+        val trigger = party.instance.triggers.find { it.isPlayerInside(player) } ?: return
         trigger.onPlayerEnter(player)
     }
 }

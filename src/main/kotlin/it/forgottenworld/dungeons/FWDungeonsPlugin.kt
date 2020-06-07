@@ -7,6 +7,7 @@ import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.db.DBHandler
 import it.forgottenworld.dungeons.db.executeQuery
 import it.forgottenworld.dungeons.db.executeUpdate
+import it.forgottenworld.dungeons.event.listener.EntityDeathListener
 import it.forgottenworld.dungeons.event.listener.TriggerListener
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
@@ -59,6 +60,7 @@ class FWDungeonsPlugin : JavaPlugin() {
         logger.info("Registering events...")
 
         server.pluginManager.registerEvents(TriggerListener(), this)
+        server.pluginManager.registerEvents(EntityDeathListener(), this)
     }
 
     override fun onDisable() {

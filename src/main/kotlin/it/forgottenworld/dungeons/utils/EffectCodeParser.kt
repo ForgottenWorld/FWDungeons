@@ -45,7 +45,8 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
             }
             CODE_FILL_ACTIVE_AREA ->
                 return { instance.getActiveAreaById(
-                        code.toInt())!!.fillWithMaterial(Material.getMaterial(codeIterator.next(), false)!!) }
+                        codeIterator.next().toInt())!!
+                        .fillWithMaterial(Material.getMaterial(codeIterator.next(), false)!!) }
             CODE_FINISH ->
                 return { instance.onInstanceFinish() }
             CODE_WHEN_DONE ->

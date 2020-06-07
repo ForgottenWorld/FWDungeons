@@ -18,7 +18,8 @@ object MobTracker {
             activeArea: ActiveArea,
             onAllKilled: () -> Unit) {
         if (instanceObjectives.contains(instanceId)) return
-        InstanceObjective(
+        instanceObjectives[instanceId] = InstanceObjective(
+                instanceId,
                 (mobs.mapNotNull { spawnMob(it, activeArea.getRandomLocationOnFloor())?.also { uuid ->
                     trackedMobsForInstanceId[uuid] = instanceId
                 } } +
