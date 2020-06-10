@@ -347,6 +347,13 @@ object FWDungeonsEditController {
                     true
             )
             dungeonEditors.remove(player.uniqueId)
+            wipDungeonPos1s.remove(player.uniqueId)
+            wipDungeonPos2s.remove(player.uniqueId)
+            wipTriggerPos1s.remove(player.uniqueId)
+            wipTriggerPos2s.remove(player.uniqueId)
+            wipActiveAreaPos1s.remove(player.uniqueId)
+            wipActiveAreaPos2s.remove(player.uniqueId)
+            wipDungeonOrigins.remove(player.uniqueId)
             wipDungeons.remove(dungeon)
             "Dungeon succesfully exported"
         }
@@ -362,6 +369,14 @@ object FWDungeonsEditController {
                     false
             )
         dungeonEditors.remove(player.uniqueId)
+        wipDungeonPos1s.remove(player.uniqueId)
+        wipDungeonPos2s.remove(player.uniqueId)
+        wipTriggerPos1s.remove(player.uniqueId)
+        wipTriggerPos2s.remove(player.uniqueId)
+        wipActiveAreaPos1s.remove(player.uniqueId)
+        wipActiveAreaPos2s.remove(player.uniqueId)
+        wipDungeonOrigins.remove(player.uniqueId)
+        wipDungeons.remove(dungeon)
         return 0
     }
 
