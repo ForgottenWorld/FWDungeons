@@ -44,6 +44,7 @@ class Party(
         players.remove(player)
         FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
         FWDungeonsController.playerParties.remove(player.uniqueId)
+        FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
         players.forEach { it.sendMessage("${player.name} left the dungeon party") }
         if (leader == player) {
@@ -59,6 +60,7 @@ class Party(
         players.remove(player)
         FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
         FWDungeonsController.playerParties.remove(player.uniqueId)
+        FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
         players.forEach { it.sendMessage("${player.name} died in the dungeon") }
         if (leader == player) {
