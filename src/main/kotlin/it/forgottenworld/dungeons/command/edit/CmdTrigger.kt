@@ -10,7 +10,8 @@ val triggerCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
         mapOf(
                 "pos1" to ::cmdTriggerPos1,
                 "pos2" to ::cmdTriggerPos2,
-                "unmake" to ::cmdTriggerUnmake
+                "unmake" to ::cmdTriggerUnmake,
+                "label" to ::cmdTriggerLabel
         )
 
 
@@ -72,6 +73,29 @@ fun cmdTriggerUnmake(sender: CommandSender, command: Command, label: String, arg
                     -2 -> "This dungeon has no triggers yet"
                     -3 -> "This dungeon was already exported beforehand"
                     else -> "Deleted trigger with id $ret"
+                }
+        )
+    }
+    return true
+}
+
+fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        val tLabel = args.getOrNull(0)?.trim()
+
+        if (tLabel?.isEmpty() != false) {
+            sender.sendMessage("Not enough arguments: please provide a non-whitespace only label")
+            return true
+        }
+
+        val ret = FWDungeonsEditController.playerLabelTrigger(sender, tLabel)
+        sender.sendMessage(
+                when (ret) {
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "This dungeon has no triggers yet"
+                    -3 -> "This dungeon was already exported beforehand"
+                    0 -> "Set label $tLabel"
+                    else -> ""
                 }
         )
     }

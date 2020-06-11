@@ -11,12 +11,14 @@ import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getBlockVector
 import it.forgottenworld.dungeons.utils.minBlockVector
 import it.forgottenworld.dungeons.utils.toVector
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import java.util.*
 
 object FWDungeonsEditController {
+
     private val dungeonEditors = mutableMapOf<UUID, Dungeon>()
     private val wipDungeons = mutableListOf<Dungeon>()
     private val wipDungeonPos1s = mutableMapOf<UUID, Block>()
@@ -26,6 +28,25 @@ object FWDungeonsEditController {
     private val wipActiveAreaPos1s = mutableMapOf<UUID, Block>()
     private val wipActiveAreaPos2s = mutableMapOf<UUID, Block>()
     private val wipDungeonOrigins = mutableMapOf<UUID, BlockVector>()
+
+
+    private fun purgeWorkingData(player: Player) {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return
+
+        dungeonEditors.remove(player.uniqueId)
+        wipDungeonPos1s.remove(player.uniqueId)
+        wipDungeonPos2s.remove(player.uniqueId)
+        wipTriggerPos1s.remove(player.uniqueId)
+        wipTriggerPos2s.remove(player.uniqueId)
+        wipActiveAreaPos1s.remove(player.uniqueId)
+        wipActiveAreaPos2s.remove(player.uniqueId)
+        wipDungeonOrigins.remove(player.uniqueId)
+        wipDungeons.remove(dungeon)
+
+        player.sendMessage("${ChatColor.RED}You're no longer editing a dungeon")
+    }
+
+
 
     fun playerEditDungeon(player: Player, dungeonId: Int) : Boolean {
         return FWDungeonsController.getDungeonById(dungeonId)?.let {d ->
@@ -159,6 +180,17 @@ object FWDungeonsEditController {
         }
     }
 
+    fun playerLabelTrigger(player: Player, label: String) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+        if (!wipDungeons.contains(dungeon)) return -3 //dungeon is not wip
+        if (dungeon.triggers.isEmpty()) return -2 //dungeon has no triggers
+
+        return dungeon.triggers.last().let {
+            it.label = label
+            0 //success
+        }
+    }
+
     fun playerSetActiveAreaPos1(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
         if (!wipDungeons.contains(dungeon)) return -5//dungeon is not wip
@@ -232,6 +264,17 @@ object FWDungeonsEditController {
         }
     }
 
+    fun playerLabelActiveArea(player: Player, label: String) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+        if (!wipDungeons.contains(dungeon)) return -3 //dungeon is not wip
+        if (dungeon.activeAreas.isEmpty()) return -2 //dungeon has no active areas
+
+        return dungeon.activeAreas.last().let {
+            it.label = label
+            0 //success
+        }
+    }
+
     fun playerAddInstance(player: Player, block: Block) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
@@ -251,13 +294,13 @@ object FWDungeonsEditController {
                                     it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector()),
                                     it.effectParser,
                                     it.requiresWholeParty
-                            )
+                            ).apply { label = it.label }
                         },
                         dungeon.activeAreas.map {
                             ActiveArea(it.id,
                                     it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector()),
                                     it.startingMaterial
-                            )
+                            ).apply { label = it.label}
                         }
         ).apply { resetInstance() })
 
@@ -346,15 +389,7 @@ object FWDungeonsEditController {
                     dungeon,
                     true
             )
-            dungeonEditors.remove(player.uniqueId)
-            wipDungeonPos1s.remove(player.uniqueId)
-            wipDungeonPos2s.remove(player.uniqueId)
-            wipTriggerPos1s.remove(player.uniqueId)
-            wipTriggerPos2s.remove(player.uniqueId)
-            wipActiveAreaPos1s.remove(player.uniqueId)
-            wipActiveAreaPos2s.remove(player.uniqueId)
-            wipDungeonOrigins.remove(player.uniqueId)
-            wipDungeons.remove(dungeon)
+            purgeWorkingData(player)
             "Dungeon succesfully exported"
         }
     }
@@ -368,31 +403,15 @@ object FWDungeonsEditController {
                     dungeon,
                     false
             )
-        dungeonEditors.remove(player.uniqueId)
-        wipDungeonPos1s.remove(player.uniqueId)
-        wipDungeonPos2s.remove(player.uniqueId)
-        wipTriggerPos1s.remove(player.uniqueId)
-        wipTriggerPos2s.remove(player.uniqueId)
-        wipActiveAreaPos1s.remove(player.uniqueId)
-        wipActiveAreaPos2s.remove(player.uniqueId)
-        wipDungeonOrigins.remove(player.uniqueId)
-        wipDungeons.remove(dungeon)
+
+        purgeWorkingData(player)
         return 0
     }
 
     fun playerDiscardDungeon(player: Player) : Int {
-        val dungeon = dungeonEditors[player.uniqueId] ?:
-        return -1 //player is not editing any dungeons
+        dungeonEditors[player.uniqueId] ?: return -1
 
-        dungeonEditors.remove(player.uniqueId)
-        wipDungeonPos1s.remove(player.uniqueId)
-        wipDungeonPos2s.remove(player.uniqueId)
-        wipTriggerPos1s.remove(player.uniqueId)
-        wipTriggerPos2s.remove(player.uniqueId)
-        wipActiveAreaPos1s.remove(player.uniqueId)
-        wipActiveAreaPos2s.remove(player.uniqueId)
-        wipDungeonOrigins.remove(player.uniqueId)
-        wipDungeons.remove(dungeon)
+        purgeWorkingData(player)
         return 0
     }
 

@@ -10,21 +10,19 @@ import org.bukkit.entity.Player
 
 class CommandFWDungeons : CommandExecutor, TabExecutor {
 
-    private val commandBindings = mapOf(
-            "dungeon" to dungeonCmdBindings
-    )
+    private val commandBindings = dungeonCmdBindings
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean{
-        if (args.count() < 2) return false
+        if (args.count() < 1) return false
 
         if (sender is Player) {
-            if (!sender.hasPermission("fwdungeons.${args[0]}${args[1]}")) {
+            if (!sender.hasPermission("fwdungeons.${args[0]}")) {
                 sender.sendMessage("You don't have permission to use this command.")
                 return true
             }
 
-            return commandBindings[args[0]]?.get(args[1])?.let {
-                it(sender, command, label, args.sliceArray(IntRange(2, args.lastIndex)))
+            return commandBindings[args[0]]?.let {
+                it(sender, command, label, args.sliceArray(IntRange(1, args.lastIndex)))
             } ?: false
         }
 
@@ -36,7 +34,6 @@ class CommandFWDungeons : CommandExecutor, TabExecutor {
             when (args.count()) {
                 0 -> commandBindings.keys.toList()
                 1 -> commandBindings.keys.filter { it.startsWith(args[0], true) }
-                2 -> commandBindings[args[0]]?.keys?.filter { it.startsWith(args[1], true) }
                 else -> null
             }
         } else null

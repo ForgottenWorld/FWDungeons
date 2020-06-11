@@ -100,7 +100,7 @@ fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, 
                 -1 -> "You're currently not in a dungeon party"
                 -2 -> "Only the dungeon party leader may make the party private"
                 -3 -> "This dungeon party is already private"
-                0 -> "The dungeon party is now private, invite players with /fwd dungeon invite"
+                0 -> "The dungeon party is now private, invite players with /fwd invite"
                 else -> ""
             })
     }

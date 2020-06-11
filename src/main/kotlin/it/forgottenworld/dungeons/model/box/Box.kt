@@ -36,13 +36,13 @@ class Box {
         this.depth = opposite.blockZ - origin.blockZ + 1
     }
 
-    constructor(blockVector1: BlockVector, blockVector2: BlockVector) {
+    /*constructor(blockVector1: BlockVector, blockVector2: BlockVector) {
         origin = minBlockVector(blockVector1, blockVector2)
         val opposite = maxBlockVector(blockVector1, blockVector2)
         this.width = opposite.blockX - origin.blockX + 1
         this.height = opposite.blockY - origin.blockY + 1
         this.depth = opposite.blockZ - origin.blockZ + 1
-    }
+    }*/
 
     fun containsPlayer(player: Player) = player.location.let {
         it.x >= origin.blockX && it.x <= origin.blockX + width &&

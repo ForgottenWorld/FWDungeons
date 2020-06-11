@@ -27,7 +27,7 @@ private fun getJoinClickable(instance: DungeonInstance, leader: Boolean, locked:
                     clickEvent =
                             ClickEvent(
                                     ClickEvent.Action.RUN_COMMAND,
-                                    "/fwdungeons dungeon join ${instance.dungeon.id} ${instance.id}")
+                                    "/fwdungeons join ${instance.dungeon.id} ${instance.id}")
                 }
 
 private fun getPageClickable(text: String, page: Int) =
@@ -36,7 +36,7 @@ private fun getPageClickable(text: String, page: Int) =
             clickEvent =
                     ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
-                            "/fwdungeons dungeon list $page")
+                            "/fwdungeons list $page")
         }
 
 private fun getCarets(count: Int) =

@@ -10,7 +10,8 @@ val activeAreaCmdBindings: Map<String, (CommandSender, Command, String, Array<St
         mapOf(
                 "pos1" to ::cmdActiveAreaPos1,
                 "pos2" to ::cmdActiveAreaPos2,
-                "unmake" to ::cmdActiveAreaUnmake
+                "unmake" to ::cmdActiveAreaUnmake,
+                "label" to ::cmdActiveAreaLabel
         )
 
 
@@ -72,6 +73,29 @@ fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, 
                     -2 -> "This dungeon has no active areas yet"
                     -3 -> "This dungeon was already exported beforehand"
                     else -> "Deleted active area with id $ret"
+                }
+        )
+    }
+    return true
+}
+
+fun cmdActiveAreaLabel(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        val aaLabel = args.getOrNull(0)?.trim()
+
+        if (aaLabel?.isEmpty() != false) {
+            sender.sendMessage("Not enough arguments: please provide a non-whitespace only label")
+            return true
+        }
+
+        val ret = FWDungeonsEditController.playerLabelActiveArea(sender, aaLabel)
+        sender.sendMessage(
+                when (ret) {
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "This dungeon has no active areas yet"
+                    -3 -> "This dungeon was already exported beforehand"
+                    0 -> "Set label $aaLabel"
+                    else -> ""
                 }
         )
     }

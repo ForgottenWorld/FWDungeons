@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.utils.getParty
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 
@@ -15,6 +16,7 @@ class Trigger(
         val box: Box,
         val effectParser: ((DungeonInstance) -> () -> Unit)?,
         val requiresWholeParty: Boolean = false) {
+    var label: String? = null
     var procced = false
     lateinit var effect: () -> Unit
 
@@ -33,7 +35,7 @@ class Trigger(
             FWDungeonsController
                     .playersTriggering[player.uniqueId] = this
             if (ConfigManager.isInDebugMode)
-                player.sendMessage("Entered trigger zone id $id in dungeon id ${dungeon.id}")
+                player.sendMessage("Entered trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
             playersCurrentlyInside.add(player)
             proc()
         }
@@ -41,7 +43,7 @@ class Trigger(
 
     fun onPlayerExit(player: Player) {
         if (ConfigManager.isInDebugMode)
-            player.sendMessage("Exited trigger zone id $id in dungeon id ${dungeon.id}")
+            player.sendMessage("Exited trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
         playersCurrentlyInside.remove(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
     }

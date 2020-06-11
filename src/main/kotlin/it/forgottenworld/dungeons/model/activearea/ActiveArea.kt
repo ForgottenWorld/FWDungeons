@@ -6,6 +6,8 @@ import org.bukkit.Material
 
 class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Material.AIR) {
 
+    var label: String? = null
+
     fun fillWithMaterial(material: Material) {
         box.getAllBlocks().forEach {
             it.setType(material, true)

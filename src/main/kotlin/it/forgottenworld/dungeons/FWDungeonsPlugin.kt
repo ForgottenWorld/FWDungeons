@@ -71,14 +71,14 @@ class FWDungeonsPlugin : JavaPlugin() {
     }
 
     private fun initTables() {
-        executeUpdate("CREATE TABLE IF NOT EXISTS fwd_instance_locations (\n" +
-                "id int NOT NULL AUTO_INCREMENT,\n" +
-                "dungeon_id int NOT NULL,\n" +
-                "instance_id int NOT NULL,\n" +
-                "x int NOT NULL,\n" +
-                "y int NOT NULL,\n" +
-                "z int NOT NULL,\n" +
-                "PRIMARY KEY (id),\n" +
+        executeUpdate("CREATE TABLE IF NOT EXISTS fwd_instance_locations ( " +
+                "id int NOT NULL AUTO_INCREMENT, " +
+                "dungeon_id int NOT NULL, " +
+                "instance_id int NOT NULL, " +
+                "x int NOT NULL, " +
+                "y int NOT NULL, " +
+                "z int NOT NULL, " +
+                "PRIMARY KEY (id), " +
                 "UNIQUE KEY uqIdDungeonIdInstance (instance_id,dungeon_id));")
     }
 
@@ -101,13 +101,13 @@ class FWDungeonsPlugin : JavaPlugin() {
                                             it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
                                             it.effectParser,
                                             it.requiresWholeParty
-                                    )
+                                    ).apply { label = it.label}
                                 },
                                 dungeon.activeAreas.map {
                                     ActiveArea(it.id,
                                             it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
                                             it.startingMaterial
-                                    )
+                                    ).apply { label = it.label}
                                 }
                         ).apply{
                             triggers.forEach { it.parseEffect(this) }

@@ -64,45 +64,51 @@ permissions:
   fwdungeonsedit.trigger.pos2:
     description: Allows the player to use /fwdungeonsedit trigger pos2
     default: op
+  fwdungeonsedit.trigger.label:
+    description: Allows the player to use /fwdungeonsedit trigger label
+    default: op
   fwdungeonsedit.trigger.unmake:
     description: Allows the player to use /fwdungeonsedit trigger unmake
     default: op
   fwdungeonsedit.activearea.pos1:
-    description: Allows the player to use /fwdungeonsedit trigger pos1
+    description: Allows the player to use /fwdungeonsedit activearea pos1
     default: op
   fwdungeonsedit.activearea.pos2:
-    description: Allows the player to use /fwdungeonsedit trigger pos2
+    description: Allows the player to use /fwdungeonsedit activearea pos2
+    default: op
+  fwdungeonsedit.activearea.label:
+    description: Allows the player to use /fwdungeonsedit activearea label
     default: op
   fwdungeonsedit.activearea.unmake:
     description: Allows the player to use /fwdungeonsedit activearea unmake
     default: op
-  fwdungeons.dungeon.list:
-    description: Allows the player to use /fwdungeons dungeon list
+  fwdungeons.list:
+    description: Allows the player to use /fwdungeons list
     default: true
-  fwdungeons.dungeon.join:
-    description: Allows the player to use /fwdungeons dungeon join
+  fwdungeons.join:
+    description: Allows the player to use /fwdungeons join
     default: true
-  fwdungeons.dungeon.invite:
-    description: Allows the player to use /fwdungeons dungeon list
+  fwdungeons.invite:
+    description: Allows the player to use /fwdungeons list
     default: true
-  fwdungeons.dungeon.leave:
-    description: Allows the player to use /fwdungeons dungeon leave
+  fwdungeons.leave:
+    description: Allows the player to use /fwdungeons leave
     default: true
-  fwdungeons.dungeon.start:
-    description: Allows the player to use /fwdungeons dungeon start
+  fwdungeons.start:
+    description: Allows the player to use /fwdungeons start
     default: true
-  fwdungeons.dungeon.escape:
-    description: Allows the player to use /fwdungeons dungeon escape
+  fwdungeons.escape:
+    description: Allows the player to use /fwdungeons escape
     default: true
-  fwdungeons.dungeon.lock:
-    description: Allows the player to use /fwdungeons dungeon lock
+  fwdungeons.lock:
+    description: Allows the player to use /fwdungeons lock
     default: true
-  fwdungeons.dungeon.unlock:
-    description: Allows the player to use /fwdungeons dungeon unlock
+  fwdungeons.unlock:
+    description: Allows the player to use /fwdungeons unlock
     default: true
-  fwdungeons.dungeon.evacuate:
-    description: Allows the player to use /fwdungeons dungeon evacuate
+  fwdungeons.evacuate:
+    description: Allows the player to use /fwdungeons evacuate
     default: op
-  fwdungeons.dungeon.lookup:
-    description: Allows the player to use /fwdungeons dungeon lookup
+  fwdungeons.lookup:
+    description: Allows the player to use /fwdungeons lookup
     default: op

@@ -6,8 +6,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 
 class EntityDeathListener: Listener {
+
     @EventHandler
     fun onEntityDeath(event: EntityDeathEvent?) {
+
         val entity = event?.entity ?: return
 
         MobTracker.instanceIdForTrackedMobs[entity.uniqueId]?.let {

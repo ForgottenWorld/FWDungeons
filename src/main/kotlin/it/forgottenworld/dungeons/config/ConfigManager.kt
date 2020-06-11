@@ -68,7 +68,11 @@ object ConfigManager {
                                                         ),
                                                         { inst -> parseEffectCode(inst, conf.getStringList("triggers.$k.effect")) },
                                                         conf.getBoolean("triggers.$k.requiresWholeParty")
-                                                )
+                                                ).apply {
+                                                    conf.getString("triggers.$k.label")?.let {
+                                                        label = it
+                                                    }
+                                                }
                                             }
                             )
                             activeAreas.addAll(
@@ -84,7 +88,11 @@ object ConfigManager {
                                                                 conf.getInt("activeAreas.$k.depth")
                                                         ),
                                                         Material.getMaterial(conf.getString("activeAreas.$k.startingMaterial")!!)!!
-                                                )
+                                                ).apply {
+                                                    conf.getString("activeAreas.$k.label")?.let {
+                                                        label = it
+                                                    }
+                                                }
                                             }
                             )
                             FWDungeonsController.activeDungeons[id] = true
@@ -115,6 +123,7 @@ object ConfigManager {
                 set("startingLocation", dungeon.startingLocation.toVector())
                 dungeon.triggers.forEach {
                     set("triggers.${it.id}.id", it.id)
+                    it.label?.let { l -> set("triggers.${it.id}.label", l) }
                     set("triggers.${it.id}.origin", it.origin.toVector())
                     set("triggers.${it.id}.width", it.box.width)
                     set("triggers.${it.id}.height", it.box.height)
@@ -125,6 +134,7 @@ object ConfigManager {
                 }
                 dungeon.activeAreas.forEach {
                     set("activeAreas.${it.id}.id", it.id)
+                    it.label?.let { l -> set("activeAreas.${it.id}.label", l) }
                     set("activeAreas.${it.id}.origin", it.box.origin.toVector())
                     set("activeAreas.${it.id}.width", it.box.width)
                     set("activeAreas.${it.id}.height", it.box.height)

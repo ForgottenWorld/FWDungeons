@@ -12,7 +12,7 @@ fun formatInvitation(senderName: String, dungeonId: Int, instanceId: Int, partyK
                         color = ChatColor.GREEN
                         clickEvent = ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
-                                "/fwdungeons dungeon join $dungeonId $instanceId $partyKey")
+                                "/fwdungeons join $dungeonId $instanceId $partyKey")
                     }
             )
             addExtra(" to accept")
