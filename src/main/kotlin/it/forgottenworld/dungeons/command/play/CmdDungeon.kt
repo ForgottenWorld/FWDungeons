@@ -86,6 +86,7 @@ fun cmdDungeonLeave(sender: CommandSender, command: Command, label: String, args
     if (sender is Player) {
         sender.sendMessage( when (FWDungeonsController.playerLeaveParty(sender)) {
             -1 -> "You're currently not in a dungeon party"
+            -2 -> "The instance has started, you can't leave now"
             0 -> "You left the dungeon party"
             else -> ""
         })

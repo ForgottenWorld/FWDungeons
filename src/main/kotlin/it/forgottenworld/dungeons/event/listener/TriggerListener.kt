@@ -14,6 +14,8 @@ class TriggerListener: Listener {
         val player = event?.player ?: return
         val party = player.getParty() ?: return
 
+        if (!party.inGame) return
+
         FWDungeonsController.playersTriggering[player.uniqueId]?.let {
             if (!it.isPlayerInside(player))
                 it.onPlayerExit(player)

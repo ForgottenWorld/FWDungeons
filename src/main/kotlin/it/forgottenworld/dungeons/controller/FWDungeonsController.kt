@@ -70,8 +70,11 @@ object FWDungeonsController {
 
     fun playerLeaveParty(player: Player): Int {
         return playerParties[player.uniqueId]?.let {
-            it.playerLeave(player)
-            0 //party left succesfully
+            if (it.inGame) -2 //already inside the dungeon
+            else {
+                it.playerLeave(player)
+                0 //party left succesfully
+            }
         } ?: -1 //player is not in a party
     }
 
