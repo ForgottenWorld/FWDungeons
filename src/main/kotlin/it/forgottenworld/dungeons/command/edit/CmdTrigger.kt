@@ -1,6 +1,8 @@
 package it.forgottenworld.dungeons.command.edit
 
 import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getTargetBlock
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -20,12 +22,12 @@ fun cmdTriggerPos1(sender: CommandSender, command: Command, label: String, args:
         val block = sender.getTargetBlock()
 
         if (block == null) {
-            sender.sendMessage("You need to be targeting a block within 5 blocks of you before calling this")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}You need to be targeting a block within 5 blocks of you before calling this")
             return true
         }
 
         val ret = FWDungeonsEditController.playerSetTriggerPos1(sender, block)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "First position set, now pick another with /fwde trigger pos2"
@@ -44,12 +46,12 @@ fun cmdTriggerPos2(sender: CommandSender, command: Command, label: String, args:
         val block = sender.getTargetBlock()
 
         if (block == null) {
-            sender.sendMessage("You need to be targeting a block within 5 blocks of you before calling this")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}You need to be targeting a block within 5 blocks of you before calling this")
             return true
         }
 
         val ret = FWDungeonsEditController.playerSetTriggerPos2(sender, block)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "First position set, now pick another with /fwde trigger pos1"
@@ -67,7 +69,7 @@ fun cmdTriggerUnmake(sender: CommandSender, command: Command, label: String, arg
     if (sender is Player) {
 
         val ret = FWDungeonsEditController.playerUnmakeTrigger(sender)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "This dungeon has no triggers yet"
@@ -84,12 +86,12 @@ fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args
         val tLabel = args.joinToString(" ").trim()
 
         if (tLabel.isEmpty()) {
-            sender.sendMessage("Not enough arguments: please provide a non-whitespace only label")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Not enough arguments: please provide a non-whitespace only label")
             return true
         }
 
         val ret = FWDungeonsEditController.playerLabelTrigger(sender, tLabel)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "This dungeon has no triggers yet"

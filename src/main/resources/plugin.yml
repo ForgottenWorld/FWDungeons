@@ -1,7 +1,7 @@
 name: FWDungeons
-version: "0.1"
+version: "0.2"
 api-version: "1.15"
-description: Create dungeons in your minecraft server
+description: Create multi-instance scriptable co-op dungeons in your minecraft server
 author: Shivs (OhMeMuffin)
 main: it.forgottenworld.dungeons.FWDungeonsPlugin
 depend:
@@ -9,11 +9,11 @@ depend:
 commands:
   fwdungeons:
     description: Access FWDungeons functions.
-    usage: /fwdungeons
+    usage: /fwdungeons [ list | join | invite | leave | start | lock | unlock | evacuate | lookup ]
     aliases: [fwdungeons,fwd]
   fwdungeonsedit:
     description: Access FWDungeons functions.
-    usage: /fwdungeonsedit [dungeon [ create | edit id | name name | pos1 | pos2 | instadd|instremove]|trigger [pos1|pos2]|activearea [pos1|pos2]]
+    usage: /fwdungeonsedit [ dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove ] | trigger [ pos1 | pos2 | label | unmake ] | activearea [ pos1 | pos2 | label | unmake ]]
     aliases: [fwdungeonsedit,fwde]
 permissions:
   fwdungeonsedit.dungeon.create:
@@ -99,9 +99,6 @@ permissions:
     default: true
   fwdungeons.start:
     description: Allows the player to use /fwdungeons start
-    default: true
-  fwdungeons.escape:
-    description: Allows the player to use /fwdungeons escape
     default: true
   fwdungeons.lock:
     description: Allows the player to use /fwdungeons lock

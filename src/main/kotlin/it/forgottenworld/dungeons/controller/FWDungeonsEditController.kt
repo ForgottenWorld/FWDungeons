@@ -2,6 +2,8 @@ package it.forgottenworld.dungeons.controller
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.db.executeUpdateAsync
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
@@ -43,7 +45,7 @@ object FWDungeonsEditController {
         wipDungeonOrigins.remove(player.uniqueId)
         wipDungeons.remove(dungeon)
 
-        player.sendMessage("${ChatColor.RED}You're no longer editing a dungeon")
+        player.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.GRAY}You're no longer editing a dungeon")
     }
 
 

@@ -2,6 +2,8 @@ package it.forgottenworld.dungeons.model.trigger
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
@@ -35,7 +37,7 @@ class Trigger(
             FWDungeonsController
                     .playersTriggering[player.uniqueId] = this
             if (ConfigManager.isInDebugMode)
-                player.sendMessage("Entered trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
+                player.sendMessage("${getString(StringConst.CHAT_PREFIX)}Entered trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
             playersCurrentlyInside.add(player)
             proc()
         }
@@ -43,7 +45,7 @@ class Trigger(
 
     fun onPlayerExit(player: Player) {
         if (ConfigManager.isInDebugMode)
-            player.sendMessage("Exited trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
+            player.sendMessage("${getString(StringConst.CHAT_PREFIX)}Exited trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
         playersCurrentlyInside.remove(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
     }

@@ -2,6 +2,8 @@ package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.controller.MobTracker
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
@@ -55,7 +57,7 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
             CODE_FINISH ->
                 return {
                     instance.party?.players?.forEach {
-                        it.sendMessage("${ChatColor.GREEN}You will exit the dungeon in 5 seconds...") }
+                        it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.GREEN}You will exit the dungeon in 5 seconds...") }
                     object : BukkitRunnable() {
                         override fun run() {
                             instance.onInstanceFinish(true)

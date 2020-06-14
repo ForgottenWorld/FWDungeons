@@ -1,7 +1,9 @@
 package it.forgottenworld.dungeons.controller
 
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.formatInvitation
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
@@ -123,7 +125,7 @@ object FWDungeonsController {
                                         it.instance.startingPostion.x,
                                         it.instance.startingPostion.y,
                                         it.instance.startingPostion.z))
-                        p.sendMessage("Good luck out there!")
+                        p.sendMessage("${getString(StringConst.CHAT_PREFIX)}Good luck out there!")
                     }
                     0 //all players teleported to instance starting position
                 }
@@ -137,8 +139,8 @@ object FWDungeonsController {
     }
 
     fun lookupPlayer(playerName: String): String {
-        val player = getPlayer(playerName) ?: return "Player not found"
-        val party = player.getParty() ?: return "Player is not in a party or an instance"
-        return "Player $playerName is in a party for dungeon id ${party.instance.dungeon.id}, instance id ${party.instance.id}"
+        val player = getPlayer(playerName) ?: return "${getString(StringConst.CHAT_PREFIX)}Player not found"
+        val party = player.getParty() ?: return "${getString(StringConst.CHAT_PREFIX)}Player is not in a party or an instance"
+        return "${getString(StringConst.CHAT_PREFIX)}Player $playerName is in a party for dungeon (id: ${party.instance.dungeon.id}), instance (id: ${party.instance.id})"
     }
 }

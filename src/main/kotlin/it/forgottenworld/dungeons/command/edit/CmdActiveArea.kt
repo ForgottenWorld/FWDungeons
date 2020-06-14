@@ -1,6 +1,8 @@
 package it.forgottenworld.dungeons.command.edit
 
 import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getTargetBlock
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -25,7 +27,7 @@ fun cmdActiveAreaPos1(sender: CommandSender, command: Command, label: String, ar
         }
 
         val ret = FWDungeonsEditController.playerSetActiveAreaPos1(sender, block)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "First position set, now pick another with /fwde activearea pos2"
@@ -44,12 +46,12 @@ fun cmdActiveAreaPos2(sender: CommandSender, command: Command, label: String, ar
         val block = sender.getTargetBlock()
 
         if (block == null) {
-            sender.sendMessage("You need to be targeting a block within 5 blocks of you before calling this")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}You need to be targeting a block within 5 blocks of you before calling this")
             return true
         }
 
         val ret = FWDungeonsEditController.playerSetActiveAreaPos2(sender, block)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "First position set, now pick another with /fwde activearea pos1"
@@ -67,7 +69,7 @@ fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, 
     if (sender is Player) {
 
         val ret = FWDungeonsEditController.playerUnmakeActiveArea(sender)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "This dungeon has no active areas yet"
@@ -84,12 +86,12 @@ fun cmdActiveAreaLabel(sender: CommandSender, command: Command, label: String, a
         val aaLabel = args.joinToString(" ").trim()
 
         if (aaLabel.isEmpty()) {
-            sender.sendMessage("Not enough arguments: please provide a non-whitespace only label")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Not enough arguments: please provide a non-whitespace only label")
             return true
         }
 
         val ret = FWDungeonsEditController.playerLabelActiveArea(sender, aaLabel)
-        sender.sendMessage(
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "This dungeon has no active areas yet"

@@ -2,6 +2,8 @@ package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.controller.MobTracker
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.event.DungeonCompletedEvent
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
@@ -20,10 +22,9 @@ class DungeonInstance(
         private val origin: BlockVector,
         val triggers: List<Trigger>,
         private val activeAreas: List<ActiveArea>) {
-    private val triggersIdMap = triggers.toTriggerIdMap()
+
     private val activeAreasIdMap = activeAreas.toActiveAreaIdMap()
 
-    fun getTriggerById(id: Int) = triggersIdMap[id]
     fun getActiveAreaById(id: Int) = activeAreasIdMap[id]
 
     var party: Party? = null
@@ -58,7 +59,7 @@ class DungeonInstance(
         }
 
         party?.players?.forEach {
-            it.sendMessage("${ChatColor.GREEN}Congratulations, you made it out alive!")
+            it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.GREEN}Congratulations, you made it out alive!")
             FWDungeonsController.playerReturnPositions[it.uniqueId]?.let { pos -> it.teleport(pos) }
             FWDungeonsController.playerReturnGameModes[it.uniqueId]?.let { gm -> it.gameMode = gm }
         }

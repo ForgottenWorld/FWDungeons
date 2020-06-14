@@ -1,6 +1,8 @@
 package it.forgottenworld.dungeons.model.party
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.utils.getRandomString
 import org.bukkit.entity.Player
@@ -34,7 +36,7 @@ class Party(
         if (players.count() == maxPlayers) return false
         return if (players.contains(player)) false
         else {
-            players.forEach { it.sendMessage("${player.name} joined the dungeon party") }
+            players.forEach { it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${player.name} joined the dungeon party") }
             FWDungeonsController.playerParties[player.uniqueId] = this
             players.add(player)
         }
@@ -47,12 +49,12 @@ class Party(
         FWDungeonsController.playerParties.remove(player.uniqueId)
         FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
-        players.forEach { it.sendMessage("${player.name} left the dungeon party") }
+        players.forEach { it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${player.name} left the dungeon party") }
         if (leader == player) {
             if (players.isEmpty()) {
                 instance.resetInstance()
             } else {
-                leader = players.first().apply { sendMessage("You're now the party leader") }
+                leader = players.first().apply { sendMessage("${getString(StringConst.CHAT_PREFIX)}You're now the party leader") }
             }
         }
     }
@@ -69,7 +71,7 @@ class Party(
             if (players.isEmpty()) {
                 instance.resetInstance()
             } else {
-                leader = players.first().apply { sendMessage("You're now the party leader") }
+                leader = players.first().apply { sendMessage("${getString(StringConst.CHAT_PREFIX)}You're now the party leader") }
             }
         }
     }

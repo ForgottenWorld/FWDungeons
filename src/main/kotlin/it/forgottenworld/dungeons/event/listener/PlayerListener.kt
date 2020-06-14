@@ -2,6 +2,8 @@ package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.cui.StringConst
+import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getParty
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.event.EventHandler
@@ -19,7 +21,7 @@ class PlayerListener: Listener {
         val party = player.getParty() ?: return
 
         party.playerDied(player)
-        player.sendMessage("${ChatColor.RED}You died in the dungeon")
+        player.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.RED}You died in the dungeon")
     }
 
     @EventHandler
@@ -36,7 +38,7 @@ class PlayerListener: Listener {
         player.getParty() ?: return
 
         if (event.cause == PlayerTeleportEvent.TeleportCause.COMMAND) {
-            player.sendMessage("You wish you could!")
+            player.sendMessage("${getString(StringConst.CHAT_PREFIX)}You wish you could!")
             player.damage(2.0)
             event.isCancelled = true
         }
