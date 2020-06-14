@@ -43,6 +43,7 @@ class Party(
     fun playerLeave(player: Player) {
         players.remove(player)
         FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
+        FWDungeonsController.playerReturnGameModes.remove(player.uniqueId)
         FWDungeonsController.playerParties.remove(player.uniqueId)
         FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
@@ -59,6 +60,7 @@ class Party(
     fun playerDied(player: Player) {
         players.remove(player)
         FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
+        FWDungeonsController.playerReturnGameModes.remove(player.uniqueId)
         FWDungeonsController.playerParties.remove(player.uniqueId)
         FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)
@@ -75,6 +77,7 @@ class Party(
     fun disband() {
         players.forEach {
             FWDungeonsController.playerReturnPositions.remove(it.uniqueId)
+            FWDungeonsController.playerReturnGameModes.remove(it.uniqueId)
             FWDungeonsController.playerParties.remove(it.uniqueId)
             FWDungeonsController.playersTriggering.remove(it.uniqueId)
         }

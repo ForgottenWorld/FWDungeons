@@ -8,7 +8,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> Boolean> =
+val cmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> Boolean> =
         mapOf(
                 "join" to ::cmdDungeonJoinInstance,
                 "list" to ::cmdDungeonList,

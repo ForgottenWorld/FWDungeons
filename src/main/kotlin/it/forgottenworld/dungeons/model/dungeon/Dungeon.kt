@@ -15,6 +15,7 @@ class Dungeon(val id: Int) {
     var triggers = mutableListOf<Trigger>()
     var activeAreas = mutableListOf<ActiveArea>()
     var instances = mutableListOf<DungeonInstance>()
+    var points = 0
 
     enum class Difficulty {
         EASY, MEDIUM, HARD;
@@ -43,6 +44,7 @@ class Dungeon(val id: Int) {
                 name: String,
                 description: String,
                 difficulty: Difficulty,
+                points: Int,
                 numberOfPlayers: IntRange,
                 box: Box,
                 startingLocation: BlockVector,
@@ -52,6 +54,7 @@ class Dungeon(val id: Int) {
         this.name = name
         this.description = description
         this.difficulty = difficulty
+        this.points = points
         this.numberOfPlayers = numberOfPlayers
         this.box = box
         this.startingLocation = startingLocation

@@ -1,8 +1,11 @@
 package it.forgottenworld.dungeons.utils
 
+import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.controller.MobTracker
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
+import org.bukkit.scheduler.BukkitRunnable
 
 const val CODE_FILL_ACTIVE_AREA = "fill"
 const val CODE_SPAWN_TO_BE_KILLED_COMMAND = "spawntobekilled"
@@ -50,7 +53,14 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
                 return { activeArea.fillWithMaterial(material) }
             }
             CODE_FINISH ->
-                return { instance.onInstanceFinish() }
+                return {
+                    instance.party?.players?.forEach {
+                        it.sendMessage("${ChatColor.GREEN}You will exit the dungeon in 5 seconds...") }
+                    object : BukkitRunnable() {
+                        override fun run() {
+                            instance.onInstanceFinish(true)
+                    }}.runTaskLater(FWDungeonsPlugin.instance, 100)
+                }
             CODE_WHEN_DONE ->
                 throw Exception("ERROR: whendone used outside of spawntobekilled statement")
         }

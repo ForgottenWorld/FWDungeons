@@ -22,7 +22,8 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
                 "difficulty" to ::cmdDungeonDifficulty,
                 "description" to ::cmdDungeonDescription,
                 "players" to ::cmdDungeonNumberOfPlayers,
-                "save" to ::cmdDungeonSave
+                "save" to ::cmdDungeonSave,
+                "points" to ::cmdDungeonPoints
         )
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -194,6 +195,29 @@ fun cmdDungeonDifficulty(sender: CommandSender, command: Command, label: String,
                     }
             )
         }
+    }
+
+    return true
+}
+
+fun cmdDungeonPoints(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        if (args.count() == 0) {
+            sender.sendMessage("Not enough arguments: please provide an amount")
+            return true
+        }
+        val p = args[0].toIntOrNull()
+        if (p == null) {
+            sender.sendMessage("Invalid argument: amount of points should be an integer")
+            return true
+        }
+        sender.sendMessage(
+                when (FWDungeonsEditController.playerSetPointsDungeon(sender, p)) {
+                    0 -> "Dungeon points changed"
+                    -1 -> "You're not editing any dungeons"
+                    else -> ""
+                }
+        )
     }
 
     return true

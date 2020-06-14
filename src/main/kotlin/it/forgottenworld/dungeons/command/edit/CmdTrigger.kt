@@ -81,9 +81,9 @@ fun cmdTriggerUnmake(sender: CommandSender, command: Command, label: String, arg
 
 fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
-        val tLabel = args.getOrNull(0)?.trim()
+        val tLabel = args.joinToString(" ").trim()
 
-        if (tLabel?.isEmpty() != false) {
+        if (tLabel.isEmpty()) {
             sender.sendMessage("Not enough arguments: please provide a non-whitespace only label")
             return true
         }

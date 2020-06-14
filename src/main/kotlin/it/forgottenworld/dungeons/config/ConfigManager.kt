@@ -41,6 +41,7 @@ object ConfigManager {
                                 conf.getString("name")!!,
                                 conf.getString("description")!!,
                                 Dungeon.Difficulty.fromString(conf.getString("difficulty")!!)!!,
+                                conf.getInt("points", 0),
                                 conf.getIntegerList("numberOfPlayers").let{ IntRange(it.first(), it.last()) },
                                 Box(
                                         BlockVector(0,0,0),
@@ -116,6 +117,7 @@ object ConfigManager {
                 set("name", dungeon.name)
                 set("description", dungeon.description)
                 set("difficulty", dungeon.difficulty.toString())
+                set("points", dungeon.points)
                 set("numberOfPlayers", listOf(dungeon.numberOfPlayers.first, dungeon.numberOfPlayers.last))
                 set("width", dungeon.box.width)
                 set("height", dungeon.box.height)

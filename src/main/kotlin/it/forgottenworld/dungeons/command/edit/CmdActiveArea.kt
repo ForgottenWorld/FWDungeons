@@ -81,9 +81,9 @@ fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, 
 
 fun cmdActiveAreaLabel(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
-        val aaLabel = args.getOrNull(0)?.trim()
+        val aaLabel = args.joinToString(" ").trim()
 
-        if (aaLabel?.isEmpty() != false) {
+        if (aaLabel.isEmpty()) {
             sender.sendMessage("Not enough arguments: please provide a non-whitespace only label")
             return true
         }

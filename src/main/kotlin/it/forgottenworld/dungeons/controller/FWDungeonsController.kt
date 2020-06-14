@@ -8,6 +8,7 @@ import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getDungeonInstance
 import it.forgottenworld.dungeons.utils.getParty
 import org.bukkit.Bukkit.*
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -19,6 +20,7 @@ object FWDungeonsController {
     val playerParties = mutableMapOf<UUID, Party>()
     val playersTriggering = mutableMapOf<UUID, Trigger>()
     val playerReturnPositions = mutableMapOf<UUID, Location>()
+    val playerReturnGameModes = mutableMapOf<UUID, GameMode>()
 
     fun getMaxDungeonId() = dungeons.keys.max() ?: -1
     fun getDungeonById(id: Int) = dungeons[id]
@@ -113,6 +115,8 @@ object FWDungeonsController {
                     it.inGame = true
                     it.players.forEach { p ->
                         playerReturnPositions[p.uniqueId] = p.location
+                        playerReturnGameModes[p.uniqueId] = p.gameMode
+                        p.gameMode = GameMode.ADVENTURE
                         p.teleport(
                                 Location(
                                         getWorld(ConfigManager.dungeonWorld),
@@ -128,7 +132,7 @@ object FWDungeonsController {
     }
 
     fun evacuateDungeon(dungeonId: Int, instanceId: Int): Boolean {
-        dungeons[dungeonId]?.instances?.find { it.id == instanceId }?.onInstanceFinish() ?: return false
+        dungeons[dungeonId]?.instances?.find { it.id == instanceId }?.onInstanceFinish(false) ?: return false
         return true
     }
 

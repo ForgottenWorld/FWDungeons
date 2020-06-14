@@ -294,7 +294,9 @@ object FWDungeonsEditController {
                                     it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector()),
                                     it.effectParser,
                                     it.requiresWholeParty
-                            ).apply { label = it.label }
+                            ).apply {
+                                label = it.label
+                            }
                         },
                         dungeon.activeAreas.map {
                             ActiveArea(it.id,
@@ -302,7 +304,10 @@ object FWDungeonsEditController {
                                     it.startingMaterial
                             ).apply { label = it.label}
                         }
-        ).apply { resetInstance() })
+        ).apply {
+                    triggers.forEach { it.parseEffect(this) }
+                    resetInstance()
+                })
 
         executeUpdateAsync(
                 "INSERT INTO fwd_instance_locations (dungeon_id, instance_id, x, y, z) VALUES (?, ?, ?, ?, ?);",
@@ -366,6 +371,14 @@ object FWDungeonsEditController {
         dungeon.difficulty = difficulty
         return 0
     }
+
+    fun playerSetPointsDungeon(player: Player, points: Int) : Int {
+        val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
+
+        dungeon.points = points
+        return 0
+    }
+
 
     fun playerSetNumberOfPlayersDungeon(player: Player, numberOfPlayers: IntRange) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
