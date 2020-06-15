@@ -62,7 +62,7 @@ class Party(
     fun playerDied(player: Player) {
         players.remove(player)
         FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
-        FWDungeonsController.playerReturnGameModes.remove(player.uniqueId)
+        FWDungeonsController.playerReturnGameModes.remove(player.uniqueId)?.let { player.gameMode = it }
         FWDungeonsController.playerParties.remove(player.uniqueId)
         FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
         FWDungeonsController.playersTriggering.remove(player.uniqueId)

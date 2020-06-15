@@ -9,6 +9,7 @@ import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getDungeonInstance
 import it.forgottenworld.dungeons.utils.getParty
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit.*
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -31,6 +32,10 @@ object FWDungeonsController {
         val dungeon = getDungeonById(dungeonId) ?: return -1 //invalid dungeon id
         val instance = dungeon.instances.find { it.id == instanceId } ?: return -2 //invalid instance id
 
+        if (activeDungeons[dungeonId] != true) {
+            return -8 //dungeon is disabled
+        }
+
         if (playerParties[player.uniqueId] != null)
             return -3 //player already in party
 
@@ -51,7 +56,7 @@ object FWDungeonsController {
             if (party.isFull) return -4 //party is full
             if (party.inGame) return -7 //party is inside the dungeon
             if (instance.party!!.isLocked && partyKey != instance.party!!.partyKey) return -5 //wrong key
-            return if (party.playerJoin(player)) 1  //party joines, player is not leader
+            return if (party.playerJoin(player)) 1  //party joined, player is not leader
             else -6 //join failed
         }
     }
@@ -142,5 +147,20 @@ object FWDungeonsController {
         val player = getPlayer(playerName) ?: return "${getString(StringConst.CHAT_PREFIX)}Player not found"
         val party = player.getParty() ?: return "${getString(StringConst.CHAT_PREFIX)}Player is not in a party or an instance"
         return "${getString(StringConst.CHAT_PREFIX)}Player $playerName is in a party for dungeon (id: ${party.instance.dungeon.id}), instance (id: ${party.instance.id})"
+    }
+
+    fun playerEnableDungeon(dungeonId: Int) : Boolean {
+        return if (dungeons.contains(dungeonId)) {
+            activeDungeons[dungeonId] = true
+            true
+        } else false
+    }
+
+    fun playerDisableDungeon(dungeonId: Int) : Boolean {
+        return dungeons[dungeonId]?.let {
+            it.instances.forEach { inst -> evacuateDungeon(it.id, inst.id) }
+            activeDungeons[dungeonId] = false
+            true
+        } ?: false
     }
 }

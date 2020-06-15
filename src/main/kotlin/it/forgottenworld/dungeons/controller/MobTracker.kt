@@ -7,35 +7,40 @@ import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import java.util.*
 
+enum class MobType { MYTHIC, VANILLA }
+data class MobSpawnData(val activeArea: ActiveArea, val mob: String, val type: MobType)
+
 object MobTracker {
     val instanceIdForTrackedMobs = mutableMapOf<UUID, Int>()
     val instanceObjectives = mutableMapOf<Int, InstanceObjective>()
 
     fun attachNewObjectiveToInstance(
             instanceId: Int,
-            mobs: List<String>,
-            mythicMobs: List<String>,
-            activeArea: ActiveArea,
+            mobs: Set<MobSpawnData>,
             onAllKilled: () -> Unit) {
         if (instanceObjectives.contains(instanceId)) return
         instanceObjectives[instanceId] = InstanceObjective(
                 instanceId,
-                (mobs.mapNotNull {
-                    spawnMob(it,
-                            activeArea
-                                    .getRandomLocationOnFloor()
-                                    .clone()
-                                    .add(0.5, 0.5, 0.5))?.also { uuid ->
-                    instanceIdForTrackedMobs[uuid] = instanceId
-                } } +
-                    mythicMobs.mapNotNull {
-                        spawnMythicMob(it,
-                                activeArea
+                mobs.mapNotNull {
+                    if (it.type == MobType.VANILLA) {
+                        spawnMob(it.mob,
+                                it.activeArea
                                         .getRandomLocationOnFloor()
                                         .clone()
-                                        .add(0.5, 0.5, 0.5))?.also {uuid ->
-                        instanceIdForTrackedMobs[uuid] = instanceId
-                    } }).toMutableList(),
+                                        .add(0.5, 0.5, 0.5)
+                                )?.also { uuid ->
+                                            instanceIdForTrackedMobs[uuid] = instanceId
+                                        }
+                    } else {
+                        spawnMythicMob(it.mob,
+                                it.activeArea
+                                        .getRandomLocationOnFloor()
+                                        .clone()
+                                        .add(0.5, 0.5, 0.5)
+                                )?.also { uuid ->
+                                            instanceIdForTrackedMobs[uuid] = instanceId
+                                        }
+                    } }.toMutableList(),
                 onAllKilled
         )
         return

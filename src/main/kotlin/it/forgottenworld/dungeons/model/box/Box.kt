@@ -93,9 +93,9 @@ class Box {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
                     var c = 0
-                    if (x == origin.blockX || x == origin.blockX + width - 1) ++c
-                    if (y == origin.blockY || y == origin.blockY + height - 1) ++c
-                    if (z == origin.blockZ || z == origin.blockZ + depth - 1) ++c
+                    if (x == 0 || x == width - 1) ++c
+                    if (y == 0 || y == height - 1) ++c
+                    if (z == 0 || z == depth - 1) ++c
                     if (c > 1)
                         blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }

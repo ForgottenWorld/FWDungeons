@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.controller.FWDungeonsEditController
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getParty
@@ -27,6 +28,9 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent?) {
         val player = event?.player ?: return
+
+        FWDungeonsEditController.purgeWorkingData(player)
+
         player.getParty() ?: return
 
         player.health = 0.0

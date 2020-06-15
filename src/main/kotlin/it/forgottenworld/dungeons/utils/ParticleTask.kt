@@ -29,3 +29,25 @@ fun repeatedlySpawnParticles(
         }
     }.runTaskTimer(FWDungeonsPlugin.instance, 0L, interval)
 }
+
+fun repeatedlySpawnParticles(
+        particle: Particle,
+        locations: Set<Location>,
+        count: Int,
+        interval: Long,
+        controlVar: TypeWrapper<Boolean>) {
+    val world = getWorld(ConfigManager.dungeonWorld) ?: return
+    object : BukkitRunnable() {
+        override fun run() {
+            //getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
+            locations.forEach {
+                world.spawnParticle(
+                        particle,
+                        it.clone().add(0.5,0.5,0.5),
+                        count)
+            }
+            if (!controlVar.value)
+                cancel()
+        }
+    }.runTaskTimer(FWDungeonsPlugin.instance, 0L, interval)
+}

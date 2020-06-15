@@ -102,13 +102,13 @@ class FWDungeonsPlugin : JavaPlugin() {
                                             it.effectParser,
                                             it.requiresWholeParty
                                     ).apply { label = it.label}
-                                },
+                                }.toMutableList(),
                                 dungeon.activeAreas.map {
                                     ActiveArea(it.id,
                                             it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
                                             it.startingMaterial
                                     ).apply { label = it.label}
-                                }
+                                }.toMutableList()
                         ).apply{
                             triggers.forEach { it.parseEffect(this) }
                             resetInstance()

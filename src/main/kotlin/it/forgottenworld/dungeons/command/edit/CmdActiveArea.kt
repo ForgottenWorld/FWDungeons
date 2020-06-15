@@ -8,6 +8,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
+@ExperimentalStdlibApi
 val activeAreaCmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> Boolean> =
         mapOf(
                 "pos1" to ::cmdActiveAreaPos1,
@@ -65,6 +66,7 @@ fun cmdActiveAreaPos2(sender: CommandSender, command: Command, label: String, ar
     return true
 }
 
+@ExperimentalStdlibApi
 fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
 

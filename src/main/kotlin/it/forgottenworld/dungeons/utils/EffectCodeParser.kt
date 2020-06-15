@@ -1,16 +1,19 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.controller.MobSpawnData
 import it.forgottenworld.dungeons.controller.MobTracker
+import it.forgottenworld.dungeons.controller.MobType
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
+import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
 import org.bukkit.scheduler.BukkitRunnable
 
 const val CODE_FILL_ACTIVE_AREA = "fill"
-const val CODE_SPAWN_TO_BE_KILLED_COMMAND = "spawntobekilled"
+const val CODE_SPAWN_TO_BE_KILLED_COMMAND = "combatobjective"
 const val CODE_WHEN_DONE = "whendone"
 const val CODE_FINISH = "exit"
 const val PREFIX_MYTHIC_MOB = "mm"
@@ -20,7 +23,7 @@ const val PREFIX_VANILLA_MOB_LENGTH = 1
 const val PREFIX_ACTIVE_AREA = "aa"
 const val PREFIX_ACTIVE_AREA_LENGTH = 2
 
-private data class TypeWrapper<T>(var value: T)
+data class TypeWrapper<T>(var value: T)
 
 fun parseEffectCode(instance: DungeonInstance, lines: List<String>): () -> Unit {
     val parsedCodeLines =
@@ -36,16 +39,12 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
     while(codeIterator.hasNext()) {
         when (val code = codeIterator.next()) {
             CODE_SPAWN_TO_BE_KILLED_COMMAND -> {
-                val mobs = mutableListOf<String>()
-                val mythicMobs = mutableListOf<String>()
-                val activeArea = TypeWrapper(-1)
-                val whenDone = parseSpawnToBeKilled(instance, codeIterator, mobs, mythicMobs, activeArea)
+                val mobs = mutableSetOf<MobSpawnData>()
+                val whenDone = parseSpawnToBeKilled(instance, codeIterator, mobs)
 
                 return { MobTracker.attachNewObjectiveToInstance(
                             instance.id,
                             mobs,
-                            mythicMobs,
-                            instance.getActiveAreaById(activeArea.value)!!,
                             whenDone) }
             }
             CODE_FILL_ACTIVE_AREA -> {
@@ -73,20 +72,19 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
 private fun parseSpawnToBeKilled(
         instance: DungeonInstance,
         codeIterator: Iterator<String>,
-        mobs: MutableList<String>,
-        mythicMobs: MutableList<String>,
-        activeArea: TypeWrapper<Int>): () -> Unit {
+        mobs: MutableSet<MobSpawnData>): () -> Unit {
+    var currentActiveArea: ActiveArea? = null
     while(codeIterator.hasNext()) {
         val code = codeIterator.next()
         when {
             code.startsWith(PREFIX_MYTHIC_MOB) -> {
-                mythicMobs.add(code.drop(PREFIX_MYTHIC_MOB_LENGTH))
+                mobs.add(MobSpawnData(currentActiveArea!!, code.drop(PREFIX_MYTHIC_MOB_LENGTH), MobType.MYTHIC))
             }
             code.startsWith(PREFIX_VANILLA_MOB) -> {
-                mobs.add(code.drop(PREFIX_VANILLA_MOB_LENGTH))
+                mobs.add(MobSpawnData(currentActiveArea!!, code.drop(PREFIX_VANILLA_MOB_LENGTH), MobType.VANILLA))
             }
             code.startsWith(PREFIX_ACTIVE_AREA) -> {
-                activeArea.value = code.drop(PREFIX_ACTIVE_AREA_LENGTH).toInt()
+                currentActiveArea = instance.getActiveAreaById(code.drop(PREFIX_ACTIVE_AREA_LENGTH).toInt())
             }
             code == CODE_WHEN_DONE -> {
                 return parseCode(instance, codeIterator)

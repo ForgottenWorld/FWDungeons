@@ -8,6 +8,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
+@ExperimentalStdlibApi
 val triggerCmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> Boolean> =
         mapOf(
                 "pos1" to ::cmdTriggerPos1,
@@ -65,6 +66,7 @@ fun cmdTriggerPos2(sender: CommandSender, command: Command, label: String, args:
     return true
 }
 
+@ExperimentalStdlibApi
 fun cmdTriggerUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
 

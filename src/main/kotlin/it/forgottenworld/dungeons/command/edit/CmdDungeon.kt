@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command.edit
 
+import it.forgottenworld.dungeons.controller.FWDungeonsController
 import it.forgottenworld.dungeons.controller.FWDungeonsEditController
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
@@ -25,7 +26,8 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
                 "description" to ::cmdDungeonDescription,
                 "players" to ::cmdDungeonNumberOfPlayers,
                 "save" to ::cmdDungeonSave,
-                "points" to ::cmdDungeonPoints
+                "points" to ::cmdDungeonPoints,
+                "hlframes" to ::cmdDungeonHlFrames
         )
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -52,7 +54,7 @@ fun cmdDungeonEdit(sender: CommandSender, command: Command, label: String, args:
         if (FWDungeonsEditController.playerEditDungeon(sender, id))
             sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Now editing dungeon with id $id")
         else
-            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}No dungeons found with id $id")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}No currently disabled dungeons found with id $id")
     }
     return true
 }
@@ -300,5 +302,18 @@ fun cmdDungeonDiscard(sender: CommandSender, command: Command, label: String, ar
                 })
     }
 
+    return true
+}
+
+
+fun cmdDungeonHlFrames(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (sender is Player) {
+        sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
+                when (FWDungeonsEditController.playerHighlightFrames(sender)) {
+                    -1 -> "You're not editing any dungeons"
+                    -2 -> "Couldn't find dungeon test instance"
+                    else -> "Toggled highlighted frames"
+                })
+    }
     return true
 }

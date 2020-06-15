@@ -9,12 +9,14 @@ import org.bukkit.entity.Player
 
 class CommandFWDungeonsEdit : CommandExecutor, TabExecutor {
 
+    @ExperimentalStdlibApi
     private val commandBindings = mapOf(
             "dungeon" to dungeonCmdBindings,
             "trigger" to triggerCmdBindings,
             "activearea" to activeAreaCmdBindings
     )
 
+    @ExperimentalStdlibApi
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         if (args.count() < 2) return false
 
@@ -37,6 +39,7 @@ class CommandFWDungeonsEdit : CommandExecutor, TabExecutor {
         return false
     }
 
+    @ExperimentalStdlibApi
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<String>): List<String>? {
         return if (cmd.name.equals("fwdungeonsedit", true) && sender is Player) {
              when (args.count()) {

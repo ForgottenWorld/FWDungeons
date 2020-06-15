@@ -9,21 +9,21 @@ import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
-import it.forgottenworld.dungeons.utils.toActiveAreaIdMap
-import it.forgottenworld.dungeons.utils.toTriggerIdMap
-import it.forgottenworld.dungeons.utils.withRefSystemOrigin
+import it.forgottenworld.dungeons.utils.*
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
+import org.bukkit.Particle
 import org.bukkit.util.BlockVector
 
 class DungeonInstance(
         val id: Int,
         val dungeon: Dungeon,
         private val origin: BlockVector,
-        val triggers: List<Trigger>,
-        private val activeAreas: List<ActiveArea>) {
+        val triggers: MutableList<Trigger>,
+        val activeAreas: MutableList<ActiveArea>) {
 
     private val activeAreasIdMap = activeAreas.toActiveAreaIdMap()
+    var highlightFrames = TypeWrapper(false)
 
     fun getActiveAreaById(id: Int) = activeAreasIdMap[id]
 
@@ -65,5 +65,31 @@ class DungeonInstance(
         }
         party?.disband()
         resetInstance()
+    }
+
+    fun toggleEditorHighlights() {
+        if (highlightFrames.value)
+            highlightFrames.value = false
+        else {
+            highlightFrames.value = true
+            val aaLocs = activeAreas.map { it.box.getFrontierBlocks() }.flatten().map { it.location }.toSet()
+            val tLocs = triggers.map { it.box.getFrontierBlocks() }.flatten().map { it.location }.toSet()
+            if (aaLocs.isNotEmpty())
+                repeatedlySpawnParticles(
+                        Particle.DRIP_WATER,
+                        aaLocs,
+                        1,
+                        10,
+                        highlightFrames
+                )
+            if (tLocs.isNotEmpty())
+                repeatedlySpawnParticles(
+                        Particle.DRIP_LAVA,
+                        tLocs,
+                        1,
+                        10,
+                        highlightFrames
+                )
+        }
     }
 }

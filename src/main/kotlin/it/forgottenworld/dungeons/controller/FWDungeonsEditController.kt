@@ -30,9 +30,9 @@ object FWDungeonsEditController {
     private val wipActiveAreaPos1s = mutableMapOf<UUID, Block>()
     private val wipActiveAreaPos2s = mutableMapOf<UUID, Block>()
     private val wipDungeonOrigins = mutableMapOf<UUID, BlockVector>()
+    val wipTestInstances = mutableMapOf<UUID, DungeonInstance>()
 
-
-    private fun purgeWorkingData(player: Player) {
+    fun purgeWorkingData(player: Player) {
         val dungeon = dungeonEditors[player.uniqueId] ?: return
 
         dungeonEditors.remove(player.uniqueId)
@@ -43,6 +43,8 @@ object FWDungeonsEditController {
         wipActiveAreaPos1s.remove(player.uniqueId)
         wipActiveAreaPos2s.remove(player.uniqueId)
         wipDungeonOrigins.remove(player.uniqueId)
+        wipTestInstances[player.uniqueId]?.highlightFrames?.value = false
+        wipTestInstances.remove(player.uniqueId)
         wipDungeons.remove(dungeon)
 
         player.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.GRAY}You're no longer editing a dungeon")
@@ -52,12 +54,16 @@ object FWDungeonsEditController {
 
     fun playerEditDungeon(player: Player, dungeonId: Int) : Boolean {
         return FWDungeonsController.getDungeonById(dungeonId)?.let {d ->
-            if (dungeonEditors.containsValue(d))
-                false
-            else {
-                playerDiscardDungeon(player)
-                dungeonEditors[player.uniqueId] = d
-                true
+            when {
+                dungeonEditors.containsValue(d) -> false
+                FWDungeonsController.activeDungeons[dungeonId] == true -> {
+                    false
+                }
+                else -> {
+                    playerDiscardDungeon(player)
+                    dungeonEditors[player.uniqueId] = d
+                    true
+                }
             }
         } ?: false
     }
@@ -79,7 +85,17 @@ object FWDungeonsEditController {
 
         return wipDungeonPos2s[player.uniqueId]?.let {
             dungeon.box = Box(block, it).withOriginZero()
-            wipDungeonOrigins[player.uniqueId] = minBlockVector(block, it)
+            val newOrigin = minBlockVector(block, it)
+            wipDungeonOrigins[player.uniqueId] = newOrigin
+            dungeon.instances.clear()
+            wipTestInstances[player.uniqueId] =
+                    DungeonInstance(
+                            1000,
+                            dungeon,
+                            newOrigin,
+                            mutableListOf(),
+                            mutableListOf()
+                    ).apply { dungeon.instances.add(this) }
             wipDungeonPos2s.remove(player.uniqueId)
             0 //dungeon box set succesfully
         } ?: ({
@@ -93,7 +109,17 @@ object FWDungeonsEditController {
 
         return wipDungeonPos1s[player.uniqueId]?.let {
             dungeon.box = Box(it, block).withOriginZero()
-            wipDungeonOrigins[player.uniqueId] = minBlockVector(block, it)
+            val newOrigin = minBlockVector(block, it)
+            wipDungeonOrigins[player.uniqueId] = newOrigin
+            dungeon.instances.clear()
+            wipTestInstances[player.uniqueId] =
+                    DungeonInstance(
+                            1000,
+                            dungeon,
+                            newOrigin,
+                            mutableListOf(),
+                            mutableListOf()
+                    ).apply { dungeon.instances.add(this) }
             wipDungeonPos1s.remove(player.uniqueId)
             0 //dungeon box set succesfully
         } ?: ({
@@ -127,6 +153,13 @@ object FWDungeonsEditController {
                             false
                     )
             )
+            wipTestInstances[player.uniqueId]?.triggers?.add(Trigger(
+                    id,
+                    dungeon,
+                    box,
+                    null,
+                    false
+            ))
             box.highlightAll()
             wipTriggerPos2s.remove(player.uniqueId)
             id //return the trigger id
@@ -162,6 +195,13 @@ object FWDungeonsEditController {
                             false
                     )
             )
+            wipTestInstances[player.uniqueId]?.triggers?.add(Trigger(
+                    id,
+                    dungeon,
+                    box,
+                    null,
+                    false
+            ))
             box.highlightAll()
             wipTriggerPos1s.remove(player.uniqueId)
             id //return the trigger id
@@ -171,6 +211,7 @@ object FWDungeonsEditController {
         })()
     }
 
+    @ExperimentalStdlibApi
     fun playerUnmakeTrigger(player: Player) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
         if (!wipDungeons.contains(dungeon)) return -3 //dungeon is not wip
@@ -178,6 +219,7 @@ object FWDungeonsEditController {
 
         return dungeon.triggers.last().let {
             dungeon.triggers.remove(it)
+            wipTestInstances[player.uniqueId]?.triggers?.removeLast()
             it.id //return the trigger id
         }
     }
@@ -189,6 +231,7 @@ object FWDungeonsEditController {
 
         return dungeon.triggers.last().let {
             it.label = label
+            wipTestInstances[player.uniqueId]?.triggers?.find { t -> t.id == it.id }?.label = label
             0 //success
         }
     }
@@ -215,6 +258,10 @@ object FWDungeonsEditController {
                             Box(block, p2).withContainerOrigin(wipOrigin!!, BlockVector(0,0,0))
                     )
             )
+            wipTestInstances[player.uniqueId]?.activeAreas?.add(ActiveArea(
+                    id,
+                    box
+            ))
             box.highlightAll()
             wipActiveAreaPos2s.remove(player.uniqueId)
             id //return the trigger id
@@ -246,6 +293,10 @@ object FWDungeonsEditController {
                             Box(p1, block).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0))
                     )
             )
+            wipTestInstances[player.uniqueId]?.activeAreas?.add(ActiveArea(
+                    id,
+                    box
+            ))
             box.highlightAll()
             wipActiveAreaPos1s.remove(player.uniqueId)
             id //return the trigger id
@@ -255,6 +306,7 @@ object FWDungeonsEditController {
         })()
     }
 
+    @ExperimentalStdlibApi
     fun playerUnmakeActiveArea(player: Player) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
         if (!wipDungeons.contains(dungeon)) return -3 //dungeon is not wip
@@ -262,6 +314,7 @@ object FWDungeonsEditController {
 
         return dungeon.activeAreas.last().let {
             dungeon.activeAreas.remove(it)
+            wipTestInstances[player.uniqueId]?.activeAreas?.removeLast()
             it.id //return the active area id
         }
     }
@@ -273,6 +326,7 @@ object FWDungeonsEditController {
 
         return dungeon.activeAreas.last().let {
             it.label = label
+            wipTestInstances[player.uniqueId]?.activeAreas?.find { t -> t.id == it.id }?.label = label
             0 //success
         }
     }
@@ -299,13 +353,13 @@ object FWDungeonsEditController {
                             ).apply {
                                 label = it.label
                             }
-                        },
+                        }.toMutableList(),
                         dungeon.activeAreas.map {
                             ActiveArea(it.id,
                                     it.box.withContainerOrigin(BlockVector(0,0,0), block.getBlockVector()),
                                     it.startingMaterial
                             ).apply { label = it.label}
-                        }
+                        }.toMutableList()
         ).apply {
                     triggers.forEach { it.parseEffect(this) }
                     resetInstance()
@@ -447,6 +501,14 @@ object FWDungeonsEditController {
         }
 
         dungeon.startingLocation = BlockVector(newBlock!!.location.toVector())
+        return 0
+    }
+
+    fun playerHighlightFrames(player: Player) : Int {
+        dungeonEditors[player.uniqueId] ?: return -1
+
+        wipTestInstances[player.uniqueId]?.toggleEditorHighlights() ?: return -2
+
         return 0
     }
 }

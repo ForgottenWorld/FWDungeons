@@ -5,6 +5,7 @@ import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getInteractiveDungeonList
 import it.forgottenworld.dungeons.cui.getLockClickable
 import it.forgottenworld.dungeons.cui.getString
+import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -20,7 +21,9 @@ val cmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> 
                 "unlock" to ::cmdDungeonUnlockParty,
                 "start" to ::cmdDungeonStart,
                 "evacuate" to ::cmdDungeonEvacuate,
-                "lookup" to ::cmdDungeonPlayerLookup
+                "lookup" to ::cmdDungeonPlayerLookup,
+                "enable" to ::cmdDungeonEnable,
+                "disable" to ::cmdDungeonDisable
         )
 
 fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -47,6 +50,7 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
             -5 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}This dungeon party is private and you were not invited")
             -6 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Couldn't join dungeon party")
             -7 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}This dungeon party has already entered the dungeon")
+            -8 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}This dugeons is disabled")
             0 -> sender.spigot().sendMessage(
                     TextComponent("${getString(StringConst.CHAT_PREFIX)}Dungeon party created. To make it private, click ")
                             .apply {
@@ -170,5 +174,49 @@ fun cmdDungeonPlayerLookup(sender: CommandSender, command: Command, label: Strin
     }
 
     sender.sendMessage(FWDungeonsController.lookupPlayer(args[0]))
+    return true
+}
+
+fun cmdDungeonEnable(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (args.count() < 1) {
+        sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Please provide a dungeon id")
+        return true
+    }
+
+    val dungeonId = args[0].toIntOrNull()
+
+    if (dungeonId == null) {
+        sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Dungeon id should be an integer")
+        return true
+    }
+
+    sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
+            if (FWDungeonsController.playerEnableDungeon(dungeonId))
+                "Dungeon (id: $dungeonId) was enabled"
+            else
+                "No dungeon found with id $dungeonId")
+
+    return true
+}
+
+fun cmdDungeonDisable(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (args.count() < 1) {
+        sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Please provide a dungeon id")
+        return true
+    }
+
+    val dungeonId = args[0].toIntOrNull()
+
+    if (dungeonId == null) {
+        sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Dungeon id should be an integer")
+        return true
+    }
+
+    sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
+            if (FWDungeonsController.playerDisableDungeon(dungeonId))
+                "Dungeon (id: $dungeonId) was disabled"
+            else
+                "No dungeon found with id $dungeonId")
+
     return true
 }

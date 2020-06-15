@@ -46,6 +46,9 @@ permissions:
   fwdungeonsedit.dungeon.name:
     description: Allows the player to use /fwdungeonsedit dungeon name
     default: op
+  fwdungeonsedit.dungeon.hlframes:
+    description: Allows the player to use /fwdungeonsedit dungeon hlframes
+    default: op
   fwdungeonsedit.dungeon.instadd:
     description: Allows the player to use /fwdungeonsedit dungeon instadd
     default: op
@@ -111,4 +114,10 @@ permissions:
     default: op
   fwdungeons.lookup:
     description: Allows the player to use /fwdungeons lookup
+    default: op
+  fwdungeons.enable:
+    description: Allows the player to use /fwdungeons enable
+    default: op
+  fwdungeons.disable:
+    description: Allows the player to use /fwdungeons disable
     default: op
