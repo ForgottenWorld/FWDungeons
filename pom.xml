@@ -49,10 +49,34 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/MythicMobs-4.9.1.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <version>1.6.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://www.mythicmobs.net/download/MythicMobs-4.9.1.jar</url>
+                            <outputFileName>MythicMobs-4.9.1.jar</outputFileName>
+                            <md5>178cff859e125f5571d0963eb6e80e78</md5>
+                            <outputDirectory>${project.basedir}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <groupId>org.jetbrains.kotlin</groupId>
