@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package it.forgottenworld.dungeons.command.edit
 
 import it.forgottenworld.dungeons.controller.FWDungeonsController

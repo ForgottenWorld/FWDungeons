@@ -37,7 +37,7 @@ fun parseEffectCode(instance: DungeonInstance, lines: List<String>): () -> Unit 
 
 private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>): () -> Unit {
     while(codeIterator.hasNext()) {
-        when (val code = codeIterator.next()) {
+        when (codeIterator.next()) {
             CODE_SPAWN_TO_BE_KILLED_COMMAND -> {
                 val mobs = mutableSetOf<MobSpawnData>()
                 val whenDone = parseSpawnToBeKilled(instance, codeIterator, mobs)

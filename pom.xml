@@ -41,12 +41,12 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.jetbrains.kotlin</groupId>-->
+<!--            <artifactId>kotlin-test-junit</artifactId>-->
+<!--            <version>${kotlin.version}</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.lumine.xikage</groupId>
             <artifactId>MythicMobs</artifactId>
@@ -71,15 +71,15 @@
                             </sourceDirs>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals> <goal>test-compile</goal> </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <id>test-compile</id>-->
+<!--                        <goals> <goal>test-compile</goal> </goals>-->
+<!--                        <configuration>-->
+<!--                            <sourceDirs>-->
+<!--                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>-->
+<!--                            </sourceDirs>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
                 </executions>
             </plugin>
             <plugin>
@@ -91,20 +91,20 @@
                         <id>default-compile</id>
                         <phase>none</phase>
                     </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <id>default-testCompile</id>-->
+<!--                        <phase>none</phase>-->
+<!--                    </execution>-->
                     <execution>
                         <id>java-compile</id>
                         <phase>compile</phase>
                         <goals> <goal>compile</goal> </goals>
                     </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals> <goal>testCompile</goal> </goals>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <id>java-test-compile</id>-->
+<!--                        <phase>test-compile</phase>-->
+<!--                        <goals> <goal>testCompile</goal> </goals>-->
+<!--                    </execution>-->
                 </executions>
             </plugin>
             <plugin>
@@ -117,10 +117,11 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-<!--                        <configuration>-->
-<!--                            <shadedArtifactAttached>true</shadedArtifactAttached>-->
+                        <configuration>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <outputDirectory>${project.basedir}/target/FWDungeons-0.2-shaded.jar</outputDirectory>
 <!--                            <outputDirectory>C:\Users\giaco\Desktop\paper-server\plugins</outputDirectory>-->
-<!--                        </configuration>-->
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
