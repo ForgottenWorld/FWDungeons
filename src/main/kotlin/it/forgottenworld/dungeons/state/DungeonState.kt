@@ -1,23 +1,26 @@
-package it.forgottenworld.dungeons.controller
+package it.forgottenworld.dungeons.state
 
+import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.formatInvitation
 import it.forgottenworld.dungeons.cui.getString
+import it.forgottenworld.dungeons.db.executeQuery
+import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
+import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.party.Party
 import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.getDungeonInstance
 import it.forgottenworld.dungeons.utils.getParty
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit.*
 import org.bukkit.GameMode
 import org.bukkit.Location
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.util.BlockVector
 import java.util.*
 
-object FWDungeonsController {
+object DungeonState {
     val dungeons = mutableMapOf<Int, Dungeon>()
     val activeDungeons = mutableMapOf<Int, Boolean>()
     val playerParties = mutableMapOf<UUID, Party>()
@@ -162,5 +165,60 @@ object FWDungeonsController {
             activeDungeons[dungeonId] = false
             true
         } ?: false
+    }
+
+    fun playerReload() {
+        dungeons.values.forEach { it.instances.forEach { inst -> evacuateDungeon(it.id, inst.id) } }
+        dungeons.clear()
+        activeDungeons.clear()
+        playerParties.clear()
+        playersTriggering.clear()
+        playerReturnPositions.clear()
+        playerReturnGameModes.clear()
+
+        loadData()
+    }
+}
+
+fun loadData() {
+    ConfigManager.loadConfig(FWDungeonsPlugin.config)
+    ConfigManager.loadDungeonConfigs(FWDungeonsPlugin.dataFolder)
+    getInstancesFromDB()
+}
+
+
+private fun getInstancesFromDB() {
+    executeQuery("SELECT * FROM fwd_instance_locations;") { res ->
+        while (res.next()) {
+            val dungeon = DungeonState.dungeons[res.getInt("dungeon_id")]
+            val instOrigin = BlockVector(
+                    res.getInt("x"),
+                    res.getInt("y"),
+                    res.getInt("z"))
+            dungeon?.instances?.add(
+                    DungeonInstance(
+                            res.getInt("instance_id"),
+                            dungeon,
+                            instOrigin,
+                            dungeon.triggers.map {
+                                Trigger(it.id,
+                                        dungeon,
+                                        it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
+                                        it.effectParser,
+                                        it.requiresWholeParty
+                                ).apply { label = it.label}
+                            }.toMutableList(),
+                            dungeon.activeAreas.map {
+                                ActiveArea(it.id,
+                                        it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
+                                        it.startingMaterial
+                                ).apply { label = it.label}
+                            }.toMutableList()
+                    ).apply{
+                        triggers.forEach { it.parseEffect(this) }
+                        resetInstance()
+                    }
+            )
+        }
     }
 }

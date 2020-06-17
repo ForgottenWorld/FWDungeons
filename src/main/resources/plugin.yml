@@ -121,3 +121,6 @@ permissions:
   fwdungeons.disable:
     description: Allows the player to use /fwdungeons disable
     default: op
+  fwdungeons.reload:
+    description: Allows the player to use /fwdungeons reload
+    default: op

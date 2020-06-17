@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.event.listener
 
-import it.forgottenworld.dungeons.controller.MobTracker
+import it.forgottenworld.dungeons.state.MobTracker
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent

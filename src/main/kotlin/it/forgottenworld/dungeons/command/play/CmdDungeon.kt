@@ -2,7 +2,7 @@
 
 package it.forgottenworld.dungeons.command.play
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getInteractiveDungeonList
 import it.forgottenworld.dungeons.cui.getLockClickable
@@ -25,7 +25,8 @@ val cmdBindings: Map<String, (CommandSender, Command, String, Array<String>) -> 
                 "evacuate" to ::cmdDungeonEvacuate,
                 "lookup" to ::cmdDungeonPlayerLookup,
                 "enable" to ::cmdDungeonEnable,
-                "disable" to ::cmdDungeonDisable
+                "disable" to ::cmdDungeonDisable,
+                "reload" to ::cmdDungeonReload
         )
 
 fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -44,7 +45,7 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
         }
 
         val partyKey = if (args.count() > 2) args[2] else ""
-        when (FWDungeonsController.playerJoinInstance(sender, instanceId, dungeonId, partyKey)) {
+        when (DungeonState.playerJoinInstance(sender, instanceId, dungeonId, partyKey)) {
             -1 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Invalid dungeon id")
             -2 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Invalid instance id")
             -3 -> sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}You're already in a party")
@@ -80,7 +81,7 @@ fun cmdDungeonInvite(sender: CommandSender, command: Command, label: String, arg
         }
 
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsController.playerSendInvite(sender, args[0])) {
+                when (DungeonState.playerSendInvite(sender, args[0])) {
                     -1 -> "You're currently not in a dungeon party"
                     -2 -> "Only the dungeon party leader may invite others to join"
                     -3 -> "No currently online player has this name"
@@ -94,7 +95,7 @@ fun cmdDungeonInvite(sender: CommandSender, command: Command, label: String, arg
 fun cmdDungeonLeave(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsController.playerLeaveParty(sender)) {
+                when (DungeonState.playerLeaveParty(sender)) {
                     -1 -> "You're currently not in a dungeon party"
                     -2 -> "The instance has started, you can't leave now"
                     0 -> "You left the dungeon party"
@@ -107,7 +108,7 @@ fun cmdDungeonLeave(sender: CommandSender, command: Command, label: String, args
 fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
             sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                    when (FWDungeonsController.playerLockParty(sender)) {
+                    when (DungeonState.playerLockParty(sender)) {
                         -1 -> "You're currently not in a dungeon party"
                         -2 -> "Only the dungeon party leader may make the party private"
                         -3 -> "This dungeon party is already private"
@@ -121,7 +122,7 @@ fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, 
 fun cmdDungeonUnlockParty(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsController.playerUnlockParty(sender)) {
+                when (DungeonState.playerUnlockParty(sender)) {
                     -1 -> "You're currently not in a dungeon party"
                     -2 -> "Only the dungeon party leader may make the party public"
                     -3 -> "This dungeon party is already public"
@@ -135,7 +136,7 @@ fun cmdDungeonUnlockParty(sender: CommandSender, command: Command, label: String
 fun cmdDungeonStart(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsController.playerStart(sender)) {
+                when (DungeonState.playerStart(sender)) {
                     -1 -> "You're currently not in a dungeon party"
                     -2 -> "Only the dungeon party leader may start the instance"
                     -3 -> "Not enough players for this dungeon"
@@ -161,7 +162,7 @@ fun cmdDungeonEvacuate(sender: CommandSender, command: Command, label: String, a
     }
 
     sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-            if (FWDungeonsController.evacuateDungeon(dungeonId, instanceId))
+            if (DungeonState.evacuateDungeon(dungeonId, instanceId))
                 "All adventurers were brought back to safety and the instance was reset"
             else
                 "Dungeon instance not found")
@@ -175,7 +176,7 @@ fun cmdDungeonPlayerLookup(sender: CommandSender, command: Command, label: Strin
         return true
     }
 
-    sender.sendMessage(FWDungeonsController.lookupPlayer(args[0]))
+    sender.sendMessage(DungeonState.lookupPlayer(args[0]))
     return true
 }
 
@@ -193,7 +194,7 @@ fun cmdDungeonEnable(sender: CommandSender, command: Command, label: String, arg
     }
 
     sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-            if (FWDungeonsController.playerEnableDungeon(dungeonId))
+            if (DungeonState.playerEnableDungeon(dungeonId))
                 "Dungeon (id: $dungeonId) was enabled"
             else
                 "No dungeon found with id $dungeonId")
@@ -215,10 +216,22 @@ fun cmdDungeonDisable(sender: CommandSender, command: Command, label: String, ar
     }
 
     sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-            if (FWDungeonsController.playerDisableDungeon(dungeonId))
+            if (DungeonState.playerDisableDungeon(dungeonId))
                 "Dungeon (id: $dungeonId) was disabled"
             else
                 "No dungeon found with id $dungeonId")
+
+    return true
+}
+
+fun cmdDungeonReload(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+    if (args.count() == 0 || args[0] != "confirm") {
+        sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.RED}WARNING: ${ChatColor.WHITE}Reloading will evacuate every instance. If you're sure you want to reload, use /fwd reload confirm")
+        return true
+    }
+
+    DungeonState.playerReload()
+    sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Reloading dungeons and instances...")
 
     return true
 }

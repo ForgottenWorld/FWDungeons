@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.model.objective
 
-import it.forgottenworld.dungeons.controller.MobTracker
+import it.forgottenworld.dungeons.state.MobTracker
 import org.bukkit.Bukkit.getEntity
 import org.bukkit.entity.LivingEntity
 import java.util.*

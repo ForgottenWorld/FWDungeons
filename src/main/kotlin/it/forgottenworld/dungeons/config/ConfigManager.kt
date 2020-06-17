@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.config
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
@@ -35,7 +35,7 @@ object ConfigManager {
         }?.forEach {
             try {
                 val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                FWDungeonsController.dungeons[conf.getInt("id")] =
+                DungeonState.dungeons[conf.getInt("id")] =
                         Dungeon(
                                 conf.getInt("id"),
                                 conf.getString("name")!!,
@@ -96,7 +96,7 @@ object ConfigManager {
                                                 }
                                             }
                             )
-                            FWDungeonsController.activeDungeons[id] = true
+                            DungeonState.activeDungeons[id] = true
                         }
             } catch (e : Exception) {
                 e.printStackTrace()

@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.controller.MobSpawnData
-import it.forgottenworld.dungeons.controller.MobTracker
-import it.forgottenworld.dungeons.controller.MobType
+import it.forgottenworld.dungeons.state.MobSpawnData
+import it.forgottenworld.dungeons.state.MobTracker
+import it.forgottenworld.dungeons.state.MobType
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.activearea.ActiveArea

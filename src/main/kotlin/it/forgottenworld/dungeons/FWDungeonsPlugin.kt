@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons
 import it.forgottenworld.dungeons.command.CommandFWDungeons
 import it.forgottenworld.dungeons.command.CommandFWDungeonsEdit
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.db.DBHandler
 import it.forgottenworld.dungeons.db.executeQuery
 import it.forgottenworld.dungeons.db.executeUpdate
@@ -13,7 +13,8 @@ import it.forgottenworld.dungeons.event.listener.TriggerListener
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.trigger.Trigger
-import org.bukkit.entity.Player
+import it.forgottenworld.dungeons.state.loadData
+import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.BlockVector
 import java.io.File
@@ -22,6 +23,7 @@ class FWDungeonsPlugin : JavaPlugin() {
     companion object {
         lateinit var instance: FWDungeonsPlugin
         lateinit var dataFolder: File
+        lateinit var config: FileConfiguration
     }
 
     override fun onEnable() {
@@ -29,9 +31,8 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         instance = this
         FWDungeonsPlugin.dataFolder = dataFolder
+        FWDungeonsPlugin.config = config
         saveDefaultConfig()
-        ConfigManager.loadConfig(config)
-        ConfigManager.loadDungeonConfigs(dataFolder)
 
         logger.info("Connecting to DB...")
 
@@ -46,9 +47,9 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         initTables()
 
-        logger.info("Retrieving instance locations from DB...")
+        logger.info("Loading data...")
 
-        getInstancesFromDB()
+        loadData()
 
         logger.info("Registering commands...")
 
@@ -80,42 +81,6 @@ class FWDungeonsPlugin : JavaPlugin() {
                 "z int NOT NULL, " +
                 "PRIMARY KEY (id), " +
                 "UNIQUE KEY uqIdDungeonIdInstance (instance_id,dungeon_id));")
-    }
-
-    private fun getInstancesFromDB() {
-        executeQuery("SELECT * FROM fwd_instance_locations;") { res ->
-            while (res.next()) {
-                val dungeon = FWDungeonsController.dungeons[res.getInt("dungeon_id")]
-                val instOrigin = BlockVector(
-                        res.getInt("x"),
-                        res.getInt("y"),
-                        res.getInt("z"))
-                dungeon?.instances?.add(
-                        DungeonInstance(
-                                res.getInt("instance_id"),
-                                dungeon,
-                                instOrigin,
-                                dungeon.triggers.map {
-                                    Trigger(it.id,
-                                            dungeon,
-                                            it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
-                                            it.effectParser,
-                                            it.requiresWholeParty
-                                    ).apply { label = it.label}
-                                }.toMutableList(),
-                                dungeon.activeAreas.map {
-                                    ActiveArea(it.id,
-                                            it.box.withContainerOrigin(BlockVector(0,0,0), instOrigin),
-                                            it.startingMaterial
-                                    ).apply { label = it.label}
-                                }.toMutableList()
-                        ).apply{
-                            triggers.forEach { it.parseEffect(this) }
-                            resetInstance()
-                        }
-                )
-            }
-        }
     }
 
 }

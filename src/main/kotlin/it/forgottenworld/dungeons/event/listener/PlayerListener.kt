@@ -1,8 +1,6 @@
 package it.forgottenworld.dungeons.event.listener
 
-import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.controller.FWDungeonsController
-import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.state.DungeonEditState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getParty
@@ -10,7 +8,6 @@ import net.md_5.bungee.api.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 
@@ -29,7 +26,7 @@ class PlayerListener: Listener {
     fun onPlayerQuit(event: PlayerQuitEvent?) {
         val player = event?.player ?: return
 
-        FWDungeonsEditController.purgeWorkingData(player)
+        DungeonEditState.purgeWorkingData(player)
 
         player.getParty() ?: return
 

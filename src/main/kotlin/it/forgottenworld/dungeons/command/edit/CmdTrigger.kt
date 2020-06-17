@@ -2,7 +2,7 @@
 
 package it.forgottenworld.dungeons.command.edit
 
-import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.state.DungeonEditState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getTargetBlock
@@ -29,7 +29,7 @@ fun cmdTriggerPos1(sender: CommandSender, command: Command, label: String, args:
             return true
         }
 
-        val ret = FWDungeonsEditController.playerSetTriggerPos1(sender, block)
+        val ret = DungeonEditState.playerSetTriggerPos1(sender, block)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -53,7 +53,7 @@ fun cmdTriggerPos2(sender: CommandSender, command: Command, label: String, args:
             return true
         }
 
-        val ret = FWDungeonsEditController.playerSetTriggerPos2(sender, block)
+        val ret = DungeonEditState.playerSetTriggerPos2(sender, block)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -72,7 +72,7 @@ fun cmdTriggerPos2(sender: CommandSender, command: Command, label: String, args:
 fun cmdTriggerUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
 
-        val ret = FWDungeonsEditController.playerUnmakeTrigger(sender)
+        val ret = DungeonEditState.playerUnmakeTrigger(sender)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -94,7 +94,7 @@ fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args
             return true
         }
 
-        val ret = FWDungeonsEditController.playerLabelTrigger(sender, tLabel)
+        val ret = DungeonEditState.playerLabelTrigger(sender, tLabel)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"

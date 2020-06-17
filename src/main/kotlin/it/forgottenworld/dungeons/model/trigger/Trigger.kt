@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.model.trigger
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.box.Box
@@ -34,7 +34,7 @@ class Trigger(
 
     fun onPlayerEnter(player: Player) {
         if (!playersCurrentlyInside.contains(player)) {
-            FWDungeonsController
+            DungeonState
                     .playersTriggering[player.uniqueId] = this
             if (ConfigManager.isInDebugMode)
                 player.sendMessage("${getString(StringConst.CHAT_PREFIX)}Entered trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
@@ -47,7 +47,7 @@ class Trigger(
         if (ConfigManager.isInDebugMode)
             player.sendMessage("${getString(StringConst.CHAT_PREFIX)}Exited trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE} in dungeon ${ChatColor.GOLD}(id: ${dungeon.id})")
         playersCurrentlyInside.remove(player)
-        FWDungeonsController.playersTriggering.remove(player.uniqueId)
+        DungeonState.playersTriggering.remove(player.uniqueId)
     }
 
     fun parseEffect(instance: DungeonInstance) {

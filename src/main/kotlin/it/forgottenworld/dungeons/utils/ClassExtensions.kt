@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.utils
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.model.activearea.ActiveArea
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import it.forgottenworld.dungeons.model.party.Party
@@ -22,10 +22,10 @@ fun Player.getTargetBlock() : Block? =
         this.getTargetBlock(null as Set<Material>?, 5)
 
 fun Player.getParty() : Party? =
-        FWDungeonsController.playerParties[uniqueId]
+        DungeonState.playerParties[uniqueId]
 
 fun Player.getDungeonInstance() : DungeonInstance? =
-        FWDungeonsController.playerParties[uniqueId]?.instance
+        DungeonState.playerParties[uniqueId]?.instance
 
 fun Block.getBlockVector() : BlockVector =
         BlockVector(this.x, this.y, this.z)

@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.controller.FWDungeonsController
-import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.state.DungeonEditState
 import it.forgottenworld.dungeons.utils.getParty
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -15,14 +15,14 @@ class TriggerListener: Listener {
     fun onPlayerMove(event: PlayerMoveEvent?) {
         val player = event?.player ?: return
 
-        val wipInstance = FWDungeonsEditController.wipTestInstances[player.uniqueId]
+        val wipInstance = DungeonEditState.wipTestInstances[player.uniqueId]
         val party = player.getParty()
 
         if (wipInstance == null && party == null) return
 
         if (party?.inGame == false) return
 
-        FWDungeonsController.playersTriggering[player.uniqueId]?.let {
+        DungeonState.playersTriggering[player.uniqueId]?.let {
             if (!it.isPlayerInside(player))
                 it.onPlayerExit(player)
             else return

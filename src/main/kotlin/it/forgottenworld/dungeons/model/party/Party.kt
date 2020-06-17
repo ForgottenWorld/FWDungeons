@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.model.party
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
@@ -37,18 +37,18 @@ class Party(
         return if (players.contains(player)) false
         else {
             players.forEach { it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${player.name} joined the dungeon party") }
-            FWDungeonsController.playerParties[player.uniqueId] = this
+            DungeonState.playerParties[player.uniqueId] = this
             players.add(player)
         }
     }
 
     fun playerLeave(player: Player) {
         players.remove(player)
-        FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
-        FWDungeonsController.playerReturnGameModes.remove(player.uniqueId)
-        FWDungeonsController.playerParties.remove(player.uniqueId)
-        FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
-        FWDungeonsController.playersTriggering.remove(player.uniqueId)
+        DungeonState.playerReturnPositions.remove(player.uniqueId)
+        DungeonState.playerReturnGameModes.remove(player.uniqueId)
+        DungeonState.playerParties.remove(player.uniqueId)
+        DungeonState.playersTriggering[player.uniqueId]?.onPlayerExit(player)
+        DungeonState.playersTriggering.remove(player.uniqueId)
         players.forEach { it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${player.name} left the dungeon party") }
         if (leader == player) {
             if (players.isEmpty()) {
@@ -61,12 +61,12 @@ class Party(
 
     fun playerDied(player: Player) {
         players.remove(player)
-        FWDungeonsController.playerReturnPositions.remove(player.uniqueId)
-        FWDungeonsController.playerReturnGameModes.remove(player.uniqueId)?.let { player.gameMode = it }
-        FWDungeonsController.playerParties.remove(player.uniqueId)
-        FWDungeonsController.playersTriggering[player.uniqueId]?.onPlayerExit(player)
-        FWDungeonsController.playersTriggering.remove(player.uniqueId)
-        players.forEach { it.sendMessage("${player.name} died in the dungeon") }
+        DungeonState.playerReturnPositions.remove(player.uniqueId)
+        DungeonState.playerReturnGameModes.remove(player.uniqueId)?.let { player.gameMode = it }
+        DungeonState.playerParties.remove(player.uniqueId)
+        DungeonState.playersTriggering[player.uniqueId]?.onPlayerExit(player)
+        DungeonState.playersTriggering.remove(player.uniqueId)
+        players.forEach { it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${player.name} died in the dungeon") }
         if (leader == player) {
             if (players.isEmpty()) {
                 instance.resetInstance()
@@ -78,10 +78,10 @@ class Party(
 
     fun disband() {
         players.forEach {
-            FWDungeonsController.playerReturnPositions.remove(it.uniqueId)
-            FWDungeonsController.playerReturnGameModes.remove(it.uniqueId)
-            FWDungeonsController.playerParties.remove(it.uniqueId)
-            FWDungeonsController.playersTriggering.remove(it.uniqueId)
+            DungeonState.playerReturnPositions.remove(it.uniqueId)
+            DungeonState.playerReturnGameModes.remove(it.uniqueId)
+            DungeonState.playerParties.remove(it.uniqueId)
+            DungeonState.playersTriggering.remove(it.uniqueId)
         }
         players.clear()
     }

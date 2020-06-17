@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.cui
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
+import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
 import net.md_5.bungee.api.ChatColor
@@ -55,9 +55,9 @@ private fun getColoredDifficulty(difficulty: Dungeon.Difficulty) =
 
 fun getInteractiveDungeonList(page: Int) =
     TextComponent().apply {
-        if (page >= 0 && page <= FWDungeonsController.dungeons.count() - 1) {
-            val d = FWDungeonsController.dungeons.values.filter{
-                FWDungeonsController.activeDungeons[it.id] == true }.toList()[page]
+        if (page >= 0 && page <= DungeonState.dungeons.count() - 1) {
+            val d = DungeonState.dungeons.values.filter{
+                DungeonState.activeDungeons[it.id] == true }.toList()[page]
             addExtra(TextComponent("${ChatColor.DARK_GRAY}====================[ ${getString(StringConst.CHAT_PREFIX).dropLast(1)}${ChatColor.GRAY}ungeons ${ChatColor.DARK_GRAY}]====================\n\n").apply {
                 addExtra(getCarets(3))
                 addExtra("${ChatColor.DARK_AQUA}DUNGEON:${ChatColor.WHITE} ${d.name}\n")
@@ -96,7 +96,7 @@ fun getInteractiveDungeonList(page: Int) =
                     addExtra("${ChatColor.DARK_GRAY} ]")
                 } else addExtra("${ChatColor.DARK_GRAY}=============")
                 addExtra("${ChatColor.DARK_GRAY}===============================")
-                if (page < FWDungeonsController.dungeons.count() - 1) {
+                if (page < DungeonState.dungeons.count() - 1) {
                     addExtra("${ChatColor.DARK_GRAY}[ ")
                     addExtra(getPageClickable("NEXT", page + 1))
                     addExtra("${ChatColor.DARK_GRAY} ]=")

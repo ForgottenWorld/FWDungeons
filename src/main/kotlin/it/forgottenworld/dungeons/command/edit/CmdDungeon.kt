@@ -2,8 +2,7 @@
 
 package it.forgottenworld.dungeons.command.edit
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
-import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.state.DungeonEditState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
@@ -34,7 +33,7 @@ val dungeonCmdBindings: Map<String, (CommandSender, Command, String, Array<Strin
 
 fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
-        val id = FWDungeonsEditController.playerCreateDungeon(sender)
+        val id = DungeonEditState.playerCreateDungeon(sender)
         sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Created dungeon with id $id")
     }
     return true
@@ -53,7 +52,7 @@ fun cmdDungeonEdit(sender: CommandSender, command: Command, label: String, args:
             return true
         }
 
-        if (FWDungeonsEditController.playerEditDungeon(sender, id))
+        if (DungeonEditState.playerEditDungeon(sender, id))
             sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}Now editing dungeon with id $id")
         else
             sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}No currently disabled dungeons found with id $id")
@@ -71,7 +70,7 @@ fun cmdDungeonPos1(sender: CommandSender, command: Command, label: String, args:
         }
 
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSetDungeonPos1(sender, block)) {
+                when (DungeonEditState.playerSetDungeonPos1(sender, block)) {
                     0 -> "Dungeon box set"
                     -1 -> "You're not editing any dungeons"
                     -2 -> "First position set, now pick another with /fwde dungeon pos2"
@@ -92,7 +91,7 @@ fun cmdDungeonPos2(sender: CommandSender, command: Command, label: String, args:
         }
 
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSetDungeonPos2(sender, block)) {
+                when (DungeonEditState.playerSetDungeonPos2(sender, block)) {
                     0 -> "Dungeon box set"
                     -1 -> "You're not editing any dungeons"
                     -2 -> "First position set, now pick another with /fwde dungeon pos1"
@@ -112,7 +111,7 @@ fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, label: String
             return true
         }
 
-        val ret = FWDungeonsEditController.playerAddInstance(sender, block)
+        val ret = DungeonEditState.playerAddInstance(sender, block)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -127,7 +126,7 @@ fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, label: String
 
 fun cmdDungeonInstanceRemove(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
-        val ret = FWDungeonsEditController.playerRemoveInstance(sender)
+        val ret = DungeonEditState.playerRemoveInstance(sender)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -149,7 +148,7 @@ fun cmdDungeonName(sender: CommandSender, command: Command, label: String, args:
             return true
         }
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSetNameDungeon(sender, args.joinToString(" "))) {
+                when (DungeonEditState.playerSetNameDungeon(sender, args.joinToString(" "))) {
                     0 -> "Dungeon name changed"
                     -1 -> "You're not editing any dungeons"
                     -2 -> "Antoher dungeon with the same name already exists"
@@ -169,7 +168,7 @@ fun cmdDungeonDescription(sender: CommandSender, command: Command, label: String
             return true
         }
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSetDescriptionDungeon(sender, args.joinToString(" "))) {
+                when (DungeonEditState.playerSetDescriptionDungeon(sender, args.joinToString(" "))) {
                     0 -> "Dungeon description changed"
                     -1 -> "You're not editing any dungeons"
                     else -> ""
@@ -194,7 +193,7 @@ fun cmdDungeonDifficulty(sender: CommandSender, command: Command, label: String,
             }
 
             sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                    when (FWDungeonsEditController.playerSetDifficultyDungeon(sender, Dungeon.Difficulty.fromString(args[0].toLowerCase())!!)) {
+                    when (DungeonEditState.playerSetDifficultyDungeon(sender, Dungeon.Difficulty.fromString(args[0].toLowerCase())!!)) {
                         0 -> "Dungeon difficulty changed"
                         -1 -> "You're not editing any dungeons"
                         else -> ""
@@ -218,7 +217,7 @@ fun cmdDungeonPoints(sender: CommandSender, command: Command, label: String, arg
             return true
         }
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSetPointsDungeon(sender, p)) {
+                when (DungeonEditState.playerSetPointsDungeon(sender, p)) {
                     0 -> "Dungeon points changed"
                     -1 -> "You're not editing any dungeons"
                     else -> ""
@@ -243,7 +242,7 @@ fun cmdDungeonNumberOfPlayers(sender: CommandSender, command: Command, label: St
             return true
         } else {
             sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                    when (FWDungeonsEditController.playerSetNumberOfPlayersDungeon(sender, IntRange(r1, r2))) {
+                    when (DungeonEditState.playerSetNumberOfPlayersDungeon(sender, IntRange(r1, r2))) {
                         0 -> "Dungeon number of players changed"
                         -1 -> "You're not editing any dungeons"
                         else -> ""
@@ -258,7 +257,7 @@ fun cmdDungeonNumberOfPlayers(sender: CommandSender, command: Command, label: St
 fun cmdDungeonWriteOut(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                 FWDungeonsEditController.playerWriteOutDungeon(sender)
+                 DungeonEditState.playerWriteOutDungeon(sender)
         )
     }
 
@@ -268,7 +267,7 @@ fun cmdDungeonWriteOut(sender: CommandSender, command: Command, label: String, a
 fun cmdDungeonSetStart(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSetStartDungeon(sender)) {
+                when (DungeonEditState.playerSetStartDungeon(sender)) {
                     0 -> "Dungeon starting location set succesfully"
                     -1 -> "You're not editing any dungeons"
                     -2 -> "Dungeon box should be set before adding a starting location"
@@ -283,7 +282,7 @@ fun cmdDungeonSetStart(sender: CommandSender, command: Command, label: String, a
 fun cmdDungeonSave(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerSaveDungeon(sender)) {
+                when (DungeonEditState.playerSaveDungeon(sender)) {
                     0 -> "Dungeon saved succesfully"
                     -1 -> "You're not editing any dungeons"
                     -2 -> "This dungeon was never exported, use /fwde dungeon writeout"
@@ -297,7 +296,7 @@ fun cmdDungeonSave(sender: CommandSender, command: Command, label: String, args:
 fun cmdDungeonDiscard(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerDiscardDungeon(sender)) {
+                when (DungeonEditState.playerDiscardDungeon(sender)) {
                     0 -> "Dungeon discarded"
                     -1 -> "You're not editing any dungeons"
                     else -> ""
@@ -311,7 +310,7 @@ fun cmdDungeonDiscard(sender: CommandSender, command: Command, label: String, ar
 fun cmdDungeonHlFrames(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
-                when (FWDungeonsEditController.playerHighlightFrames(sender)) {
+                when (DungeonEditState.playerHighlightFrames(sender)) {
                     -1 -> "You're not editing any dungeons"
                     -2 -> "Couldn't find dungeon test instance"
                     else -> "Toggled highlighted frames"

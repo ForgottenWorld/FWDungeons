@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.controller
+package it.forgottenworld.dungeons.state
 
 import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
 import it.forgottenworld.dungeons.model.activearea.ActiveArea

@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.controller
+package it.forgottenworld.dungeons.state
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
@@ -19,7 +19,7 @@ import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import java.util.*
 
-object FWDungeonsEditController {
+object DungeonEditState {
 
     private val dungeonEditors = mutableMapOf<UUID, Dungeon>()
     private val wipDungeons = mutableListOf<Dungeon>()
@@ -53,10 +53,10 @@ object FWDungeonsEditController {
 
 
     fun playerEditDungeon(player: Player, dungeonId: Int) : Boolean {
-        return FWDungeonsController.getDungeonById(dungeonId)?.let {d ->
+        return DungeonState.getDungeonById(dungeonId)?.let { d ->
             when {
                 dungeonEditors.containsValue(d) -> false
-                FWDungeonsController.activeDungeons[dungeonId] == true -> {
+                DungeonState.activeDungeons[dungeonId] == true -> {
                     false
                 }
                 else -> {
@@ -69,7 +69,7 @@ object FWDungeonsEditController {
     }
 
     fun playerCreateDungeon(player: Player) : Int {
-        var newId: Int = FWDungeonsController.getMaxDungeonId() + 1
+        var newId: Int = DungeonState.getMaxDungeonId() + 1
         while (wipDungeons.find{ it.id == newId } != null) {
             newId += 1
         }
@@ -403,7 +403,7 @@ object FWDungeonsEditController {
     fun playerSetNameDungeon(player: Player, name: String) : Int {
         val dungeon = dungeonEditors[player.uniqueId] ?: return -1 //player not editing a dungeon
 
-        FWDungeonsController.dungeons.values.find {
+        DungeonState.dungeons.values.find {
             it.name.equals(name.trim(), true)
         }?.let { return -2 } //another dungeon with the same name already exists
         wipDungeons.find {

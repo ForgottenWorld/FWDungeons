@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.model.dungeon
 
-import it.forgottenworld.dungeons.controller.FWDungeonsController
-import it.forgottenworld.dungeons.controller.MobTracker
+import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.state.MobTracker
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.event.DungeonCompletedEvent
@@ -60,8 +60,8 @@ class DungeonInstance(
 
         party?.players?.forEach {
             it.sendMessage("${getString(StringConst.CHAT_PREFIX)}${ChatColor.GREEN}Congratulations, you made it out alive!")
-            FWDungeonsController.playerReturnPositions[it.uniqueId]?.let { pos -> it.teleport(pos) }
-            FWDungeonsController.playerReturnGameModes[it.uniqueId]?.let { gm -> it.gameMode = gm }
+            DungeonState.playerReturnPositions[it.uniqueId]?.let { pos -> it.teleport(pos) }
+            DungeonState.playerReturnGameModes[it.uniqueId]?.let { gm -> it.gameMode = gm }
         }
         party?.disband()
         resetInstance()

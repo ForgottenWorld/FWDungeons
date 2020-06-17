@@ -2,7 +2,7 @@
 
 package it.forgottenworld.dungeons.command.edit
 
-import it.forgottenworld.dungeons.controller.FWDungeonsEditController
+import it.forgottenworld.dungeons.state.DungeonEditState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.utils.getTargetBlock
@@ -25,11 +25,11 @@ fun cmdActiveAreaPos1(sender: CommandSender, command: Command, label: String, ar
         val block = sender.getTargetBlock()
 
         if (block == null) {
-            sender.sendMessage("You need to be targeting a block within 5 blocks of you before calling this")
+            sender.sendMessage("${getString(StringConst.CHAT_PREFIX)}You need to be targeting a block within 5 blocks of you before calling this")
             return true
         }
 
-        val ret = FWDungeonsEditController.playerSetActiveAreaPos1(sender, block)
+        val ret = DungeonEditState.playerSetActiveAreaPos1(sender, block)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -53,7 +53,7 @@ fun cmdActiveAreaPos2(sender: CommandSender, command: Command, label: String, ar
             return true
         }
 
-        val ret = FWDungeonsEditController.playerSetActiveAreaPos2(sender, block)
+        val ret = DungeonEditState.playerSetActiveAreaPos2(sender, block)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -72,7 +72,7 @@ fun cmdActiveAreaPos2(sender: CommandSender, command: Command, label: String, ar
 fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender is Player) {
 
-        val ret = FWDungeonsEditController.playerUnmakeActiveArea(sender)
+        val ret = DungeonEditState.playerUnmakeActiveArea(sender)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
@@ -94,7 +94,7 @@ fun cmdActiveAreaLabel(sender: CommandSender, command: Command, label: String, a
             return true
         }
 
-        val ret = FWDungeonsEditController.playerLabelActiveArea(sender, aaLabel)
+        val ret = DungeonEditState.playerLabelActiveArea(sender, aaLabel)
         sender.sendMessage( getString(StringConst.CHAT_PREFIX) +
                 when (ret) {
                     -1 -> "You're not editing any dungeons"
