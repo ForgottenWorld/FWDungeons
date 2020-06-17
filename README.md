@@ -47,3 +47,5 @@
         lookup
         enable
         disable
+        reload
+        
