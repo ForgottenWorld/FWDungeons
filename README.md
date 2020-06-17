@@ -3,3 +3,47 @@
 [![](https://jitpack.io/v/ForgottenWorld/FWDungeons.svg)](https://jitpack.io/#ForgottenWorld/FWDungeons)
 
 <b>FWDungeons</b> is a SpigotMC plugin for creating multi-instance scriptable co-op dungeons.
+
+## COMMANDS
+
+    /fwdungeonsedit (/fwde)
+        dungeon
+            create
+            edit
+            name
+            description
+            setstart
+            difficulty
+            players
+            points
+            pos1
+            pos2
+            hlframes
+            writeout
+            save
+            discard
+            instadd
+            instremove
+        trigger
+            pos1
+            pos2
+            label
+            unmake
+        activearea
+            pos1
+            pos2
+            label
+            unmake
+            
+    /fwdungeons (/fwd)
+        list
+        join
+        invite
+        leave
+        start
+        lock
+        unlock
+        evacuate
+        lookup
+        enable
+        disable
