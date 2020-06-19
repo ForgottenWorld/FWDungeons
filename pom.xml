@@ -6,7 +6,7 @@
 
     <groupId>it.forgottenworld</groupId>
     <artifactId>FWDungeons</artifactId>
-    <version>0.3</version>
+    <version>0.3.2</version>
 
     <properties>
         <kotlin.version>1.3.72</kotlin.version>
@@ -131,7 +131,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.github.com/ForgottenWorld/FWDungeons</url>
+            <url>https://maven.pkg.github.com/ForgottenWorld/FWDungeons</url>
         </repository>
     </distributionManagement>
 </project>
