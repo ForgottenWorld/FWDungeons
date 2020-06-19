@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.event.listener
 
-import it.forgottenworld.dungeons.state.MobTracker
+import it.forgottenworld.dungeons.state.MobState
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
@@ -12,9 +12,11 @@ class EntityDeathListener: Listener {
 
         val entity = event?.entity ?: return
 
-        MobTracker.instanceIdForTrackedMobs[entity.uniqueId]?.let {
-            MobTracker.instanceObjectives[it]?.onMobKilled(entity.uniqueId)
-            MobTracker.instanceIdForTrackedMobs.remove(entity.uniqueId)
+        MobState.instanceIdForTrackedMobs[entity.uniqueId]?.let {
+            val dId = MobState.dungeonIdForTrackedMobs[entity.uniqueId]!!
+            MobState.instanceObjectives[MobState.DungeonAndInstanceIdPair(dId, it)]?.onMobKilled(entity.uniqueId)
+            MobState.instanceIdForTrackedMobs.remove(entity.uniqueId)
+            MobState.dungeonIdForTrackedMobs.remove(entity.uniqueId)
         }
     }
 }

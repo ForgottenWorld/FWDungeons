@@ -10,16 +10,20 @@ import java.util.*
 enum class MobType { MYTHIC, VANILLA }
 data class MobSpawnData(val activeArea: ActiveArea, val mob: String, val type: MobType)
 
-object MobTracker {
+object MobState {
+    data class DungeonAndInstanceIdPair(val dungeonId: Int, val instanceId: Int)
+
+    val dungeonIdForTrackedMobs = mutableMapOf<UUID, Int>()
     val instanceIdForTrackedMobs = mutableMapOf<UUID, Int>()
-    val instanceObjectives = mutableMapOf<Int, InstanceObjective>()
+    val instanceObjectives = mutableMapOf<DungeonAndInstanceIdPair, InstanceObjective>()
 
     fun attachNewObjectiveToInstance(
+            dungeonId: Int,
             instanceId: Int,
-            mobs: Set<MobSpawnData>,
+            mobs: List<MobSpawnData>,
             onAllKilled: () -> Unit) {
-        if (instanceObjectives.contains(instanceId)) return
-        instanceObjectives[instanceId] = InstanceObjective(
+        instanceObjectives[DungeonAndInstanceIdPair(dungeonId, instanceId)] = InstanceObjective(
+                dungeonId,
                 instanceId,
                 mobs.mapNotNull {
                     if (it.type == MobType.VANILLA) {
@@ -29,6 +33,7 @@ object MobTracker {
                                         .clone()
                                         .add(0.5, 0.5, 0.5)
                                 )?.also { uuid ->
+                                            dungeonIdForTrackedMobs[uuid] = dungeonId
                                             instanceIdForTrackedMobs[uuid] = instanceId
                                         }
                     } else {
@@ -38,12 +43,12 @@ object MobTracker {
                                         .clone()
                                         .add(0.5, 0.5, 0.5)
                                 )?.also { uuid ->
+                                            dungeonIdForTrackedMobs[uuid] = dungeonId
                                             instanceIdForTrackedMobs[uuid] = instanceId
                                         }
                     } }.toMutableList(),
                 onAllKilled
         )
-        return
     }
 
     private fun spawnMythicMob(type: String, location: Location): UUID? =

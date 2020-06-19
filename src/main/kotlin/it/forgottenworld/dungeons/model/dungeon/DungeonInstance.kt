@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.state.DungeonState
-import it.forgottenworld.dungeons.state.MobTracker
+import it.forgottenworld.dungeons.state.MobState
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
 import it.forgottenworld.dungeons.event.DungeonCompletedEvent
@@ -45,9 +45,11 @@ class DungeonInstance(
             it.clearCurrentlyInsidePlayers()
         }
         activeAreas.forEach { it.fillWithMaterial(it.startingMaterial) }
-        MobTracker.instanceObjectives[id]?.abort()
+        MobState.instanceObjectives[MobState.DungeonAndInstanceIdPair(dungeon.id, id)]?.abort()
         @Suppress("ControlFlowWithEmptyBody")
-        while (MobTracker.instanceIdForTrackedMobs.values.remove(id)) {}
+        while (MobState.instanceIdForTrackedMobs.values.remove(id)) {}
+        @Suppress("ControlFlowWithEmptyBody")
+        while (MobState.dungeonIdForTrackedMobs.values.remove(id)) {}
     }
 
     fun onInstanceFinish(givePoints: Boolean) {

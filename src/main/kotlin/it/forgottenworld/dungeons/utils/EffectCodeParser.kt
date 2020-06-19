@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.state.MobSpawnData
-import it.forgottenworld.dungeons.state.MobTracker
+import it.forgottenworld.dungeons.state.MobState
 import it.forgottenworld.dungeons.state.MobType
 import it.forgottenworld.dungeons.cui.StringConst
 import it.forgottenworld.dungeons.cui.getString
@@ -39,10 +39,11 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
     while(codeIterator.hasNext()) {
         when (codeIterator.next()) {
             CODE_SPAWN_TO_BE_KILLED_COMMAND -> {
-                val mobs = mutableSetOf<MobSpawnData>()
+                val mobs = mutableListOf<MobSpawnData>()
                 val whenDone = parseSpawnToBeKilled(instance, codeIterator, mobs)
 
-                return { MobTracker.attachNewObjectiveToInstance(
+                return { MobState.attachNewObjectiveToInstance(
+                            instance.dungeon.id,
                             instance.id,
                             mobs,
                             whenDone) }
@@ -72,7 +73,7 @@ private fun parseCode(instance: DungeonInstance, codeIterator: Iterator<String>)
 private fun parseSpawnToBeKilled(
         instance: DungeonInstance,
         codeIterator: Iterator<String>,
-        mobs: MutableSet<MobSpawnData>): () -> Unit {
+        mobs: MutableList<MobSpawnData>): () -> Unit {
     var currentActiveArea: ActiveArea? = null
     while(codeIterator.hasNext()) {
         val code = codeIterator.next()
