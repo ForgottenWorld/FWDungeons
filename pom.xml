@@ -120,7 +120,7 @@
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
 <!--                            <outputFile>${project.basedir}/target/${project.artifactId}-${project.version}-shaded.jar</outputFile>-->
-                            <outputFile>C:/Users/giaco/Desktop/paper-server/plugins/${project.artifactId}-${project.version}.jar</outputFile>
+<!--                            <outputFile>C:/Users/giaco/Desktop/paper-server/plugins/${project.artifactId}-${project.version}.jar</outputFile>-->
                         </configuration>
                     </execution>
                 </executions>
