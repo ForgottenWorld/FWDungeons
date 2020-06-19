@@ -32,15 +32,15 @@ fun repeatedlySpawnParticles(
 
 fun repeatedlySpawnParticles(
         particle: Particle,
-        locations: Set<Location>,
         count: Int,
         interval: Long,
-        controlVar: TypeWrapper<Boolean>) {
+        controlVar: TypeWrapper<Boolean>,
+        locationsGetter: () -> Set<Location>) {
     val world = getWorld(ConfigManager.dungeonWorld) ?: return
     object : BukkitRunnable() {
         override fun run() {
             //getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
-            locations.forEach {
+            locationsGetter().forEach {
                 world.spawnParticle(
                         particle,
                         it.clone().add(0.5,0.5,0.5),

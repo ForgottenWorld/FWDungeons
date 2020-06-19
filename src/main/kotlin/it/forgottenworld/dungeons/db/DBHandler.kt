@@ -32,9 +32,9 @@ object DBHandler {
             Class.forName("com.mysql.jdbc.Driver")
             connection =
                     DriverManager.getConnection(
-                            "jdbc:mysql://${DBHandler.host}:${DBHandler.port}/${DBHandler.database}?autoReconnect=true&useSSL=false",
-                            DBHandler.username,
-                            DBHandler.password)
+                            "jdbc:mysql://$host:$port/$database",
+                            username,
+                            password)
         }
 
         return connection

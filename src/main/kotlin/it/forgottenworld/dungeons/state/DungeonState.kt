@@ -181,8 +181,8 @@ object DungeonState {
 }
 
 fun loadData() {
-    ConfigManager.loadConfig(FWDungeonsPlugin.config)
-    ConfigManager.loadDungeonConfigs(FWDungeonsPlugin.dataFolder)
+    ConfigManager.loadConfig(FWDungeonsPlugin.pluginConfig)
+    ConfigManager.loadDungeonConfigs(FWDungeonsPlugin.pluginDataFolder)
     getInstancesFromDB()
 }
 

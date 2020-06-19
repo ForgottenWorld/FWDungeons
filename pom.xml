@@ -6,7 +6,7 @@
 
     <groupId>it.forgottenworld</groupId>
     <artifactId>FWDungeons</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
 
     <properties>
         <kotlin.version>1.3.72</kotlin.version>
@@ -119,12 +119,19 @@
                         </goals>
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <outputDirectory>${project.basedir}/target/FWDungeons-0.2-shaded.jar</outputDirectory>
-<!--                            <outputDirectory>C:\Users\giaco\Desktop\paper-server\plugins</outputDirectory>-->
+<!--                            <outputFile>${project.basedir}/target/${project.artifactId}-${project.version}-shaded.jar</outputFile>-->
+<!--                            <outputFile>C:/Users/giaco/Desktop/paper-server/plugins/${project.artifactId}-${project.version}.jar</outputFile>-->
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.github.com/ForgottenWorld/FWDungeons</url>
+        </repository>
+    </distributionManagement>
 </project>

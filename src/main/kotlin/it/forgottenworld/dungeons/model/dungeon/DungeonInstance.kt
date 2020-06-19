@@ -12,6 +12,7 @@ import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.utils.*
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.util.BlockVector
 
@@ -23,7 +24,9 @@ class DungeonInstance(
         val activeAreas: MutableList<ActiveArea>) {
 
     private val activeAreasIdMap = activeAreas.toActiveAreaIdMap()
-    var highlightFrames = TypeWrapper(false)
+    var doHighlightFrames = TypeWrapper(false)
+    var activeAreaHlFrameLocs = TypeWrapper(setOf<Location>())
+    var triggerHlFrameLocs = TypeWrapper(setOf<Location>())
 
     fun getActiveAreaById(id: Int) = activeAreasIdMap[id]
 
@@ -67,29 +70,30 @@ class DungeonInstance(
         resetInstance()
     }
 
+    fun updateHlBlocks() {
+        activeAreaHlFrameLocs.value = activeAreas.map { it.box.getFrontierBlocks() }.flatten().map { it.location }.toSet()
+
+        triggerHlFrameLocs.value = triggers.map { it.box.getFrontierBlocks() }.flatten().map { it.location }.toSet()
+    }
+
     fun toggleEditorHighlights() {
-        if (highlightFrames.value)
-            highlightFrames.value = false
+        if (doHighlightFrames.value)
+            doHighlightFrames.value = false
         else {
-            highlightFrames.value = true
-            val aaLocs = activeAreas.map { it.box.getFrontierBlocks() }.flatten().map { it.location }.toSet()
-            val tLocs = triggers.map { it.box.getFrontierBlocks() }.flatten().map { it.location }.toSet()
-            if (aaLocs.isNotEmpty())
-                repeatedlySpawnParticles(
-                        Particle.DRIP_WATER,
-                        aaLocs,
-                        1,
-                        10,
-                        highlightFrames
-                )
-            if (tLocs.isNotEmpty())
-                repeatedlySpawnParticles(
+            doHighlightFrames.value = true
+            updateHlBlocks()
+            repeatedlySpawnParticles(
+                    Particle.DRIP_WATER,
+                    1,
+                    10,
+                    doHighlightFrames
+                ) { activeAreaHlFrameLocs.value }
+            repeatedlySpawnParticles(
                         Particle.DRIP_LAVA,
-                        tLocs,
                         1,
                         10,
-                        highlightFrames
-                )
+                        doHighlightFrames
+                ) { triggerHlFrameLocs.value }
         }
     }
 }

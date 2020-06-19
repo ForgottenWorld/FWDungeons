@@ -2,37 +2,30 @@ package it.forgottenworld.dungeons
 
 import it.forgottenworld.dungeons.command.CommandFWDungeons
 import it.forgottenworld.dungeons.command.CommandFWDungeonsEdit
-import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.db.DBHandler
-import it.forgottenworld.dungeons.db.executeQuery
 import it.forgottenworld.dungeons.db.executeUpdate
 import it.forgottenworld.dungeons.event.listener.EntityDeathListener
 import it.forgottenworld.dungeons.event.listener.PlayerListener
 import it.forgottenworld.dungeons.event.listener.TriggerListener
-import it.forgottenworld.dungeons.model.activearea.ActiveArea
-import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.state.loadData
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.util.BlockVector
 import java.io.File
 
 class FWDungeonsPlugin : JavaPlugin() {
     companion object {
         lateinit var instance: FWDungeonsPlugin
-        lateinit var dataFolder: File
-        lateinit var config: FileConfiguration
+        lateinit var pluginDataFolder: File
+        lateinit var pluginConfig: FileConfiguration
     }
 
     override fun onEnable() {
         logger.info("Enabling FWDungeons...")
 
         instance = this
-        FWDungeonsPlugin.dataFolder = dataFolder
-        FWDungeonsPlugin.config = config
         saveDefaultConfig()
+        pluginDataFolder = dataFolder
+        pluginConfig = config
 
         logger.info("Connecting to DB...")
 

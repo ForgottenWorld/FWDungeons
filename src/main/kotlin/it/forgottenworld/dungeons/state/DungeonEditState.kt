@@ -43,7 +43,7 @@ object DungeonEditState {
         wipActiveAreaPos1s.remove(player.uniqueId)
         wipActiveAreaPos2s.remove(player.uniqueId)
         wipDungeonOrigins.remove(player.uniqueId)
-        wipTestInstances[player.uniqueId]?.highlightFrames?.value = false
+        wipTestInstances[player.uniqueId]?.doHighlightFrames?.value = false
         wipTestInstances.remove(player.uniqueId)
         wipDungeons.remove(dungeon)
 
@@ -153,13 +153,16 @@ object DungeonEditState {
                             false
                     )
             )
-            wipTestInstances[player.uniqueId]?.triggers?.add(Trigger(
+            wipTestInstances[player.uniqueId]?.apply{
+                triggers.add(Trigger(
                     id,
                     dungeon,
                     box,
                     null,
                     false
-            ))
+                ))
+                updateHlBlocks()
+            }
             box.highlightAll()
             wipTriggerPos2s.remove(player.uniqueId)
             id //return the trigger id
@@ -195,13 +198,16 @@ object DungeonEditState {
                             false
                     )
             )
-            wipTestInstances[player.uniqueId]?.triggers?.add(Trigger(
-                    id,
-                    dungeon,
-                    box,
-                    null,
-                    false
-            ))
+            wipTestInstances[player.uniqueId]?.apply{
+                triggers.add(Trigger(
+                        id,
+                        dungeon,
+                        box,
+                        null,
+                        false
+                ))
+                updateHlBlocks()
+            }
             box.highlightAll()
             wipTriggerPos1s.remove(player.uniqueId)
             id //return the trigger id
@@ -219,7 +225,10 @@ object DungeonEditState {
 
         return dungeon.triggers.last().let {
             dungeon.triggers.remove(it)
-            wipTestInstances[player.uniqueId]?.triggers?.removeLast()
+            wipTestInstances[player.uniqueId]?.apply {
+                triggers.removeLast()
+                updateHlBlocks()
+            }
             it.id //return the trigger id
         }
     }
@@ -258,10 +267,13 @@ object DungeonEditState {
                             Box(block, p2).withContainerOrigin(wipOrigin!!, BlockVector(0,0,0))
                     )
             )
-            wipTestInstances[player.uniqueId]?.activeAreas?.add(ActiveArea(
-                    id,
-                    box
-            ))
+            wipTestInstances[player.uniqueId]?.apply {
+                activeAreas.add(ActiveArea(
+                        id,
+                        box
+                ))
+                updateHlBlocks()
+            }
             box.highlightAll()
             wipActiveAreaPos2s.remove(player.uniqueId)
             id //return the trigger id
@@ -293,10 +305,13 @@ object DungeonEditState {
                             Box(p1, block).withContainerOrigin(wipOrigin!!,BlockVector(0,0,0))
                     )
             )
-            wipTestInstances[player.uniqueId]?.activeAreas?.add(ActiveArea(
-                    id,
-                    box
-            ))
+            wipTestInstances[player.uniqueId]?.apply {
+                activeAreas.add(ActiveArea(
+                        id,
+                        box
+                ))
+                updateHlBlocks()
+            }
             box.highlightAll()
             wipActiveAreaPos1s.remove(player.uniqueId)
             id //return the trigger id
@@ -314,7 +329,10 @@ object DungeonEditState {
 
         return dungeon.activeAreas.last().let {
             dungeon.activeAreas.remove(it)
-            wipTestInstances[player.uniqueId]?.activeAreas?.removeLast()
+            wipTestInstances[player.uniqueId]?.apply {
+                activeAreas.removeLast()
+                updateHlBlocks()
+            }
             it.id //return the active area id
         }
     }
@@ -454,7 +472,7 @@ object DungeonEditState {
             "Can't writeout yet, missing: $whatIsMissing"
         } else {
             ConfigManager.saveDungeonConfig(
-                    FWDungeonsPlugin.dataFolder,
+                    FWDungeonsPlugin.pluginDataFolder,
                     dungeon,
                     true
             )
@@ -468,7 +486,7 @@ object DungeonEditState {
         if (wipDungeons.contains(dungeon)) return -2 //dungeon is wip
 
         ConfigManager.saveDungeonConfig(
-                    FWDungeonsPlugin.dataFolder,
+                    FWDungeonsPlugin.pluginDataFolder,
                     dungeon,
                     false
             )
