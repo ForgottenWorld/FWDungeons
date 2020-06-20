@@ -54,7 +54,7 @@ class DungeonInstance(
 
     fun onInstanceFinish(givePoints: Boolean) {
         if (givePoints && dungeon.points != 0) {
-            party?.players?.map { it.uniqueId.toString() }?.toSet()?.let {
+            party?.players?.map { it.uniqueId }?.toSet()?.let {
                 DungeonCompletedEvent(
                         it, dungeon.points.toFloat()
                 )
