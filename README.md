@@ -8,7 +8,9 @@
 <b>FWDungeons</b> is a SpigotMC plugin for creating multi-instance scriptable co-op dungeons.
 
 ## COMMANDS
-
+<details>
+    <summary>Click to expand</summary>
+    
     /fwdungeonsedit (/fwde)
         dungeon
             create
@@ -123,3 +125,4 @@ Deletes the last created active area.
         disable
         reload
         
+</details>
