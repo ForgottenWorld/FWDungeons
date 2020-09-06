@@ -7,6 +7,7 @@ import java.sql.SQLException
 
 
 object DBHandler {
+
     private var connection: Connection? = null
     private lateinit var host: String
     private lateinit var database: String

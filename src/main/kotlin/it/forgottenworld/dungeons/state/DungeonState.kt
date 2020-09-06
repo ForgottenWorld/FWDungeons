@@ -21,6 +21,7 @@ import org.bukkit.util.BlockVector
 import java.util.*
 
 object DungeonState {
+
     val dungeons = mutableMapOf<Int, Dungeon>()
     val activeDungeons = mutableMapOf<Int, Boolean>()
     val playerParties = mutableMapOf<UUID, Party>()
@@ -28,7 +29,7 @@ object DungeonState {
     val playerReturnPositions = mutableMapOf<UUID, Location>()
     val playerReturnGameModes = mutableMapOf<UUID, GameMode>()
 
-    fun getMaxDungeonId() = dungeons.keys.max() ?: -1
+    fun getMaxDungeonId() = dungeons.keys.maxOrNull() ?: -1
     fun getDungeonById(id: Int) = dungeons[id]
 
     fun playerJoinInstance(player: Player, instanceId: Int, dungeonId: Int, partyKey: String): Int {

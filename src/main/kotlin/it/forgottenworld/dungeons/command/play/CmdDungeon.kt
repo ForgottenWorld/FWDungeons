@@ -2,11 +2,8 @@
 
 package it.forgottenworld.dungeons.command.play
 
+import it.forgottenworld.dungeons.cui.*
 import it.forgottenworld.dungeons.state.DungeonState
-import it.forgottenworld.dungeons.cui.StringConst
-import it.forgottenworld.dungeons.cui.getInteractiveDungeonList
-import it.forgottenworld.dungeons.cui.getLockClickable
-import it.forgottenworld.dungeons.cui.getString
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.Command
@@ -112,7 +109,7 @@ fun cmdDungeonLockParty(sender: CommandSender, command: Command, label: String, 
                         -1 -> "You're currently not in a dungeon party"
                         -2 -> "Only the dungeon party leader may make the party private"
                         -3 -> "This dungeon party is already private"
-                        0 -> "The dungeon party is now private, invite players with /fwd invite"
+                        0 -> "The dungeon party is now private, invite players with /fwd invite. To make it public, click ${getUnlockClickable()}"
                         else -> ""
                     })
     }
