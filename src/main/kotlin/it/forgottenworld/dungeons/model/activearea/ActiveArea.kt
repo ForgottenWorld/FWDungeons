@@ -11,7 +11,7 @@ class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Mater
     var label: String? = null
 
     fun fillWithMaterial(material: Material) {
-        box.getAllBlocks().apply {
+        box.getAllBlocks().run {
             forEach {
                 it.setType(material, true)
             }

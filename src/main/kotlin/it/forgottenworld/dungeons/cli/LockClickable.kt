@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.cui
+package it.forgottenworld.dungeons.cli
 
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent

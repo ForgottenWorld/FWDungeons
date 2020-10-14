@@ -1,9 +1,9 @@
-package it.forgottenworld.dungeons.cui
+package it.forgottenworld.dungeons.cli
 
 import net.md_5.bungee.api.ChatColor
 
-fun getString(const: StringConst) = const.string
+fun getString(const: Strings) = const.string
 
-enum class StringConst(val string: String) {
+enum class Strings(val string: String) {
     CHAT_PREFIX("${ChatColor.DARK_RED}F${ChatColor.GOLD}W${ChatColor.YELLOW}D${ChatColor.WHITE} ")
 }

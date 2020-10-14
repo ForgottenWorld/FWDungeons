@@ -10,26 +10,23 @@ class InstanceObjective(
         private val instanceId: Int,
         private val mobsToKill: MutableList<UUID>,
         private val onAllKilled: () -> Unit) {
+
     var active = true
 
     fun onMobKilled(uuid: UUID) {
         if (!active) return
         mobsToKill.remove(uuid)
-        if (mobsToKill.isEmpty()) {
-            MobState.instanceObjectives.remove(MobState.DungeonAndInstanceIdPair(dungeonId, instanceId))
-            if (active) onAllKilled()
-        }
+        if (mobsToKill.isNotEmpty()) return
+        MobState.instanceObjectives.remove(dungeonId to instanceId)
+        if (active) onAllKilled()
     }
 
     fun abort() {
         active = false
-        MobState.instanceObjectives.remove(MobState.DungeonAndInstanceIdPair(dungeonId, instanceId))
-        mobsToKill.forEach {
-            val entity = getEntity(it)
-            if (entity != null && entity is LivingEntity) {
-                entity.health = 0.0
-            }
-        }
+        MobState.instanceObjectives.remove(dungeonId to instanceId)
+        mobsToKill
+                .map { getEntity(it) }
+                .filterIsInstance<LivingEntity>()
+                .forEach { it.health = 0.0 }
     }
-
 }

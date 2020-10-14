@@ -1,8 +1,8 @@
-package it.forgottenworld.dungeons.cui
+package it.forgottenworld.dungeons.cli
 
-import it.forgottenworld.dungeons.state.DungeonState
 import it.forgottenworld.dungeons.model.dungeon.Dungeon
 import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
+import it.forgottenworld.dungeons.state.DungeonState
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
@@ -40,9 +40,7 @@ private fun getPageClickable(text: String, page: Int) =
         }
 
 private fun getCarets(count: Int) =
-        TextComponent("${">".repeat(count)} ").apply {
-            color = ChatColor.GRAY
-        }
+        TextComponent("${">".repeat(count)} ").apply { color = ChatColor.GRAY }
 
 private fun getColoredDifficulty(difficulty: Dungeon.Difficulty) =
         TextComponent("${difficulty.toString().toUpperCase()}\n").apply {
@@ -58,7 +56,7 @@ fun getInteractiveDungeonList(page: Int) =
         if (page >= 0 && page <= DungeonState.dungeons.count() - 1) {
             val d = DungeonState.dungeons.values.filter{
                 DungeonState.activeDungeons[it.id] == true }.toList()[page]
-            addExtra(TextComponent("${ChatColor.DARK_GRAY}====================[ ${getString(StringConst.CHAT_PREFIX).dropLast(1)}${ChatColor.GRAY}ungeons ${ChatColor.DARK_GRAY}]====================\n\n").apply {
+            addExtra(TextComponent("${ChatColor.DARK_GRAY}====================[ ${getString(Strings.CHAT_PREFIX).dropLast(1)}${ChatColor.GRAY}ungeons ${ChatColor.DARK_GRAY}]====================\n\n").apply {
                 addExtra(getCarets(3))
                 addExtra("${ChatColor.DARK_AQUA}DUNGEON:${ChatColor.WHITE} ${d.name}\n")
                 addExtra(getCarets(3))

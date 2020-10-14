@@ -12,11 +12,13 @@ class EntityDeathListener: Listener {
 
         val entity = event?.entity ?: return
 
-        MobState.instanceIdForTrackedMobs[entity.uniqueId]?.let {
-            val dId = MobState.dungeonIdForTrackedMobs[entity.uniqueId]!!
-            MobState.instanceObjectives[MobState.DungeonAndInstanceIdPair(dId, it)]?.onMobKilled(entity.uniqueId)
-            MobState.instanceIdForTrackedMobs.remove(entity.uniqueId)
-            MobState.dungeonIdForTrackedMobs.remove(entity.uniqueId)
+        MobState.run {
+            instanceIdForTrackedMobs[entity.uniqueId]?.let {
+                val dId = dungeonIdForTrackedMobs[entity.uniqueId]!!
+                instanceObjectives[dId to it]?.onMobKilled(entity.uniqueId)
+                instanceIdForTrackedMobs.remove(entity.uniqueId)
+                dungeonIdForTrackedMobs.remove(entity.uniqueId)
+            }
         }
     }
 }

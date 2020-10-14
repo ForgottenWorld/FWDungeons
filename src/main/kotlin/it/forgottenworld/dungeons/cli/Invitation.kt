@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.cui
+package it.forgottenworld.dungeons.cli
 
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
@@ -6,7 +6,7 @@ import net.md_5.bungee.api.chat.TextComponent
 
 
 fun formatInvitation(senderName: String, dungeonId: Int, instanceId: Int, partyKey: String) =
-        TextComponent("${getString(StringConst.CHAT_PREFIX)}$senderName invited you to join a dungeon party, click ").apply {
+        TextComponent("${getString(Strings.CHAT_PREFIX)}$senderName invited you to join a dungeon party, click ").apply {
             addExtra(
                     TextComponent("HERE").apply {
                         color = ChatColor.GREEN

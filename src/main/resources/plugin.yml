@@ -1,5 +1,5 @@
 name: FWDungeons
-version: "0.3.4a"
+version: "0.4.0"
 api-version: "1.15"
 description: Create multi-instance scriptable co-op dungeons in your minecraft server
 author: Shivs (OhMeMuffin)
@@ -13,7 +13,7 @@ commands:
     aliases: [fwdungeons,fwd]
   fwdungeonsedit:
     description: Access FWDungeons functions.
-    usage: /fwdungeonsedit [ dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes ] | trigger [ pos1 | pos2 | label | unmake ] | activearea [ pos1 | pos2 | label | unmake ]]
+    usage: /fwdungeonsedit [ dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes ] | trigger [ pos1 | pos2 | label | unmake | wand ] | activearea [ pos1 | pos2 | label | unmake | wand ]]
     aliases: [fwdungeonsedit,fwde]
 permissions:
   fwdungeonsedit.dungeon.create:
@@ -76,6 +76,9 @@ permissions:
   fwdungeonsedit.trigger.unmake:
     description: Allows the player to use /fwdungeonsedit trigger unmake
     default: op
+  fwdungeonsedit.trigger.wand:
+    description: Allows the player to use /fwdungeonsedit trigger wand
+    default: op
   fwdungeonsedit.activearea.pos1:
     description: Allows the player to use /fwdungeonsedit activearea pos1
     default: op
@@ -87,6 +90,9 @@ permissions:
     default: op
   fwdungeonsedit.activearea.unmake:
     description: Allows the player to use /fwdungeonsedit activearea unmake
+    default: op
+  fwdungeonsedit.activearea.wand:
+    description: Allows the player to use /fwdungeonsedit activearea wand
     default: op
   fwdungeons.list:
     description: Allows the player to use /fwdungeons list
