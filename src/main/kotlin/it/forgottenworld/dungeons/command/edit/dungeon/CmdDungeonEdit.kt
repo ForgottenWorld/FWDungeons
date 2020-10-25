@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.state.DungeonEditState
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.manager.DungeonEditManager
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -21,13 +21,13 @@ fun cmdDungeonEdit(sender: CommandSender, command: Command, label: String, args:
         return true
     }
 
-    val res = DungeonState.getDungeonById(id)?.let { d ->
+    val res = DungeonManager.getDungeonById(id)?.let { d ->
         when {
-            DungeonEditState.dungeonEditors.containsValue(d) -> false
-            DungeonState.activeDungeons[id] == true -> false
+            DungeonEditManager.dungeonEditors.containsValue(d) -> false
+            DungeonManager.activeDungeons[id] == true -> false
             else -> {
-                DungeonEditState.purgeWorkingData(sender)
-                DungeonEditState.dungeonEditors[sender.uniqueId] = d
+                DungeonEditManager.purgeWorkingData(sender)
+                DungeonEditManager.dungeonEditors[sender.uniqueId] = d
                 true
             }
         }

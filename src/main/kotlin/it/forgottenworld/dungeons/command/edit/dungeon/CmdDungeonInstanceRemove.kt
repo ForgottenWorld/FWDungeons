@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.state.DungeonEditState
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.bukkitThreadAsync
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
@@ -14,13 +14,13 @@ import java.io.File
 fun cmdDungeonInstanceRemove(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender !is Player) return true
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] 
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId]
             ?: run {
                 sender.sendFWDMessage("You're not editing any dungeons")
                 return true
             }
 
-    if (DungeonEditState.wipDungeons.contains(dungeon)) {
+    if (DungeonEditManager.wipDungeons.contains(dungeon)) {
         sender.sendFWDMessage("Dungeon instances may only be removed from fully protoyped dungeons")
         return true
     }

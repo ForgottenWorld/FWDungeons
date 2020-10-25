@@ -38,9 +38,9 @@ fun BlockVector.toVector() =
 
 fun BlockVector.withRefSystemOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
         BlockVector(
-                this.x - oldOrigin.x + newOrigin.x,
-                this.y - oldOrigin.y + newOrigin.y,
-                this.z - oldOrigin.z + newOrigin.z)
+                x - oldOrigin.x + newOrigin.x,
+                y - oldOrigin.y + newOrigin.y,
+                z - oldOrigin.z + newOrigin.z)
 
 inline fun bukkitThreadAsync(crossinline action: BukkitRunnable.() -> Unit) =
         object: BukkitRunnable() {

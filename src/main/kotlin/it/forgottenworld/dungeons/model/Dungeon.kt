@@ -1,10 +1,7 @@
-package it.forgottenworld.dungeons.model.dungeon
+package it.forgottenworld.dungeons.model
 
-import it.forgottenworld.dungeons.model.activearea.ActiveArea
-import it.forgottenworld.dungeons.model.box.Box
-import it.forgottenworld.dungeons.model.trigger.Trigger
 import it.forgottenworld.dungeons.scripting.parseCode
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.toVector
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
@@ -52,10 +49,10 @@ class Dungeon(val id: Int) {
             conf.getInt("points", 0),
             conf.getIntegerList("numberOfPlayers").let{ IntRange(it.first(), it.last()) },
             Box(
-            BlockVector(0,0,0),
-            conf.getInt("width"),
-            conf.getInt("height"),
-            conf.getInt("depth")
+                BlockVector(0,0,0),
+                conf.getInt("width"),
+                conf.getInt("height"),
+                conf.getInt("depth")
             ),
             conf.getVector("startingLocation")!!.toBlockVector(),
             mutableListOf(),
@@ -64,25 +61,24 @@ class Dungeon(val id: Int) {
             ).apply {
                 triggers.addAll(
                         conf.getConfigurationSection("triggers")
-                        !!.getKeys(false)
-                                .map { k ->
-                                    Trigger(
-                                            k.toInt(),
-                                            this,
-                                            Box(
-                                                    conf.getVector("triggers.$k.origin")!!.toBlockVector(),
-                                                    conf.getInt("triggers.$k.width"),
-                                                    conf.getInt("triggers.$k.height"),
-                                                    conf.getInt("triggers.$k.depth")
-                                            ),
-                                            { inst -> parseCode(inst, conf.getStringList("triggers.$k.effect")) },
-                                            conf.getBoolean("triggers.$k.requiresWholeParty")
-                                    ).apply {
-                                        conf.getString("triggers.$k.label")?.let {
-                                            label = it
-                                        }
-                                    }
+                        !!.getKeys(false).map { k ->
+                            Trigger(
+                                    k.toInt(),
+                                    this,
+                                    Box(
+                                            conf.getVector("triggers.$k.origin")!!.toBlockVector(),
+                                            conf.getInt("triggers.$k.width"),
+                                            conf.getInt("triggers.$k.height"),
+                                            conf.getInt("triggers.$k.depth")
+                                    ),
+                                    parseCode(conf.getStringList("triggers.$k.effect")),
+                                    conf.getBoolean("triggers.$k.requiresWholeParty")
+                            ).apply {
+                                conf.getString("triggers.$k.label")?.let {
+                                    label = it
                                 }
+                            }
+                        }
                 )
                 activeAreas.addAll(
                         conf.getConfigurationSection("activeAreas")
@@ -104,7 +100,7 @@ class Dungeon(val id: Int) {
                                     }
                                 }
                 )
-                DungeonState.activeDungeons[id] = true
+                DungeonManager.activeDungeons[id] = true
             }
     }
 
@@ -153,8 +149,7 @@ class Dungeon(val id: Int) {
                 set("triggers.${it.id}.width", it.box.width)
                 set("triggers.${it.id}.height", it.box.height)
                 set("triggers.${it.id}.depth", it.box.depth)
-                if (eraseEffects)
-                    set("triggers.${it.id}.effect", "")
+                if (eraseEffects) set("triggers.${it.id}.effect", "")
                 set("triggers.${it.id}.requiresWholeParty", it.requiresWholeParty)
             }
             dungeon.activeAreas.forEach {
@@ -178,8 +173,4 @@ class Dungeon(val id: Int) {
         if (triggers.isEmpty()) append("at least one trigger, ")
         if (activeAreas.isEmpty()) append("at least one active area, ")
     }.toString().dropLast(2)
-
-    fun getActiveAreaById(id: Int) = activeAreas.find { it.id == id }
-
-    fun getTriggerById(id: Int) = triggers.find { it.id == id }
 }

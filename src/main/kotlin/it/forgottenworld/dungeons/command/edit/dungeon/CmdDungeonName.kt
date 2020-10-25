@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.state.DungeonEditState
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.manager.DungeonEditManager
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -17,18 +17,18 @@ fun cmdDungeonName(sender: CommandSender, command: Command, label: String, args:
 
     val name = args.joinToString(" ")
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
 
-    DungeonState.dungeons.values
+    DungeonManager.dungeons.values
             .find { it.name.equals(name.trim(), true) }
             ?.let {
                 sender.sendFWDMessage("Antoher dungeon with the same name already exists")
                 return true
             }
-    DungeonEditState.wipDungeons
+    DungeonEditManager.wipDungeons
             .find { it.name.equals(name.trim(), true) }
             ?.let {
                 sender.sendFWDMessage("Antoher dungeon with the same name is being created by someone")

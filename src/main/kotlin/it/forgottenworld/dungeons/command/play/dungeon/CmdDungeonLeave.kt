@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.state.DungeonState.party
+import it.forgottenworld.dungeons.manager.DungeonManager.party
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -14,7 +14,7 @@ fun cmdDungeonLeave(sender: CommandSender, command: Command, label: String, args
             sender.sendFWDMessage("The instance has started, you can't leave now")
             return true
         }
-        it.playerLeave(sender)
+        it.onPlayerLeave(sender)
         sender.sendFWDMessage("You left the dungeon party")
     } ?: sender.sendFWDMessage("You're currently not in a dungeon party")
 

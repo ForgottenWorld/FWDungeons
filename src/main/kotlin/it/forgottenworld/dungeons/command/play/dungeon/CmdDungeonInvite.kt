@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.cli.formatInvitation
-import it.forgottenworld.dungeons.state.DungeonState.dungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.Command

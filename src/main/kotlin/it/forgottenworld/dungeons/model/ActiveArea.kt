@@ -1,12 +1,14 @@
-package it.forgottenworld.dungeons.model.activearea
+package it.forgottenworld.dungeons.model
 
-import it.forgottenworld.dungeons.model.box.Box
+import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
+import kotlin.random.Random
 
-class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Material.AIR) {
+class ActiveArea(val id:Int, val box: Box, val startingMaterial: Material = Material.AIR) {
 
     var label: String? = null
 
@@ -25,9 +27,11 @@ class ActiveArea(val id:Int, val box:Box, val startingMaterial: Material = Mater
         }
     }
 
-    fun getRandomLocationOnFloor(): Location {
-        val floorBlocks = box.getFloorBlocks()
-        return floorBlocks.random().location.clone().add(0.0,1.0,0.0)
-    }
+    fun getRandomLocationOnFloor() = Location(
+            Bukkit.getWorld(ConfigManager.dungeonWorld),
+            Random.nextDouble(box.origin.x + 0.5, box.origin.x + box.width - 0.5),
+            box.origin.y,
+            Random.nextDouble(box.origin.z + 0.5, box.origin.z + box.depth - 0.5)
+    )
 
 }

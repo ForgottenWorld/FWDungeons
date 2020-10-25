@@ -3,9 +3,9 @@ package it.forgottenworld.dungeons.command.play.dungeon
 import it.forgottenworld.dungeons.cli.Strings
 import it.forgottenworld.dungeons.cli.getLockClickable
 import it.forgottenworld.dungeons.cli.getString
-import it.forgottenworld.dungeons.model.party.Party
-import it.forgottenworld.dungeons.state.DungeonState
-import it.forgottenworld.dungeons.state.DungeonState.party
+import it.forgottenworld.dungeons.model.Party
+import it.forgottenworld.dungeons.manager.DungeonManager
+import it.forgottenworld.dungeons.manager.DungeonManager.party
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.Command
@@ -29,7 +29,7 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
 
     val partyKey = if (args.count() > 2) args[2] else ""
 
-    val dungeon = DungeonState.getDungeonById(dungeonId) ?: run {
+    val dungeon = DungeonManager.getDungeonById(dungeonId) ?: run {
         sender.sendFWDMessage("Invalid dungeon id")
         return true
     }
@@ -38,12 +38,12 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
         return true
     }
 
-    if (DungeonState.activeDungeons[dungeonId] != true) {
+    if (DungeonManager.activeDungeons[dungeonId] != true) {
         sender.sendFWDMessage("This dugeons is disabled")
         return true
     }
 
-    sender.party ?: run {
+    if (sender.party != null) {
         sender.sendFWDMessage("You're already in a party")
         return true
     }
@@ -81,7 +81,7 @@ fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: Strin
         return true
     }
 
-    if (party.playerJoin(sender))
+    if (party.onPlayerJoin(sender))
         sender.sendFWDMessage("You joined the dungeon party")
     else
         sender.sendFWDMessage("Couldn't join dungeon party")

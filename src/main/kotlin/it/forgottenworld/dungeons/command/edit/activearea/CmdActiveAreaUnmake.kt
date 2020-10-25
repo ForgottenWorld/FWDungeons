@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.activearea
 
-import it.forgottenworld.dungeons.state.DungeonEditState
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -9,11 +9,11 @@ import org.bukkit.entity.Player
 fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender !is Player) return true
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
-    if (!DungeonEditState.wipDungeons.contains(dungeon)) {
+    if (!DungeonEditManager.wipDungeons.contains(dungeon)) {
         sender.sendFWDMessage("This dungeon was already exported beforehand")
         return true
     }
@@ -24,7 +24,7 @@ fun cmdActiveAreaUnmake(sender: CommandSender, command: Command, label: String, 
 
     dungeon.activeAreas.lastOrNull()?.let {
         dungeon.activeAreas.remove(it)
-        DungeonEditState.wipTestInstances[sender.uniqueId]?.run {
+        DungeonEditManager.wipTestInstances[sender.uniqueId]?.run {
             activeAreas.removeLast()
             updateHlBlocks()
         }

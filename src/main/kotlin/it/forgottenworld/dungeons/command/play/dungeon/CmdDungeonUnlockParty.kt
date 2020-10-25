@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.state.DungeonState.party
+import it.forgottenworld.dungeons.manager.DungeonManager.party
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender

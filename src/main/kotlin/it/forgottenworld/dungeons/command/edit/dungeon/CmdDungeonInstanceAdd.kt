@@ -1,10 +1,10 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.model.activearea.ActiveArea
-import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.model.trigger.Trigger
-import it.forgottenworld.dungeons.state.DungeonEditState
+import it.forgottenworld.dungeons.model.ActiveArea
+import it.forgottenworld.dungeons.model.DungeonInstance
+import it.forgottenworld.dungeons.model.Trigger
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.blockVector
 import it.forgottenworld.dungeons.utils.bukkitThreadAsync
 import it.forgottenworld.dungeons.utils.sendFWDMessage
@@ -28,12 +28,12 @@ fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, _label: Strin
     }
 
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
 
-    if (DungeonEditState.wipDungeons.contains(dungeon)) {
+    if (DungeonEditManager.wipDungeons.contains(dungeon)) {
         sender.sendFWDMessage("Dungeon instances may only be created for fully protoyped dungeons")
         return true
     }
@@ -48,7 +48,7 @@ fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, _label: Strin
                         Trigger(it.id,
                                 it.dungeon,
                                 it.box.withContainerOrigin(BlockVector(0,0,0), block.blockVector),
-                                it.effectParser,
+                                it.effect,
                                 it.requiresWholeParty
                         ).apply { label = it.label }
                     }.map { it.id to it }.toMap().toMutableMap(),
@@ -59,7 +59,6 @@ fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, _label: Strin
                         ).apply { label = it.label}
                     }.toMutableList()
             ).apply {
-                // triggers.values.forEach { it.parseEffect(this) }
                 try {
                     val config = YamlConfiguration()
                     val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")

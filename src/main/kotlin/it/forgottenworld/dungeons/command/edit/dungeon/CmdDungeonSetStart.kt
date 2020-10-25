@@ -1,9 +1,8 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.state.DungeonEditState
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import it.forgottenworld.dungeons.utils.toVector
-import org.bukkit.block.Block
+import it.forgottenworld.dungeons.utils.withRefSystemOrigin
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -12,29 +11,31 @@ import org.bukkit.util.BlockVector
 fun cmdDungeonSetStart(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
     if (sender !is Player) return true
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
+
     if (!dungeon.hasBox) {
         sender.sendFWDMessage("Dungeon box should be set before adding a starting location")
         return true
     }
 
-    var newBlock: Block? = null
-    if (DungeonEditState.wipDungeonOrigins[sender.uniqueId]?.let {
-                newBlock = sender.world.getBlockAt(
-                        sender.location.subtract(
-                                it.toVector())
-                )
-                dungeon.box.withOrigin(it).containsPlayer(sender)
+    if (!DungeonEditManager.wipDungeons.contains(dungeon)) {
+        sender.sendFWDMessage("This dungeon was already exported beforehand")
+        return true
+    }
 
-            } != true) {
+    val wipOrigin = DungeonEditManager.wipDungeonOrigins[sender.uniqueId] ?: return true
+    if (!dungeon.box.withOrigin(wipOrigin).containsPlayer(sender)) {
         sender.sendFWDMessage("You're outside of the dungeon box")
         return true
     }
 
-    dungeon.startingLocation = BlockVector(newBlock!!.location.toVector())
+    dungeon.startingLocation = sender.location
+            .let { BlockVector(it.blockX, it.blockY, it.blockZ) }
+            .withRefSystemOrigin(wipOrigin, BlockVector(0, 0, 0))
+
     sender.sendFWDMessage("Dungeon starting location set succesfully")
 
     return true

@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -20,7 +20,7 @@ fun cmdDungeonEvacuate(sender: CommandSender, command: Command, label: String, a
     }
 
     sender.sendFWDMessage(
-            if (DungeonState.evacuateDungeon(dungeonId, instanceId))
+            if (DungeonManager.evacuateDungeon(dungeonId, instanceId))
                 "All adventurers were brought back to safety and the instance was reset"
             else
                 "Dungeon instance not found")

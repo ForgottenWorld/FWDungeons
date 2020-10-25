@@ -1,26 +1,28 @@
 package it.forgottenworld.dungeons.scripting
 
-import it.forgottenworld.dungeons.model.activearea.ActiveArea
-import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.state.MobSpawnData
-import it.forgottenworld.dungeons.state.MobType
+import it.forgottenworld.dungeons.model.DungeonInstance
+import it.forgottenworld.dungeons.model.MobSpawnData
+import it.forgottenworld.dungeons.manager.InstanceObjectiveManager
 
 fun parseCombatObjective(
-        instance: DungeonInstance,
-        codeIterator: Iterator<String>,
-        mobs: MutableList<MobSpawnData>): () -> Unit {
-    var currentActiveArea: ActiveArea? = null
+        codeIterator: Iterator<String>): (DungeonInstance) -> Unit {
+    var currentActiveArea: Int? = null
+    val mobs = mutableListOf<MobSpawnData>()
     while(codeIterator.hasNext()) {
         val code = codeIterator.next()
         when {
-            code.startsWith(PREFIX_MYTHIC_MOB) ->
-                mobs.add(MobSpawnData(currentActiveArea!!, code.removePrefix(PREFIX_MYTHIC_MOB), MobType.MYTHIC))
-            code.startsWith(PREFIX_VANILLA_MOB) ->
-                mobs.add(MobSpawnData(currentActiveArea!!, code.removePrefix(PREFIX_VANILLA_MOB), MobType.VANILLA))
+            code.startsWith(PREFIX_MYTHIC_MOB) -> {
+                if (currentActiveArea == null) throw Exception("Target active area not yet set")
+                mobs.add(MobSpawnData(currentActiveArea, code.removePrefix(PREFIX_MYTHIC_MOB), true))
+            }
+            code.startsWith(PREFIX_VANILLA_MOB) -> {
+                if (currentActiveArea == null) throw Exception("Target active area not yet set")
+                mobs.add(MobSpawnData(currentActiveArea, code.removePrefix(PREFIX_VANILLA_MOB), false))
+            }
             code.startsWith(PREFIX_ACTIVE_AREA) ->
-                currentActiveArea = instance.getActiveAreaById(code.removePrefix(PREFIX_ACTIVE_AREA).toInt())
+                currentActiveArea = code.removePrefix(PREFIX_ACTIVE_AREA).toInt()
             code == CODE_WHEN_DONE ->
-                return doParseCode(instance, codeIterator)
+                return { InstanceObjectiveManager.attachNewObjectiveToInstance(it, mobs, doParseCode(codeIterator)) }
         }
     }
     return {}

@@ -15,8 +15,8 @@
 
     <repositories>
         <repository>
-            <id>spigotmc-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>mvnrepository</id>
@@ -31,8 +31,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
             <version>1.16.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
@@ -126,9 +126,9 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-<!--                            <shadedArtifactAttached>false</shadedArtifactAttached>-->
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <outputDirectory>/home/giacomo/paper/plugins</outputDirectory>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+<!--                            <shadedArtifactAttached>true</shadedArtifactAttached>-->
+<!--                            <outputDirectory>/home/giacomo/paper/plugins</outputDirectory>-->
                         </configuration>
                     </execution>
                 </executions>

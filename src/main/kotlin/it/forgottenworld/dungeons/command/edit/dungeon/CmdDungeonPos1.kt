@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.model.box.Box
-import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.state.DungeonEditState
+import it.forgottenworld.dungeons.model.Box
+import it.forgottenworld.dungeons.model.DungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.minBlockVector
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
@@ -20,28 +20,32 @@ fun cmdDungeonPos1(sender: CommandSender, command: Command, label: String, args:
         return true
     }
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
 
-    DungeonEditState.wipDungeonPos2s[sender.uniqueId]?.let {
+    DungeonEditManager.wipDungeonPos2s[sender.uniqueId]?.let {
         dungeon.box = Box(block, it).withOriginZero()
         val newOrigin = minBlockVector(block, it)
-        DungeonEditState.wipDungeonOrigins[sender.uniqueId] = newOrigin
+        DungeonEditManager.wipDungeonOrigins[sender.uniqueId] = newOrigin
         dungeon.instances.clear()
-        DungeonEditState.wipTestInstances[sender.uniqueId] =
+        DungeonEditManager.wipTestInstances[sender.uniqueId] =
                 DungeonInstance(
                         1000,
                         dungeon,
                         newOrigin,
                         mutableMapOf(),
-                        mutableListOf()
-                ).apply { dungeon.instances.add(this) }
-        DungeonEditState.wipDungeonPos2s.remove(sender.uniqueId)
+                        mutableListOf(),
+                        true
+                ).apply {
+                    dungeon.instances.add(this)
+                    tester = sender
+                }
+        DungeonEditManager.wipDungeonPos2s.remove(sender.uniqueId)
         sender.sendFWDMessage("Dungeon box set")
     } ?: ({
-        DungeonEditState.wipDungeonPos1s[sender.uniqueId] = block
+        DungeonEditManager.wipDungeonPos1s[sender.uniqueId] = block
         sender.sendFWDMessage("First position set, now pick another with /fwde dungeon pos2")
     })()
 

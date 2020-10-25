@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.config
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.model.dungeon.Dungeon
-import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.model.Dungeon
+import it.forgottenworld.dungeons.model.DungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.bukkitThreadAsync
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -29,7 +29,7 @@ object ConfigManager {
                 ?.forEach {
                     try {
                         val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                        DungeonState.dungeons[conf.getInt("id")] = Dungeon.fromConfig(conf)
+                        DungeonManager.dungeons[conf.getInt("id")] = Dungeon.fromConfig(conf)
                     } catch (e : Exception) {
                         e.printStackTrace()
                     }

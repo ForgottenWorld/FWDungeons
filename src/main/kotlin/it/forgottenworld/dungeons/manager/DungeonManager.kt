@@ -1,14 +1,14 @@
-package it.forgottenworld.dungeons.state
+package it.forgottenworld.dungeons.manager
 
-import it.forgottenworld.dungeons.model.dungeon.Dungeon
-import it.forgottenworld.dungeons.model.party.Party
-import it.forgottenworld.dungeons.model.trigger.Trigger
+import it.forgottenworld.dungeons.model.Dungeon
+import it.forgottenworld.dungeons.model.Party
+import it.forgottenworld.dungeons.model.Trigger
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.*
 
-object DungeonState {
+object DungeonManager {
 
     val dungeons = mutableMapOf<Int, Dungeon>()
     val activeDungeons = mutableMapOf<Int, Boolean>()

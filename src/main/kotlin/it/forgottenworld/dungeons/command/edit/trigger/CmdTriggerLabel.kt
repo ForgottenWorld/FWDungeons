@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.trigger
 
-import it.forgottenworld.dungeons.state.DungeonEditState
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -15,12 +15,12 @@ fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args
         return true
     }
 
-    val dungeon = DungeonEditState.dungeonEditors[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
 
-    if (!DungeonEditState.wipDungeons.contains(dungeon)) run {
+    if (!DungeonEditManager.wipDungeons.contains(dungeon)) run {
         sender.sendFWDMessage("This dungeon was already exported beforehand")
         return true
     }
@@ -32,7 +32,7 @@ fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args
 
     dungeon.triggers.lastOrNull()?.let {
         it.label = label
-        DungeonEditState.wipTestInstances[sender.uniqueId]?.triggers?.get(it.id)?.label = label
+        DungeonEditManager.wipTestInstances[sender.uniqueId]?.triggers?.get(it.id)?.label = label
         sender.sendFWDMessage("Set label $tLabel")
     }
 

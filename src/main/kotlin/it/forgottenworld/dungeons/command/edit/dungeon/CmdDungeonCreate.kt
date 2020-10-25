@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.model.dungeon.Dungeon
-import it.forgottenworld.dungeons.state.DungeonEditState
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.model.Dungeon
+import it.forgottenworld.dungeons.manager.DungeonEditManager
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -12,12 +12,12 @@ fun cmdDungeonCreate(sender: CommandSender, command: Command, label: String, arg
     if (sender !is Player) return true
 
     val newId =
-            DungeonEditState.wipDungeons.map{ it.id }.maxOrNull()?.plus(1)
-                    ?: DungeonState.getMaxDungeonId() + 1
+            DungeonEditManager.wipDungeons.map{ it.id }.maxOrNull()?.plus(1)
+                    ?: DungeonManager.getMaxDungeonId() + 1
 
     Dungeon(newId).let {
-        DungeonEditState.wipDungeons.add(it)
-        DungeonEditState.dungeonEditors[sender.uniqueId] = it
+        DungeonEditManager.wipDungeons.add(it)
+        DungeonEditManager.dungeonEditors[sender.uniqueId] = it
     }
 
     sender.sendFWDMessage("Created dungeon with id $newId")

@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.cli
 
-import it.forgottenworld.dungeons.model.dungeon.Dungeon
-import it.forgottenworld.dungeons.model.dungeon.DungeonInstance
-import it.forgottenworld.dungeons.state.DungeonState
+import it.forgottenworld.dungeons.model.Dungeon
+import it.forgottenworld.dungeons.model.DungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonManager
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
@@ -53,9 +53,11 @@ private fun getColoredDifficulty(difficulty: Dungeon.Difficulty) =
 
 fun getInteractiveDungeonList(page: Int) =
     TextComponent().apply {
-        if (page >= 0 && page <= DungeonState.dungeons.count() - 1) {
-            val d = DungeonState.dungeons.values.filter{
-                DungeonState.activeDungeons[it.id] == true }.toList()[page]
+        if (page >= 0 && page <= DungeonManager.dungeons.count() - 1) {
+            val d = DungeonManager.dungeons.values
+                    .filter { DungeonManager.activeDungeons[it.id] == true }
+                    .toList()
+                    .getOrNull(page) ?: return@apply
             addExtra(TextComponent("${ChatColor.DARK_GRAY}====================[ ${getString(Strings.CHAT_PREFIX).dropLast(1)}${ChatColor.GRAY}ungeons ${ChatColor.DARK_GRAY}]====================\n\n").apply {
                 addExtra(getCarets(3))
                 addExtra("${ChatColor.DARK_AQUA}DUNGEON:${ChatColor.WHITE} ${d.name}\n")
@@ -94,7 +96,7 @@ fun getInteractiveDungeonList(page: Int) =
                     addExtra("${ChatColor.DARK_GRAY} ]")
                 } else addExtra("${ChatColor.DARK_GRAY}=============")
                 addExtra("${ChatColor.DARK_GRAY}===============================")
-                if (page < DungeonState.dungeons.count() - 1) {
+                if (page < DungeonManager.dungeons.count() - 1) {
                     addExtra("${ChatColor.DARK_GRAY}[ ")
                     addExtra(getPageClickable("NEXT", page + 1))
                     addExtra("${ChatColor.DARK_GRAY} ]=")

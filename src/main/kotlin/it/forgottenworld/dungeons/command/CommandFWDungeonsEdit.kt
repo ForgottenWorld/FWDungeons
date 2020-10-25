@@ -35,7 +35,7 @@ class CommandFWDungeonsEdit : CommandExecutor, TabExecutor {
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<String>) =
             if (!cmd.name.equals("fwdungeonsedit", true) || sender !is Player) null
-            else when (args.count()) {
+            else when (args.size) {
                 0 -> commandBindings.keys.toList()
                 1 -> commandBindings.keys.filter { it.startsWith(args[0], true) }
                 2 -> commandBindings[args[0]]?.keys?.filter { it.startsWith(args[1], true) }
