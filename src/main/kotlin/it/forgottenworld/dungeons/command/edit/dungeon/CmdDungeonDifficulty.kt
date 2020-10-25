@@ -1,14 +1,11 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.model.Dungeon
 import it.forgottenworld.dungeons.manager.DungeonEditManager
+import it.forgottenworld.dungeons.model.Dungeon
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdDungeonDifficulty(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdDungeonDifficulty(sender: Player, args: Array<out String>): Boolean {
     if (args.isEmpty()) {
         sender.sendFWDMessage("Not enough arguments: please provide a difficulty")
         return true

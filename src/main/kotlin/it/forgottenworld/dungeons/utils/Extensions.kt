@@ -15,12 +15,6 @@ import java.util.*
 val Player.targetBlock
         inline get() = getTargetBlock(null as Set<Material>?, 5)
 
-val Player.footBlock
-        inline get() = world.getBlockAt(location)
-
-val Player.eyeBlock
-        inline get() = world.getBlockAt(eyeLocation)
-
 val Block.blockVector
         inline get() = BlockVector(x, y, z)
 

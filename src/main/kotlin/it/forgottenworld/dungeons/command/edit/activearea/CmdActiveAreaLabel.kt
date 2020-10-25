@@ -2,12 +2,9 @@ package it.forgottenworld.dungeons.command.edit.activearea
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdActiveAreaLabel(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdActiveAreaLabel(sender: Player, args: Array<out String>): Boolean {
     val aaLabel = args.joinToString(" ").trim()
 
     if (aaLabel.isEmpty()) {
@@ -29,8 +26,8 @@ fun cmdActiveAreaLabel(sender: CommandSender, command: Command, label: String, a
     }
 
     dungeon.activeAreas.last().let {
-        it.label = label
-        DungeonEditManager.wipTestInstances[sender.uniqueId]?.activeAreas?.find { t -> t.id == it.id }?.label = label
+        it.label = aaLabel
+        DungeonEditManager.wipTestInstances[sender.uniqueId]?.activeAreas?.find { t -> t.id == it.id }?.label = aaLabel
         sender.sendFWDMessage("Set label $aaLabel")
     }
 

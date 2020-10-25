@@ -1,25 +1,22 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.model.ActiveArea
 import it.forgottenworld.dungeons.model.DungeonInstance
 import it.forgottenworld.dungeons.model.Trigger
-import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.blockVector
 import it.forgottenworld.dungeons.utils.bukkitThreadAsync
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import java.io.File
 
-fun cmdDungeonInstanceAdd(sender: CommandSender, command: Command, _label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdDungeonInstanceAdd(sender: Player, args: Array<out String>): Boolean {
     val block = sender.targetBlock
 
     if (block.blockData.material == Material.AIR) {

@@ -2,12 +2,9 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdDungeonNumberOfPlayers(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdDungeonNumberOfPlayers(sender: Player, args: Array<out String>): Boolean {
     if (args.count() < 2) {
         sender.sendFWDMessage("Not enough arguments: please provide minimum and maximum players")
         return true

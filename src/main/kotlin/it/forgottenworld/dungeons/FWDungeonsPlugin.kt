@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons
 
-import it.forgottenworld.dungeons.command.CommandFWDungeons
-import it.forgottenworld.dungeons.command.CommandFWDungeonsEdit
+import it.forgottenworld.dungeons.command.FWDungeonsCommand
+import it.forgottenworld.dungeons.command.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.event.listener.EntityDeathListener
 import it.forgottenworld.dungeons.event.listener.PlayerListener
@@ -31,8 +31,8 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         logger.info("Registering commands...")
 
-        getCommand("fwdungeonsedit")?.setExecutor(CommandFWDungeonsEdit())
-        getCommand("fwdungeons")?.setExecutor(CommandFWDungeons())
+        getCommand("fwdungeonsedit")?.setExecutor(FWDungeonsEditCommand())
+        getCommand("fwdungeons")?.setExecutor(FWDungeonsCommand())
 
         logger.info("Registering events...")
 

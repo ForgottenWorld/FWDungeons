@@ -48,7 +48,9 @@ object DungeonManager {
     val Player.dungeonInstance
         get() = playerParties[uniqueId]?.instance
 
-    fun getMaxDungeonId() = dungeons.keys.maxOrNull() ?: -1
+    val maxDungeonId
+        get() = dungeons.keys.maxOrNull() ?: -1
+
     fun getDungeonById(id: Int) = dungeons[id]
 
     fun evacuateDungeon(dungeonId: Int, instanceId: Int): Boolean {

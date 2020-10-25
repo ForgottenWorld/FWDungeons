@@ -29,9 +29,9 @@ class ActiveArea(val id:Int, val box: Box, val startingMaterial: Material = Mate
 
     fun getRandomLocationOnFloor() = Location(
             Bukkit.getWorld(ConfigManager.dungeonWorld),
-            Random.nextDouble(box.origin.x + 0.5, box.origin.x + box.width - 0.5),
+            Random.nextInt(box.origin.x.toInt(), box.origin.x.toInt() + box.width) + 0.5,
             box.origin.y,
-            Random.nextDouble(box.origin.z + 0.5, box.origin.z + box.depth - 0.5)
+            Random.nextInt(box.origin.z.toInt(), box.origin.z.toInt() + box.depth) + 0.5
     )
 
 }

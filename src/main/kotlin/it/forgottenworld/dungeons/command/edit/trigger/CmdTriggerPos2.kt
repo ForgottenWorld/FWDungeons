@@ -1,18 +1,15 @@
 package it.forgottenworld.dungeons.command.edit.trigger
 
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.model.Box
 import it.forgottenworld.dungeons.model.Trigger
-import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
 import org.bukkit.Material
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 
-fun cmdTriggerPos2(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdTriggerPos2(sender: Player, args: Array<out String>): Boolean {
     val block = sender.targetBlock
 
     if (block.blockData.material == Material.AIR) {

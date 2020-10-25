@@ -3,13 +3,9 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdDungeonEdit(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
-
+fun cmdDungeonEdit(sender: Player, args: Array<out String>): Boolean {
     if (args.isEmpty()) {
         sender.sendFWDMessage("Not enough arguments: please provide a dungeon id")
         return true

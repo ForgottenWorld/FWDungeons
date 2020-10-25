@@ -3,17 +3,14 @@ package it.forgottenworld.dungeons.command.play.dungeon
 import it.forgottenworld.dungeons.cli.Strings
 import it.forgottenworld.dungeons.cli.getLockClickable
 import it.forgottenworld.dungeons.cli.getString
-import it.forgottenworld.dungeons.model.Party
 import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.manager.DungeonManager.party
+import it.forgottenworld.dungeons.model.Party
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import net.md_5.bungee.api.chat.TextComponent
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdDungeonJoinInstance(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdDungeonJoinInstance(sender: Player, args: Array<out String>): Boolean {
     if (args.count() < 2) {
         sender.sendFWDMessage("Please provide both a dungeon and instance id")
         return true

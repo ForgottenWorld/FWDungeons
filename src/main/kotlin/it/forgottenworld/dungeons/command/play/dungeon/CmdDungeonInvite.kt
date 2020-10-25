@@ -4,13 +4,9 @@ import it.forgottenworld.dungeons.cli.formatInvitation
 import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdDungeonInvite(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
-
+fun cmdDungeonInvite(sender: Player, args: Array<out String>): Boolean {
     if (args.isEmpty()) {
         sender.sendFWDMessage("Please provide the name of whomever you want invite")
         return true

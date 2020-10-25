@@ -1,16 +1,15 @@
 package it.forgottenworld.dungeons.task
 
-import it.forgottenworld.dungeons.model.DungeonInstance
 import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.manager.DungeonManager.collidingTrigger
+import it.forgottenworld.dungeons.model.DungeonInstance
 import it.forgottenworld.dungeons.utils.bukkitThreadTimer
-import it.forgottenworld.dungeons.utils.footBlock
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 
 object TriggerChecker {
 
-    var task: BukkitTask? = null
+    private var task: BukkitTask? = null
 
     private fun checkTrigger(instance: DungeonInstance, player: Player) {
         val collidingTrigger = player.collidingTrigger
@@ -20,7 +19,7 @@ object TriggerChecker {
             return
         }
 
-        player.footBlock
+        player.location.block
                 .getMetadata("FWD_triggers")
                 .firstOrNull()
                 ?.asInt()

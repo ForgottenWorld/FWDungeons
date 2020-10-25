@@ -3,10 +3,9 @@ package it.forgottenworld.dungeons.command.play.dungeon
 import it.forgottenworld.dungeons.manager.DungeonManager.party
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 
-fun cmdDungeonPlayerLookup(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+fun cmdDungeonPlayerLookup(sender: CommandSender, args: Array<out String>): Boolean {
     if (args.count() == 0) {
         sender.sendFWDMessage("Please provide a player name")
         return true

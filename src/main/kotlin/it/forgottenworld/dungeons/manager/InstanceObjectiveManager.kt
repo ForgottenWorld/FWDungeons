@@ -14,6 +14,14 @@ object InstanceObjectiveManager {
     val instanceIdForTrackedMobs = mutableMapOf<UUID, Int>()
     val instanceObjectives = mutableMapOf<Pair<Int, Int>, InstanceObjective>()
 
+    fun onEntityDeath(uuid: UUID) {
+        val id = instanceIdForTrackedMobs[uuid] ?: return
+        val dId = dungeonIdForTrackedMobs[uuid]!!
+        instanceObjectives[dId to id]?.onMobKilled(uuid)
+        instanceIdForTrackedMobs.remove(uuid)
+        dungeonIdForTrackedMobs.remove(uuid)
+    }
+    
     fun attachNewObjectiveToInstance(
             instance: DungeonInstance,
             mobs: List<MobSpawnData>,
@@ -36,15 +44,13 @@ object InstanceObjectiveManager {
         )
     }
 
-    private fun spawnMob(isMythic: Boolean, type: String, location: Location): UUID? =
-            if (isMythic)
-                spawnMythicMob(type, location)
-            else
-                spawnVanillaMob(type, location)
+    private fun spawnMob(isMythic: Boolean, type: String, location: Location) =
+            if (isMythic) spawnMythicMob(type, location)
+            else spawnVanillaMob(type, location)
 
     private fun spawnMythicMob(type: String, location: Location) =
-        BukkitAPIHelper().spawnMythicMob(type, location).uniqueId
+            BukkitAPIHelper().spawnMythicMob(type, location).uniqueId
 
     private fun spawnVanillaMob(type: String, location: Location) =
-        location.world?.spawnEntity(location, EntityType.valueOf(type))?.uniqueId
+            location.world?.spawnEntity(location, EntityType.valueOf(type))?.uniqueId
 }

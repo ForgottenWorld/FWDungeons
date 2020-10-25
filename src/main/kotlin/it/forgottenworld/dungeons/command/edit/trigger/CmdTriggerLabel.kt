@@ -2,12 +2,9 @@ package it.forgottenworld.dungeons.command.edit.trigger
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
+fun cmdTriggerLabel(sender: Player, args: Array<out String>): Boolean {
     val tLabel = args.joinToString(" ").trim()
 
     if (tLabel.isEmpty()) {
@@ -31,8 +28,8 @@ fun cmdTriggerLabel(sender: CommandSender, command: Command, label: String, args
     }
 
     dungeon.triggers.lastOrNull()?.let {
-        it.label = label
-        DungeonEditManager.wipTestInstances[sender.uniqueId]?.triggers?.get(it.id)?.label = label
+        it.label = tLabel
+        DungeonEditManager.wipTestInstances[sender.uniqueId]?.triggers?.get(it.id)?.label = tLabel
         sender.sendFWDMessage("Set label $tLabel")
     }
 

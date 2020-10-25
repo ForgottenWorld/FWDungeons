@@ -4,16 +4,12 @@ import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-fun cmdActiveAreaWand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
-
+fun cmdActiveAreaWand(sender: Player, args: Array<out String>): Boolean {
     if (sender.inventory.itemInMainHand.type != Material.AIR) {
         sender.sendFWDMessage("Your main hand must be empty")
         return true

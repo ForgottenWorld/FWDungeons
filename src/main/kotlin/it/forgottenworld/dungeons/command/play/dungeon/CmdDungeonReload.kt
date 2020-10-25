@@ -5,10 +5,9 @@ import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.task.TriggerChecker
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import net.md_5.bungee.api.ChatColor
-import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 
-fun cmdDungeonReload(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
+fun cmdDungeonReload(sender: CommandSender, args: Array<out String>): Boolean {
     if (args.count() == 0 || args[0] != "confirm") {
         sender.sendFWDMessage("${ChatColor.RED}WARNING: ${ChatColor.WHITE}Reloading will evacuate every instance. If you're sure you want to reload, use /fwd reload confirm")
         return true

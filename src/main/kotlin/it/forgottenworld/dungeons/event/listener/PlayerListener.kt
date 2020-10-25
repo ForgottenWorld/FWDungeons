@@ -10,6 +10,7 @@ import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
 import it.forgottenworld.dungeons.utils.bukkitThreadLater
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import net.md_5.bungee.api.ChatColor
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -67,9 +68,17 @@ class PlayerListener: Listener {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (event.player.party != null &&
+                event.item?.type == Material.ENDER_PEARL &&
+                (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)) {
+            event.player.sendFWDMessage("No ender pearls in the dungeon!")
+            event.isCancelled = true
+            return
+        }
+
         if (!event.player.isEditingDungeon) return
 
-        val persistentDataContainer = event.player.inventory.itemInMainHand.itemMeta?.persistentDataContainer ?: return
+        val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
         val isTriggerWand =
                 persistentDataContainer
                         .get(NamespacedKey(FWDungeonsPlugin.instance, "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)

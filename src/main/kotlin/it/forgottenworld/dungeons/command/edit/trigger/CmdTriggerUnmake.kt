@@ -2,13 +2,9 @@ package it.forgottenworld.dungeons.command.edit.trigger
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun cmdTriggerUnmake(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
-
+fun cmdTriggerUnmake(sender: Player, args: Array<out String>): Boolean {
     val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true

@@ -30,8 +30,8 @@ class DungeonInstance(
 
     private val activeAreasIdMap = activeAreas.map { it.id to it }.toMap()
     var doHighlightFrames = TypeWrapper(false)
-    var activeAreaHlFrameLocs = TypeWrapper(setOf<Location>())
-    var triggerHlFrameLocs = TypeWrapper(setOf<Location>())
+    private var activeAreaHlFrameLocs = TypeWrapper(setOf<Location>())
+    private var triggerHlFrameLocs = TypeWrapper(setOf<Location>())
     var tester: Player? = null
 
     companion object {
@@ -78,7 +78,9 @@ class DungeonInstance(
     val box
         get() = dungeon.box.withOrigin(origin)
 
-    private val startingPostion = dungeon.startingLocation.withRefSystemOrigin(BlockVector(0,0,0), origin)
+    private val startingPostion = dungeon.startingLocation
+            ?.withRefSystemOrigin(BlockVector(0,0,0), origin)
+            ?: origin
 
     fun resetInstance() {
         party = null

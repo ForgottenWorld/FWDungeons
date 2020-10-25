@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.model
 
-import it.forgottenworld.dungeons.scripting.parseCode
 import it.forgottenworld.dungeons.manager.DungeonManager
+import it.forgottenworld.dungeons.scripting.parseCode
 import it.forgottenworld.dungeons.utils.toVector
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
@@ -13,7 +13,7 @@ class Dungeon(val id: Int) {
     lateinit var difficulty: Difficulty
     lateinit var numberOfPlayers: IntRange
     lateinit var box: Box
-    lateinit var startingLocation: BlockVector
+    var startingLocation: BlockVector? = null
     var triggers = mutableListOf<Trigger>()
     var activeAreas = mutableListOf<ActiveArea>()
     var instances = mutableListOf<DungeonInstance>()
@@ -141,7 +141,7 @@ class Dungeon(val id: Int) {
             set("width", dungeon.box.width)
             set("height", dungeon.box.height)
             set("depth", dungeon.box.depth)
-            set("startingLocation", dungeon.startingLocation.toVector())
+            set("startingLocation", dungeon.startingLocation?.toVector())
             dungeon.triggers.forEach {
                 set("triggers.${it.id}.id", it.id)
                 it.label?.let { l -> set("triggers.${it.id}.label", l) }
@@ -169,7 +169,7 @@ class Dungeon(val id: Int) {
         if (!::difficulty.isInitialized) append("difficulty, ")
         if (!::numberOfPlayers.isInitialized) append("number of players, ")
         if (!hasBox) append("box, ")
-        if (!::startingLocation.isInitialized) append("starting location, ")
+        if (startingLocation == null) append("starting location, ")
         if (triggers.isEmpty()) append("at least one trigger, ")
         if (activeAreas.isEmpty()) append("at least one active area, ")
     }.toString().dropLast(2)

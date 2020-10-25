@@ -5,15 +5,11 @@ import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.bukkitThreadAsync
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
 
-fun cmdDungeonInstanceRemove(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-    if (sender !is Player) return true
-
+fun cmdDungeonInstanceRemove(sender: Player, args: Array<out String>): Boolean {
     val dungeon = DungeonEditManager.dungeonEditors[sender.uniqueId]
             ?: run {
                 sender.sendFWDMessage("You're not editing any dungeons")
