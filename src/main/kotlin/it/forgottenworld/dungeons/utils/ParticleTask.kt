@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import org.bukkit.Bukkit.getWorld
 import org.bukkit.Location
 import org.bukkit.Particle
+import org.bukkit.scheduler.BukkitTask
 
 fun repeatedlySpawnParticles(
         particle: Particle,
@@ -11,7 +11,7 @@ fun repeatedlySpawnParticles(
         count: Int,
         interval: Long,
         iterations: Int) {
-    val world = getWorld(ConfigManager.dungeonWorld) ?: return
+    val world = ConfigManager.dungeonWorld
     var i = 0
     bukkitThreadTimer(0L, interval) {
         //getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
@@ -30,18 +30,14 @@ fun repeatedlySpawnParticles(
         particle: Particle,
         count: Int,
         interval: Long,
-        controlVar: TypeWrapper<Boolean>,
-        locationsGetter: () -> Set<Location>) {
-    val world = getWorld(ConfigManager.dungeonWorld) ?: return
-    bukkitThreadTimer(0L, interval) {
-        //getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
-        locationsGetter().forEach {
+        getLocations: () -> Set<Location>): BukkitTask {
+    val world = ConfigManager.dungeonWorld
+    return bukkitThreadTimer(0L, interval) {
+        getLocations().forEach {
             world.spawnParticle(
                     particle,
-                    it.clone().add(0.5,0.5,0.5),
+                    Location(it.world, it.x + 0.5, it.y + 0.5, it.z + 0.5),
                     count)
         }
-        if (!controlVar.value)
-            cancel()
     }
 }

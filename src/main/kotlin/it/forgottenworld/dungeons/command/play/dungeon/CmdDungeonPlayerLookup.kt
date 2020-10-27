@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.manager.DungeonManager.party
+import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -17,7 +17,7 @@ fun cmdDungeonPlayerLookup(sender: CommandSender, args: Array<out String>): Bool
                 return true
             }
 
-    val party = player.party
+    val instance = player.dungeonInstance
             ?: run {
                 sender.sendFWDMessage("Player is not in a party or an instance")
                 return true
@@ -25,8 +25,8 @@ fun cmdDungeonPlayerLookup(sender: CommandSender, args: Array<out String>): Bool
 
     sender.sendFWDMessage(
             "Player ${args[0]} is in a party for dungeon " +
-            "(id: ${party.instance.dungeon.id}), " +
-            "instance (id: ${party.instance.id})"
+            "(id: ${instance.dungeon.id}), " +
+            "instance (id: ${instance.id})"
     )
 
     return true

@@ -1,12 +1,11 @@
 package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.manager.DungeonEditManager
-import it.forgottenworld.dungeons.manager.DungeonEditManager.isEditingDungeon
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
-import it.forgottenworld.dungeons.manager.DungeonManager.party
-import it.forgottenworld.dungeons.manager.RespawnManager.respawnGameMode
-import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
+import it.forgottenworld.dungeons.service.DungeonEditService
+import it.forgottenworld.dungeons.service.DungeonEditService.isEditingDungeon
+import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
+import it.forgottenworld.dungeons.service.RespawnService.respawnGameMode
+import it.forgottenworld.dungeons.service.RespawnService.respawnLocation
 import it.forgottenworld.dungeons.utils.bukkitThreadLater
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import net.md_5.bungee.api.ChatColor
@@ -27,28 +26,23 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent?) {
         val player = event?.entity ?: return
-        val party = player.party ?: return
+        val instance = player.dungeonInstance ?: return
 
-        party.playerDied(player)
+        instance.onPlayerDeath(player)
         player.sendFWDMessage("${ChatColor.RED}You died in the dungeon")
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent?) {
         val player = event?.player ?: return
-
-        DungeonEditManager.purgeWorkingData(player)
-
-        player.party ?: return
-
-        player.health = 0.0
+        DungeonEditService.playerExitEditMode(player)
+        player.dungeonInstance?.onPlayerLeave(player)
     }
 
     @EventHandler
     fun onPlayerTeleport(event: PlayerTeleportEvent?) {
         val player = event?.player ?: return
-        player.party ?: return
-        if (player.dungeonInstance?.isTpSafe == true) return
+        if (player.dungeonInstance?.isTpSafe != false) return
 
         when (event.cause) {
             PlayerTeleportEvent.TeleportCause.ENDER_PEARL, PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT -> {
@@ -68,7 +62,7 @@ class PlayerListener: Listener {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.player.party != null &&
+        if (event.player.dungeonInstance != null &&
                 event.item?.type == Material.ENDER_PEARL &&
                 (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)) {
             event.player.sendFWDMessage("No ender pearls in the dungeon!")

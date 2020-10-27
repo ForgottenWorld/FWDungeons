@@ -1,12 +1,12 @@
-package it.forgottenworld.dungeons.model
+package it.forgottenworld.dungeons.model.box
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.utils.maxBlockVector
-import it.forgottenworld.dungeons.utils.minBlockVector
+import it.forgottenworld.dungeons.utils.max
+import it.forgottenworld.dungeons.utils.min
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
-import org.bukkit.Bukkit.getWorld
 import org.bukkit.Particle
 import org.bukkit.block.Block
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 
@@ -26,9 +26,9 @@ class Box {
         this.depth = depth
     }
 
-    constructor(block1: Block, block2: Block) {
-        origin = minBlockVector(block1, block2)
-        val opposite = maxBlockVector(block1, block2)
+    constructor(pos1: BlockVector, pos2: BlockVector) {
+        origin = pos1 min pos2
+        val opposite = pos1 max pos2
         this.width = opposite.blockX - origin.blockX + 1
         this.height = opposite.blockY - origin.blockY + 1
         this.depth = opposite.blockZ - origin.blockZ + 1
@@ -59,11 +59,11 @@ class Box {
 
     fun getAllBlocks(): Set<Block> {
         val blocks = mutableSetOf<Block>()
-        val world = getWorld(ConfigManager.dungeonWorld)
+        val world = ConfigManager.dungeonWorld
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
-                    blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
+                    blocks.add(world.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
         }
@@ -72,7 +72,7 @@ class Box {
 
     fun getFrontierBlocks() : Set<Block> {
         val blocks = mutableSetOf<Block>()
-        val world = getWorld(ConfigManager.dungeonWorld)
+        val world = ConfigManager.dungeonWorld
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
@@ -81,7 +81,7 @@ class Box {
                     if (y == 0 || y == height - 1) ++c
                     if (z == 0 || z == depth - 1) ++c
                     if (c > 1)
-                        blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
+                        blocks.add(world.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
         }
@@ -96,5 +96,14 @@ class Box {
                 10,
                 20
         )
+    }
+
+    companion object {
+
+        fun fromConfig(config: ConfigurationSection) = Box(
+                config.getVector("origin")!!.toBlockVector(),
+                config.getInt("width"),
+                config.getInt("height"),
+                config.getInt("depth"))
     }
 }

@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.manager.DungeonManager
+import it.forgottenworld.dungeons.service.DungeonService
 import it.forgottenworld.dungeons.task.TriggerChecker
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import net.md_5.bungee.api.ChatColor
@@ -13,13 +13,12 @@ fun cmdDungeonReload(sender: CommandSender, args: Array<out String>): Boolean {
         return true
     }
 
-    DungeonManager.dungeons.values.flatMap { it.instances }.forEach { DungeonManager.evacuateDungeon(it.dungeon.id, it.id) }
-    DungeonManager.dungeons.clear()
-    DungeonManager.activeDungeons.clear()
-    DungeonManager.playerParties.clear()
-    DungeonManager.playersTriggering.clear()
-    DungeonManager.playerReturnPositions.clear()
-    DungeonManager.playerReturnGameModes.clear()
+    DungeonService.dungeons.values.flatMap { it.instances.values }.forEach { it.evacuate() }
+    DungeonService.dungeons.clear()
+    DungeonService.playerInstances.clear()
+    DungeonService.playersTriggering.clear()
+    DungeonService.playerReturnPositions.clear()
+    DungeonService.playerReturnGameModes.clear()
 
     ConfigManager.loadData()
     TriggerChecker.start()

@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.manager.DungeonManager.party
+import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -8,15 +8,15 @@ import org.bukkit.entity.Player
 fun cmdDungeonUnlockParty(sender: CommandSender, args: Array<out String>): Boolean {
     if (sender !is Player) return true
 
-    val party = sender.party ?: run {
+    val instance = sender.dungeonInstance ?: run {
         sender.sendFWDMessage("You're currently not in a dungeon party")
         return true
     }
 
     when {
-        !party.isLocked -> sender.sendFWDMessage("This dungeon party is already public")
-        sender == party.leader -> {
-            party.unlock()
+        !instance.isLocked -> sender.sendFWDMessage("This dungeon party is already public")
+        sender == instance.leader -> {
+            instance.unlock()
             sender.sendFWDMessage("This dungeon party is now public, anyone can join")
         }
         else -> sender.sendFWDMessage("Only the dungeon party leader may make the party public")
