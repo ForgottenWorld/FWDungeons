@@ -1,6 +1,6 @@
 name: FWDungeons
 version: "0.6.0"
-api-version: "1.15"
+api-version: "1.16"
 description: Create multi-instance scriptable co-op dungeons in your minecraft server
 author: Shivs (OhMeMuffin)
 main: it.forgottenworld.dungeons.FWDungeonsPlugin
