@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.service.DungeonService
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -15,7 +15,7 @@ fun cmdDungeonEnable(sender: CommandSender, args: Array<out String>): Boolean {
         return true
     }
 
-    val res = DungeonService
+    val res = DungeonManager
             .dungeons[dungeonId]
             ?.let { it.active = true } != null
 

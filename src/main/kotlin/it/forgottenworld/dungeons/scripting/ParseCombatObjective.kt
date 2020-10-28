@@ -1,8 +1,7 @@
 package it.forgottenworld.dungeons.scripting
 
-import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.combat.MobSpawnData
-import it.forgottenworld.dungeons.service.InstanceObjectiveService
+import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 
 fun parseCombatObjective(
         codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit {
@@ -22,7 +21,7 @@ fun parseCombatObjective(
             code.startsWith(PREFIX_ACTIVE_AREA) ->
                 currentActiveArea = code.removePrefix(PREFIX_ACTIVE_AREA).toInt()
             code == CODE_WHEN_DONE ->
-                return { InstanceObjectiveService.attachNewObjectiveToInstance(it, mobs, doParseCode(codeIterator)) }
+                return { it.attachNewObjective(mobs, doParseCode(codeIterator)) }
         }
     }
     return {}

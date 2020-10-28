@@ -9,6 +9,7 @@ import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
+import org.bukkit.util.Vector
 
 class Box {
     var origin : BlockVector
@@ -44,6 +45,12 @@ class Box {
         it.x >= origin.blockX && it.x < origin.blockX + width &&
                 it.y >= origin.blockY && it.y < origin.blockY + height &&
                 it.z >= origin.blockZ && it.z < origin.blockZ + depth
+    }
+
+    fun containsVector(vector: Vector) = vector.run {
+        x >= origin.blockX && x < origin.blockX + width &&
+                y >= origin.blockY && y < origin.blockY + height &&
+                z >= origin.blockZ && z < origin.blockZ + depth
     }
 
     fun withOriginZero() : Box = Box(BlockVector(0, 0, 0), width, height, depth)
@@ -93,7 +100,7 @@ class Box {
                 Particle.COMPOSTER,
                 getAllBlocks().map{ it.location }.toSet(),
                 1,
-                10,
+                500,
                 20
         )
     }

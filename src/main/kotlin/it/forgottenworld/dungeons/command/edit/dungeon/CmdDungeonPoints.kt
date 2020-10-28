@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.service.DungeonEditService
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -15,7 +15,7 @@ fun cmdDungeonPoints(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    val dungeon = DungeonEditService.wipDungeons[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }

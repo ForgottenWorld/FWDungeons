@@ -1,13 +1,13 @@
-package it.forgottenworld.dungeons.service
+package it.forgottenworld.dungeons.manager
 
-import it.forgottenworld.dungeons.service.DungeonEditService.dungeonBoxBuilder
+import it.forgottenworld.dungeons.manager.DungeonEditManager.dungeonBoxBuilder
 import it.forgottenworld.dungeons.utils.blockVector
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-object DungeonBoxCreationService {
+object DungeonBoxCreationManager {
 
     fun setDungeonBoxPos(sender: Player, posNo: Int) {
         val block = sender.targetBlock
@@ -17,7 +17,7 @@ object DungeonBoxCreationService {
             return
         }
 
-        val dungeon = DungeonEditService.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }
@@ -40,7 +40,7 @@ object DungeonBoxCreationService {
         }
 
         dungeon.box = box.withOriginZero()
-        DungeonEditService.dungeonBoxBuilders.remove(sender.uniqueId)
+        DungeonEditManager.dungeonBoxBuilders.remove(sender.uniqueId)
 
         dungeon.createTestInstance(box.origin, sender)
 

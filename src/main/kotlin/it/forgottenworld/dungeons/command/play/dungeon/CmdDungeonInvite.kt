@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.cli.formatInvitation
-import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -27,7 +27,7 @@ fun cmdDungeonInvite(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    toPlayer.spigot().sendMessage(formatInvitation(
+    toPlayer.spigot().sendMessage(*formatInvitation(
             sender.name,
             instance.dungeon.id,
             instance.id,

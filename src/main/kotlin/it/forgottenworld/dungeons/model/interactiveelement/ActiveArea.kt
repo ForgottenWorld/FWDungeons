@@ -27,7 +27,7 @@ class ActiveArea(
                     Particle.PORTAL,
                     map{ it.location }.toSet(),
                     1,
-                    10,
+                    500,
                     4
             )
         }

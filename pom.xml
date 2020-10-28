@@ -6,7 +6,7 @@
 
     <groupId>it.forgottenworld</groupId>
     <artifactId>FWDungeons</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
 
     <properties>
         <kotlin.version>1.4.10</kotlin.version>
@@ -46,6 +46,18 @@
             <artifactId>MythicMobs</artifactId>
             <version>4.10.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.shynixn.mccoroutine</groupId>
+            <artifactId>mccoroutine-bukkit-core</artifactId>
+            <version>0.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.4.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -96,8 +108,8 @@
                         </goals>
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-<!--                            <shadedArtifactAttached>true</shadedArtifactAttached>-->
-<!--                            <outputDirectory>/home/giacomo/paper/plugins</outputDirectory>-->
+<!--                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <outputDirectory>/home/giacomo/paper/plugins</outputDirectory>-->
                         </configuration>
                     </execution>
                 </executions>

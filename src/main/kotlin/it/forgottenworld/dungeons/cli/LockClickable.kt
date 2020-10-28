@@ -1,18 +1,19 @@
 package it.forgottenworld.dungeons.cli
 
+import it.forgottenworld.dungeons.utils.clickEvent
+import it.forgottenworld.dungeons.utils.component
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
-import net.md_5.bungee.api.chat.TextComponent
 
 
-fun getLockClickable() =
-        TextComponent("HERE").apply {
-            color = ChatColor.GOLD
-            clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons lock")
-        }
+fun getLockClickable() = component {
+    append("HERE")
+    color(ChatColor.GOLD)
+    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons lock")
+}
 
-fun getUnlockClickable() =
-        TextComponent("HERE").apply {
-            color = ChatColor.GOLD
-            clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons unlock")
-        }
+fun getUnlockClickable() = component {
+    append("HERE")
+    color(ChatColor.RED)
+    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons unlock")
+}

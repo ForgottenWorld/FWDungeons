@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.config.ConfigManager
+import kotlinx.coroutines.delay
 import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.scheduler.BukkitTask
@@ -12,17 +13,16 @@ fun repeatedlySpawnParticles(
         interval: Long,
         iterations: Int) {
     val world = ConfigManager.dungeonWorld
-    var i = 0
-    bukkitThreadTimer(0L, interval) {
-        //getLogger().info("sending particle at ${location.x} ${location.y} ${location.z}")
-        locations.forEach {
-            world.spawnParticle(
-                    particle,
-                    it.clone().add(0.5,0.5,0.5),
-                    count)
+    launch {
+        for (i in 0 until iterations) {
+            delay(interval)
+            locations.forEach {
+                world.spawnParticle(
+                        particle,
+                        it.clone().add(0.5, 0.5, 0.5),
+                        count)
+            }
         }
-        if (++i == iterations)
-            cancel()
     }
 }
 

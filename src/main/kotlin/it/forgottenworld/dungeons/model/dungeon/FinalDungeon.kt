@@ -5,9 +5,9 @@ import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.service.DungeonService
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.utils.blockVector
-import it.forgottenworld.dungeons.utils.bukkitThreadAsync
+import it.forgottenworld.dungeons.utils.launchAsync
 import it.forgottenworld.dungeons.utils.toVector
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
@@ -62,7 +62,7 @@ class FinalDungeon(val id: Int,
 
     fun makeEditable(): EditableDungeon? {
         if (active) return null
-        DungeonService.dungeons.remove(id)
+        DungeonManager.dungeons.remove(id)
 
         return EditableDungeon(-1001).also {
             it.name = name
@@ -83,11 +83,11 @@ class FinalDungeon(val id: Int,
         val newOrigin = target.blockVector
 
         val newTriggers = triggers
-                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0,0,0), newOrigin) }
+                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
                 .toMap()
 
         val newActiveAreas = activeAreas
-                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0,0,0), newOrigin) }
+                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
                 .toMap()
 
         val newInstance = DungeonFinalInstance(
@@ -104,7 +104,7 @@ class FinalDungeon(val id: Int,
                 val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
                 if (file.exists()) config.load(file)
                 newInstance.toConfig(config.createSection("${id}-${newInstance.id}"))
-                bukkitThreadAsync { config.save(file) }
+                launchAsync { config.save(file) }
             } catch (e: Exception) {
                 Bukkit.getLogger().warning(e.message)
             }

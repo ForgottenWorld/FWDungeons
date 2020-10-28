@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -16,7 +16,7 @@ fun cmdDungeonStart(sender: Player, args: Array<out String>): Boolean {
         instance.players.count() < instance.minPlayers ->
             sender.sendFWDMessage("Not enough players for this dungeon")
         else -> {
-            sender.dungeonInstance?.onInstanceStart()
+            sender.dungeonInstance?.onStart()
             sender.sendFWDMessage("Dungeon party members have been teleported to the dungeon entrance")
         }
     }

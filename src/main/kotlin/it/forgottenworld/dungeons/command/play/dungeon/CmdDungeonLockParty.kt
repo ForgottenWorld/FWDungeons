@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.cli.getUnlockClickable
-import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
+import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.entity.Player
 

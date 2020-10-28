@@ -2,9 +2,10 @@ package it.forgottenworld.dungeons.cli
 
 import it.forgottenworld.dungeons.model.dungeon.Difficulty
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.service.DungeonService
-import it.forgottenworld.dungeons.utils.extra
-import it.forgottenworld.dungeons.utils.textComponent
+import it.forgottenworld.dungeons.manager.DungeonManager
+import it.forgottenworld.dungeons.utils.append
+import it.forgottenworld.dungeons.utils.clickEvent
+import it.forgottenworld.dungeons.utils.component
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import java.lang.Integer.max
@@ -15,107 +16,122 @@ private fun getJoinClickable(
         leader: Boolean,
         locked: Boolean,
         full: Boolean,
-        inGame: Boolean) = textComponent {
-    text = when {
-        leader -> "${ChatColor.GREEN}CREATE"
-        locked -> "${ChatColor.GOLD}PRIVATE"
-        full -> "${ChatColor.RED}FULL"
-        inGame -> "${ChatColor.RED}IN DUNGEON"
-        else -> "${ChatColor.GREEN}JOIN"
-    }
+        inGame: Boolean) = component {
+
+    append(when {
+        leader -> "CREATE"
+        locked -> "PRIVATE"
+        full -> "FULL"
+        inGame -> "IN DUNGEON"
+        else -> "JOIN"
+    })
+
+    color(when {
+        locked -> ChatColor.GOLD
+        full || inGame -> ChatColor.RED
+        else -> ChatColor.GREEN
+    })
+
     if (!full && !locked && !inGame)
-        clickEvent = ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/fwdungeons join ${instance.dungeon.id} ${instance.id}")
+        clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons join ${instance.dungeon.id} ${instance.id}")
 }
 
-private fun getPageClickable(text: String, page: Int) =
-        textComponent(text) {
-            color = ChatColor.AQUA
-            clickEvent = ClickEvent(
-                    ClickEvent.Action.RUN_COMMAND,
-                    "/fwdungeons list $page")
-        }
+private fun getPageClickable(text: String, page: Int) = component {
+    append(text, ChatColor.AQUA)
+    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons list $page")
+}
 
-private fun getCarets(count: Int) = "${ChatColor.GRAY}${">".repeat(count)} "
+private fun getPaginator(page: Int) = component {
+    if (page > 0) {
+        append("=[ ", ChatColor.DARK_GRAY)
+        append(getPageClickable("PREVIOUS", page - 1))
+        append(" ]", ChatColor.DARK_GRAY)
+    } else {
+        append("=============", ChatColor.DARK_GRAY)
+    }
 
-private fun getColoredDifficulty(difficulty: Difficulty) =
-        "${when (difficulty) {
-            Difficulty.EASY -> ChatColor.DARK_GREEN
-            Difficulty.MEDIUM -> ChatColor.GOLD
-            Difficulty.HARD -> ChatColor.DARK_RED
-        }}${difficulty.toString().toUpperCase()}\n"
+    append("===============================", ChatColor.DARK_GRAY)
 
-fun getInteractiveDungeonList(page: Int) = textComponent {
-    if (page < 0 || page > DungeonService.dungeons.count() - 1) return@textComponent
-    val d = DungeonService.dungeons.values
-            .filter { it.active}
+    if (page < DungeonManager.dungeons.count() - 1) {
+        append("[ ")
+        color(ChatColor.DARK_GRAY)
+        append(getPageClickable("NEXT", page + 1))
+        append(" ]=")
+        color(ChatColor.DARK_GRAY)
+    } else {
+        append("=========")
+        color(ChatColor.DARK_GRAY)
+    }
+}
+
+private fun getChevrons(count: Int) = "${ChatColor.GRAY}${">".repeat(count)} "
+
+private fun getColoredDifficulty(difficulty: Difficulty) = component {
+    append("${difficulty.toString().toUpperCase()}\n")
+    color(when (difficulty) {
+        Difficulty.EASY -> ChatColor.DARK_GREEN
+        Difficulty.MEDIUM -> ChatColor.GOLD
+        Difficulty.HARD -> ChatColor.DARK_RED
+    })
+}
+
+fun getInteractiveDungeonList(page: Int) = component {
+
+    if (page < 0 || page > DungeonManager.dungeons.count() - 1) return@component
+    val d = DungeonManager.dungeons.values
+            .filter { it.active }
             .toList()
-            .getOrNull(page) ?: return@textComponent
+            .getOrNull(page) ?: return@component
 
-    addExtra("${ChatColor.DARK_GRAY}====================[ ${
-        getString(Strings.CHAT_PREFIX).dropLast(1)}${ChatColor.GRAY}ungeons ${
-        ChatColor.DARK_GRAY}]====================\n\n")
+    append("====================[ ", ChatColor.DARK_GRAY)
+    append(getString(Strings.CHAT_PREFIX).dropLast(1))
+    append("ungeons ", ChatColor.GRAY)
+    append("]====================\n\n", ChatColor.DARK_GRAY)
 
-    extra(getCarets(3)) {
-        addExtra("${ChatColor.DARK_AQUA}DUNGEON:${ChatColor.WHITE} ${d.name}\n")
-    }
+    append(getChevrons(3))
+    append("DUNGEON: ", ChatColor.DARK_AQUA)
+    append("${d.name}\n", ChatColor.WHITE)
 
-    extra(getCarets(3)) {
-        addExtra("${ChatColor.DARK_AQUA}DESCRIPTION:${ChatColor.WHITE} ${d.description}\n")
-    }
+    append(getChevrons(3))
+    append("DESCRIPTION: ", ChatColor.DARK_AQUA)
+    append("${d.description}\n", ChatColor.WHITE)
 
-    extra(getCarets(3)) {
-        addExtra("${ChatColor.DARK_AQUA}DIFFICULTY:${ChatColor.WHITE} ")
-        addExtra(getColoredDifficulty(d.difficulty))
-    }
+    append(getChevrons(3))
+    append("DIFFICULTY: ", ChatColor.DARK_AQUA)
+    append(getColoredDifficulty(d.difficulty))
+    append("\n")
 
-    extra(getCarets(3)) {
-        addExtra("${ChatColor.DARK_AQUA}PLAYERS:${ChatColor.WHITE} ${
-            d.numberOfPlayers.first.toString() +
-                    if (d.numberOfPlayers.last != d.numberOfPlayers.first)
-                        "-" + d.numberOfPlayers.last.toString()
-                    else ""
-        }\n\n")
-    }
+    append(getChevrons(3))
+    append("PLAYERS: ", ChatColor.DARK_AQUA)
+
+    val minPl = d.numberOfPlayers.first
+    val maxPl = d.numberOfPlayers.last
+    append("$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n", ChatColor.WHITE)
 
     d.instances.values.forEachIndexed { ii, inst ->
 
-        extra(getCarets(1)) {
-            addExtra("Room ${ii + 1} ${ChatColor.DARK_GRAY}| ${ChatColor.GRAY}Leader: ")
-            extra(inst.leader?.name ?: "${ChatColor.DARK_GRAY}none") {
-                if (text != "none") color = ChatColor.LIGHT_PURPLE
-            }
+        append(getChevrons(1))
+        append("Room ${ii + 1} ")
+        append("| ", ChatColor.DARK_GRAY)
+        append("Leader: ", ChatColor.GRAY)
+        inst.leader?.name?.let {
+            append(it, ChatColor.LIGHT_PURPLE)
+        } ?: run {
+            append("none", ChatColor.DARK_GRAY)
         }
 
-        extra {
-            addExtra("  [ ")
-            getJoinClickable(
+        append("  [ ", ChatColor.WHITE)
+        append(getJoinClickable(
                     inst,
                     inst.leader == null,
                     inst.isLocked,
                     inst.isFull,
-                    inst.inGame)
-            addExtra(" ]")
-        }
+                    inst.inGame))
+        append(" ]", ChatColor.WHITE)
 
-        addExtra(if (inst.leader != null) "  [ ${inst.playerCount}/${inst.maxPlayers} ]\n" else "\n")
+        append(inst.leader?.let{ "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
     }
 
-    addExtra("\n".repeat(12 - d.instances.count() - ceil(max((d.description.length - 48), 0) / 60.0).toInt()))
-
-    if (page > 0) {
-        extra("${ChatColor.DARK_GRAY}=[ ") {
-            extra { getPageClickable("PREVIOUS", page - 1) }
-            addExtra("${ChatColor.DARK_GRAY} ]")
-        }
-    } else addExtra("${ChatColor.DARK_GRAY}=============")
-
-    addExtra("${ChatColor.DARK_GRAY}===============================")
-    if (page < DungeonService.dungeons.count() - 1) {
-        extra("${ChatColor.DARK_GRAY}[ ") {
-            extra { getPageClickable("NEXT", page + 1) }
-            addExtra("${ChatColor.DARK_GRAY} ]=")
-        }
-    } else addExtra("${ChatColor.DARK_GRAY}=========")
+    append("\n".repeat(12 - d.instances.count() - ceil(max((d.description.length - 48), 0) / 60.0).toInt()))
+    append(getPaginator(page))
 }

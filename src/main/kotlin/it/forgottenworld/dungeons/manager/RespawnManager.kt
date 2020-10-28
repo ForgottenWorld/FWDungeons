@@ -1,11 +1,11 @@
-package it.forgottenworld.dungeons.service
+package it.forgottenworld.dungeons.manager
 
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.*
 
-object RespawnService {
+object RespawnManager {
 
     private val playerRespawnLocations = mutableMapOf<UUID, Location>()
     private val playerRespawnGameModes = mutableMapOf<UUID, GameMode>()

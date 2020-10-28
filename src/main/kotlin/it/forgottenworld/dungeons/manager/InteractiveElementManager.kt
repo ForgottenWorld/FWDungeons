@@ -1,11 +1,11 @@
-package it.forgottenworld.dungeons.service
+package it.forgottenworld.dungeons.manager
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.ACTIVE_AREA
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.TRIGGER
-import it.forgottenworld.dungeons.service.DungeonEditService.activeAreaBoxBuilder
-import it.forgottenworld.dungeons.service.DungeonEditService.triggerBoxBuilder
+import it.forgottenworld.dungeons.manager.DungeonEditManager.activeAreaBoxBuilder
+import it.forgottenworld.dungeons.manager.DungeonEditManager.triggerBoxBuilder
 import it.forgottenworld.dungeons.utils.blockVector
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-object InteractiveElementService {
+object InteractiveElementManager {
 
     fun setInteractiveElementPos(sender: Player, posNo: Int, type: InteractiveElementType) {
         val block = sender.targetBlock
@@ -26,7 +26,7 @@ object InteractiveElementService {
             return
         }
 
-        val dungeon = DungeonEditService.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }
@@ -69,9 +69,9 @@ object InteractiveElementService {
             else "active area"
         } with id $id")
         if (type == TRIGGER)
-            DungeonEditService.triggerBoxBuilders.remove(sender.uniqueId)
+            DungeonEditManager.triggerBoxBuilders.remove(sender.uniqueId)
         else
-            DungeonEditService.activeAreaBoxBuilders.remove(sender.uniqueId)
+            DungeonEditManager.activeAreaBoxBuilders.remove(sender.uniqueId)
     }
 
     fun labelInteractiveElement(sender: Player, label: String, type: InteractiveElementType) {
@@ -80,7 +80,7 @@ object InteractiveElementService {
             return
         }
 
-        val dungeon = DungeonEditService.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }
@@ -95,7 +95,7 @@ object InteractiveElementService {
     }
 
     fun unMakeInteractiveElement(sender: Player, type: InteractiveElementType) {
-        val dungeon = DungeonEditService.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }

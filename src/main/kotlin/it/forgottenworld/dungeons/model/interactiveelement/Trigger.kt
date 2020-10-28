@@ -1,19 +1,18 @@
 package it.forgottenworld.dungeons.model.interactiveelement
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.manager.DungeonManager.collidingTrigger
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.instance.DungeonInstance
 import it.forgottenworld.dungeons.scripting.parseCode
-import it.forgottenworld.dungeons.service.DungeonService.collidingTrigger
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.toVector
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
-import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.util.BlockVector
+import org.bukkit.util.Vector
 
 class Trigger(
         override val id: Int,
@@ -28,6 +27,7 @@ class Trigger(
     val origin : BlockVector
         get() = box.origin
 
+    /*
     fun applyMeta() =
         box.getAllBlocks().forEach {
             it.removeMetadata("FWD_triggers", FWDungeonsPlugin.instance)
@@ -36,10 +36,11 @@ class Trigger(
                     FixedMetadataValue(FWDungeonsPlugin.instance, id)
             )
         }
+    */
 
     fun clearCurrentlyInsidePlayers() = playersCurrentlyInside.clear()
 
-    fun isPlayerInside(player: Player) = box.containsPlayer(player)
+    fun containsVector(vector: Vector) = box.containsVector(vector)
 
     fun onPlayerEnter(player: Player, instance: DungeonInstance) {
         if (ConfigManager.isInDebugMode)
@@ -62,16 +63,13 @@ class Trigger(
 
     fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
             Trigger(id,
-                box.withContainerOrigin(oldOrigin, newOrigin),
-                effect,
-                requiresWholeParty
+                    box.withContainerOrigin(oldOrigin, newOrigin),
+                    effect,
+                    requiresWholeParty
             ).also { it.label = label }
 
     private fun proc(instance: DungeonFinalInstance) {
-        if (playersCurrentlyInside.isEmpty()
-                || procced
-                || requiresWholeParty && instance.playerCount != playersCurrentlyInside.size) return
-
+        if (procced || requiresWholeParty && instance.playerCount != playersCurrentlyInside.size) return
         procced = true
         effect?.invoke(instance)
     }

@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.command.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.event.listener.EntityDeathListener
 import it.forgottenworld.dungeons.event.listener.PlayerListener
-import it.forgottenworld.dungeons.task.TriggerChecker
+import it.forgottenworld.dungeons.event.listener.TriggerListener
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -38,10 +38,9 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         server.pluginManager.registerEvents(EntityDeathListener(), this)
         server.pluginManager.registerEvents(PlayerListener(), this)
+        server.pluginManager.registerEvents(TriggerListener(), this)
 
         logger.info("Registering trigger checker...")
-
-        TriggerChecker.start()
     }
 
     override fun onDisable() {

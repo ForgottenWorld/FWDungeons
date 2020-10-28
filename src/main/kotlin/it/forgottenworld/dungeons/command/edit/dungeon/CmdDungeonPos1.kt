@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.service.DungeonBoxCreationService
+import it.forgottenworld.dungeons.manager.DungeonBoxCreationManager
 import org.bukkit.entity.Player
 
 fun cmdDungeonPos1(sender: Player, args: Array<out String>): Boolean {
-    DungeonBoxCreationService.setDungeonBoxPos(sender, 1)
+    DungeonBoxCreationManager.setDungeonBoxPos(sender, 1)
     return true
 }

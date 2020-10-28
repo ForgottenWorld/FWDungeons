@@ -1,13 +1,14 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.service.DungeonEditService
+import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.toBlockVector
 import it.forgottenworld.dungeons.utils.withRefSystemOrigin
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 
 fun cmdDungeonSetStart(sender: Player, args: Array<out String>): Boolean {
-    val dungeon = DungeonEditService.wipDungeons[sender.uniqueId] ?: run {
+    val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
         sender.sendFWDMessage("You're not editing any dungeons")
         return true
     }
@@ -24,7 +25,6 @@ fun cmdDungeonSetStart(sender: Player, args: Array<out String>): Boolean {
     }
 
     dungeon.startingLocation = sender.location
-            .toVector()
             .toBlockVector()
             .withRefSystemOrigin(testInstance.origin, BlockVector(0, 0, 0))
 

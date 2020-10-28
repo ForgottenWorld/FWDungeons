@@ -1,10 +1,10 @@
 package it.forgottenworld.dungeons.config
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.service.DungeonService
-import it.forgottenworld.dungeons.utils.bukkitThreadAsync
+import it.forgottenworld.dungeons.utils.launchAsync
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -37,7 +37,7 @@ object ConfigManager {
                 ?.forEach {
                     try {
                         val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                        DungeonService.dungeons[conf.getInt("id")] = FinalDungeon.fromConfig(conf)
+                        DungeonManager.dungeons[conf.getInt("id")] = FinalDungeon.fromConfig(conf)
                     } catch (e : Exception) {
                         e.printStackTrace()
                     }
@@ -56,7 +56,7 @@ object ConfigManager {
             if (existsAlready) conf.load(file)
 
             dungeon.toConfig(conf, eraseEffects)
-            bukkitThreadAsync { conf.save(file) }
+            launchAsync { conf.save(file) }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -72,6 +72,7 @@ object ConfigManager {
     }
 
     fun loadData() {
+        FWDungeonsPlugin.instance.reloadConfig()
         loadConfig(FWDungeonsPlugin.pluginConfig)
         loadDungeonConfigs(FWDungeonsPlugin.pluginDataFolder)
         getInstancesFromConfig()

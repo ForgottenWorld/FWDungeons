@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.service
+package it.forgottenworld.dungeons.manager
 
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
@@ -8,7 +8,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.*
 
-object DungeonService {
+object DungeonManager {
 
     val dungeons = mutableMapOf<Int, FinalDungeon>()
 

@@ -1,13 +1,12 @@
 package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonTestInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.service.DungeonService
-import it.forgottenworld.dungeons.task.TriggerChecker
 import it.forgottenworld.dungeons.utils.firstMissing
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
@@ -30,8 +29,7 @@ class EditableDungeon(val id: Int) : Dungeon {
     val hasTestInstance get() = testInstance != null
     
     fun finalize(): FinalDungeon {
-        testInstance?.let { TriggerChecker.activeInstances.remove(it) }
-        val newId = DungeonService.dungeons.keys.firstMissing()
+        val newId = DungeonManager.dungeons.keys.firstMissing()
 
         val finalDungeon = FinalDungeon(
             newId,
@@ -53,7 +51,9 @@ class EditableDungeon(val id: Int) : Dungeon {
                     k)
         }.toMap()
 
-        DungeonService.dungeons[newId] = finalDungeon
+        testInstance?.onDestroy()
+        testInstance = null
+        DungeonManager.dungeons[newId] = finalDungeon
         return finalDungeon
     }
     
@@ -74,7 +74,7 @@ class EditableDungeon(val id: Int) : Dungeon {
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
-        activeAreas[id] = ActiveArea(id, box.withContainerOrigin(testInstance!!.origin,BlockVector(0,0,0)))
+        activeAreas[id] = ActiveArea(id, box.withContainerOrigin(testInstance!!.origin,BlockVector(0, 0, 0)))
         return id
     }
 
@@ -92,7 +92,7 @@ class EditableDungeon(val id: Int) : Dungeon {
 
     private fun newTrigger(box: Box): Int {
         val id = triggers.keys.lastOrNull()?.plus(1) ?: 0
-        triggers[id] = Trigger(id, box.withContainerOrigin(testInstance!!.origin,BlockVector(0,0,0)))
+        triggers[id] = Trigger(id, box.withContainerOrigin(testInstance!!.origin,BlockVector(0, 0, 0)))
         return id
     }
 
@@ -110,11 +110,11 @@ class EditableDungeon(val id: Int) : Dungeon {
 
     fun createTestInstance(at: BlockVector, creator: Player) {
         val triggs = triggers
-                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0,0,0), at)}
+                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), at)}
                 .toMap()
                 .toMutableMap()
 
-        val aas = activeAreas.map { (k,v) -> k to v.withContainerOrigin(BlockVector(0,0,0), at)}
+        val aas = activeAreas.map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), at)}
                 .toMap()
                 .toMutableMap()
 

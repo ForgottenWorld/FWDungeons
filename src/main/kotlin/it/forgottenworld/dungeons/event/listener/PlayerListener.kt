@@ -1,13 +1,14 @@
 package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.service.DungeonEditService
-import it.forgottenworld.dungeons.service.DungeonEditService.isEditingDungeon
-import it.forgottenworld.dungeons.service.DungeonService.dungeonInstance
-import it.forgottenworld.dungeons.service.RespawnService.respawnGameMode
-import it.forgottenworld.dungeons.service.RespawnService.respawnLocation
-import it.forgottenworld.dungeons.utils.bukkitThreadLater
+import it.forgottenworld.dungeons.manager.DungeonEditManager
+import it.forgottenworld.dungeons.manager.DungeonEditManager.isEditingDungeon
+import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
+import it.forgottenworld.dungeons.manager.RespawnManager.respawnGameMode
+import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
+import it.forgottenworld.dungeons.utils.launch
 import it.forgottenworld.dungeons.utils.sendFWDMessage
+import kotlinx.coroutines.delay
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -35,7 +36,7 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent?) {
         val player = event?.player ?: return
-        DungeonEditService.playerExitEditMode(player)
+        DungeonEditManager.playerExitEditMode(player)
         player.dungeonInstance?.onPlayerLeave(player)
     }
 
@@ -99,7 +100,8 @@ class PlayerListener: Listener {
         event.player.run {
             respawnLocation?.let {
                 sendFWDMessage("You will be teleported shortly")
-                bukkitThreadLater(30L) {
+                launch {
+                    delay(1500)
                     teleport(it, PlayerTeleportEvent.TeleportCause.PLUGIN)
                     respawnLocation = null
                 }

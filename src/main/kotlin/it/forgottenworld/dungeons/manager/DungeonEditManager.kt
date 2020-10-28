@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.service
+package it.forgottenworld.dungeons.manager
 
 import it.forgottenworld.dungeons.model.box.BoxBuilder
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon
@@ -7,7 +7,7 @@ import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
 
-object DungeonEditService {
+object DungeonEditManager {
 
     val wipDungeons = mutableMapOf<UUID, EditableDungeon>()
 
@@ -37,10 +37,7 @@ object DungeonEditService {
                 }
 
     fun playerExitEditMode(player: Player) {
-        (wipDungeons.remove(player.uniqueId) ?: return)
-                .testInstance
-                ?.doHighlightFrames
-                ?.value = false
+        (wipDungeons.remove(player.uniqueId) ?: return).testInstance?.onDestroy()
 
         dungeonBoxBuilders.remove(player.uniqueId)
         triggerBoxBuilders.remove(player.uniqueId)
