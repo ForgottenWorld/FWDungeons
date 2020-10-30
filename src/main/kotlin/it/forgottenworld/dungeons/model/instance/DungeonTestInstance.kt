@@ -33,24 +33,23 @@ class DungeonTestInstance(
             val map = it.map { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), origin) }.toMap()
             launch {
                 checkTriggers = false
-                updateHlBlocks()
                 delay(1000)
             }
-            it
+            map
         },
         {
+            updateHlBlocks()
             checkTriggers = true
             startCheckingTriggers()
         }
     )
 
-    override val activeAreas: Map<Int, ActiveArea> by mapObserver(dungeon.activeAreas) {
+    override val activeAreas: Map<Int, ActiveArea> by mapObserver(dungeon.activeAreas, {
         it.map { (k, v) ->
             k to v.withContainerOrigin(BlockVector(0, 0, 0), origin) }
                 .toMap()
                 .also { nm -> nm.values.lastOrNull()?.box?.highlightAll() }
-        updateHlBlocks()
-    }
+    }) { updateHlBlocks() }
 
     private var triggerHlFrameLocs = setOf<Location>()
     private var activeAreaHlFrameLocs = setOf<Location>()

@@ -58,7 +58,7 @@ object DungeonEditManager {
                 }
 
     fun playerExitEditMode(player: Player) {
-        (wipDungeons.remove(player.uniqueId) ?: return).testInstance?.onDestroy()
+        (wipDungeons.remove(player.uniqueId) ?: return).onDestroy()
 
         dungeonBoxBuilders.remove(player.uniqueId)
         triggerBoxBuilders.remove(player.uniqueId)

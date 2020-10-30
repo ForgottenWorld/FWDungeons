@@ -52,8 +52,7 @@ class EditableDungeon(override val id: Int) : Dungeon {
                     k)
         }.toMap()
 
-        testInstance?.onDestroy()
-        testInstance = null
+        onDestroy()
         DungeonManager.dungeons[newId] = finalDungeon
         return finalDungeon
     }
@@ -104,9 +103,10 @@ class EditableDungeon(override val id: Int) : Dungeon {
     }
 
     fun onDestroy() {
-        testInstance?.onDestroy()
         triggers.clearObservers()
         activeAreas.clearObservers()
+        testInstance?.onDestroy()
+        testInstance = null
     }
 
     fun whatIsMissingForWriteout() = StringBuilder().apply {
