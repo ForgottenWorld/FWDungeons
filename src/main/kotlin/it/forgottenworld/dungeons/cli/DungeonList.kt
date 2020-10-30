@@ -1,11 +1,11 @@
 package it.forgottenworld.dungeons.cli
 
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.model.dungeon.Difficulty
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.manager.DungeonManager
-import it.forgottenworld.dungeons.utils.append
-import it.forgottenworld.dungeons.utils.clickEvent
-import it.forgottenworld.dungeons.utils.component
+import it.forgottenworld.dungeons.utils.ktx.append
+import it.forgottenworld.dungeons.utils.ktx.clickEvent
+import it.forgottenworld.dungeons.utils.ktx.component
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import java.lang.Integer.max
@@ -17,7 +17,7 @@ private fun getJoinClickable(
         locked: Boolean,
         full: Boolean,
         inGame: Boolean) = component {
-
+    append("  [ ", ChatColor.WHITE)
     append(when {
         leader -> "CREATE"
         locked -> "PRIVATE"
@@ -25,15 +25,14 @@ private fun getJoinClickable(
         inGame -> "IN DUNGEON"
         else -> "JOIN"
     })
-
     color(when {
         locked -> ChatColor.GOLD
         full || inGame -> ChatColor.RED
         else -> ChatColor.GREEN
     })
-
     if (!full && !locked && !inGame)
         clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons join ${instance.dungeon.id} ${instance.id}")
+    append(" ]", ChatColor.WHITE)
 }
 
 private fun getPageClickable(text: String, page: Int) = component {
@@ -78,9 +77,8 @@ private fun getColoredDifficulty(difficulty: Difficulty) = component {
 fun getInteractiveDungeonList(page: Int) = component {
 
     if (page < 0 || page > DungeonManager.dungeons.count() - 1) return@component
-    val d = DungeonManager.dungeons.values
+    val dng = DungeonManager.dungeons.values
             .filter { it.active }
-            .toList()
             .getOrNull(page) ?: return@component
 
     append("====================[ ", ChatColor.DARK_GRAY)
@@ -90,25 +88,25 @@ fun getInteractiveDungeonList(page: Int) = component {
 
     append(getChevrons(3))
     append("DUNGEON: ", ChatColor.DARK_AQUA)
-    append("${d.name}\n", ChatColor.WHITE)
+    append("${dng.name}\n", ChatColor.WHITE)
 
     append(getChevrons(3))
     append("DESCRIPTION: ", ChatColor.DARK_AQUA)
-    append("${d.description}\n", ChatColor.WHITE)
+    append("${dng.description}\n", ChatColor.WHITE)
 
     append(getChevrons(3))
     append("DIFFICULTY: ", ChatColor.DARK_AQUA)
-    append(getColoredDifficulty(d.difficulty))
+    append(getColoredDifficulty(dng.difficulty))
     append("\n")
 
     append(getChevrons(3))
     append("PLAYERS: ", ChatColor.DARK_AQUA)
 
-    val minPl = d.numberOfPlayers.first
-    val maxPl = d.numberOfPlayers.last
+    val minPl = dng.numberOfPlayers.first
+    val maxPl = dng.numberOfPlayers.last
     append("$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n", ChatColor.WHITE)
 
-    d.instances.values.forEachIndexed { ii, inst ->
+    dng.instances.values.forEachIndexed { ii, inst ->
 
         append(getChevrons(1))
         append("Room ${ii + 1} ")
@@ -120,18 +118,17 @@ fun getInteractiveDungeonList(page: Int) = component {
             append("none", ChatColor.DARK_GRAY)
         }
 
-        append("  [ ", ChatColor.WHITE)
+
         append(getJoinClickable(
                     inst,
                     inst.leader == null,
                     inst.isLocked,
                     inst.isFull,
                     inst.inGame))
-        append(" ]", ChatColor.WHITE)
 
         append(inst.leader?.let{ "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
     }
 
-    append("\n".repeat(12 - d.instances.count() - ceil(max((d.description.length - 48), 0) / 60.0).toInt()))
+    append("\n".repeat(12 - dng.instances.count() - ceil(max((dng.description.length - 48), 0) / 60.0).toInt()))
     append(getPaginator(page))
 }

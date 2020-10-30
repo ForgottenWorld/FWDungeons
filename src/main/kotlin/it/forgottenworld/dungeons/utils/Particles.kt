@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.utils.ktx.bukkitThreadTimer
 import kotlinx.coroutines.delay
 import org.bukkit.Location
 import org.bukkit.Particle

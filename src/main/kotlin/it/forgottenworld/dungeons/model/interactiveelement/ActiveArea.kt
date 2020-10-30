@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.model.interactiveelement
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
-import it.forgottenworld.dungeons.utils.toVector
+import it.forgottenworld.dungeons.utils.ktx.toVector
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -57,6 +57,7 @@ class ActiveArea(
     }
     
     companion object {
+
         fun fromConfig(id: Int, config: ConfigurationSection) =
                 ActiveArea(
                         id,

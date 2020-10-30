@@ -15,15 +15,16 @@ object ConfigManager {
 
     lateinit var config: FileConfiguration
 
-    val isInDebugMode: Boolean by lazy { config.getBoolean("debugMode") }
+    val isInDebugMode by lazy { config.getBoolean("debugMode", false) }
 
-    private val dungeonWorldName: String by lazy {
+    private val dungeonWorldId by lazy {
         config.getString("dungeonWorld")
-            ?: throw Exception("dungeonWorld missing from config!")
+                ?.let { Bukkit.getWorld(it)?.uid ?: throw Exception("Dungeon world not found!") }
+                ?: throw Exception("dungeonWorld missing from config!")
     }
 
     val dungeonWorld
-        get() = Bukkit.getWorld(dungeonWorldName) ?: throw Exception("Dungeon world not found!")
+        get() = Bukkit.getWorld(dungeonWorldId) ?: throw Exception("Dungeon world not found!")
 
     private fun loadConfig(config: FileConfiguration) {
         this.config = config

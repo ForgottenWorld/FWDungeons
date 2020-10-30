@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.utils.launchAsync
-import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player

@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.manager
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager.dungeonBoxBuilder
-import it.forgottenworld.dungeons.utils.blockVector
-import it.forgottenworld.dungeons.utils.sendFWDMessage
-import it.forgottenworld.dungeons.utils.targetBlock
+import it.forgottenworld.dungeons.utils.ktx.blockVector
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.targetBlock
 import org.bukkit.Material
 import org.bukkit.entity.Player
 

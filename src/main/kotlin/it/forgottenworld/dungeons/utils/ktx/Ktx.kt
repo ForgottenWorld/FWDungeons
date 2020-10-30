@@ -1,8 +1,9 @@
-package it.forgottenworld.dungeons.utils
+package it.forgottenworld.dungeons.utils.ktx
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.cli.Strings
 import it.forgottenworld.dungeons.cli.getString
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -48,3 +50,5 @@ inline fun bukkitThreadTimer(delay: Long, interval: Long, crossinline action: Bu
         object: BukkitRunnable() {
             override fun run() = action()
         }.runTaskTimer(FWDungeonsPlugin.instance, delay, interval)
+
+fun getPlayer(uuid: UUID) = Bukkit.getPlayer(uuid)

@@ -1,31 +1,32 @@
 package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.manager.DungeonManager
-import it.forgottenworld.dungeons.utils.blockVector
+import it.forgottenworld.dungeons.utils.ktx.blockVector
+import it.forgottenworld.dungeons.utils.ktx.toVector
 import it.forgottenworld.dungeons.utils.launchAsync
-import it.forgottenworld.dungeons.utils.toVector
+import it.forgottenworld.dungeons.utils.observableMapOf
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.util.BlockVector
 import java.io.File
 
-class FinalDungeon(val id: Int,
-                   val name: String,
-                   val description: String,
-                   val difficulty: Difficulty,
-                   val points: Int,
-                   val numberOfPlayers: IntRange,
-                   val box: Box,
-                   val startingLocation: BlockVector,
-                   private val triggers: Map<Int, Trigger>,
-                   private val activeAreas: Map<Int, ActiveArea>,
-                   var instances: Map<Int,DungeonFinalInstance>) : Dungeon {
+class FinalDungeon(override val id: Int,
+                   override val name: String,
+                   override val description: String,
+                   override val difficulty: Difficulty,
+                   override val points: Int,
+                   override val numberOfPlayers: IntRange,
+                   override val box: Box,
+                   override val startingLocation: BlockVector,
+                   override val triggers: Map<Int, Trigger>,
+                   override val activeAreas: Map<Int, ActiveArea>,
+                   var instances: Map<Int, DungeonFinalInstance>) : Dungeon {
 
     var active = true
 
@@ -72,9 +73,9 @@ class FinalDungeon(val id: Int,
             it.numberOfPlayers = numberOfPlayers
             it.box = box
             it.startingLocation = startingLocation
-            it.triggers = triggers.toMutableMap()
-            it.activeAreas = activeAreas.toMutableMap()
-            it.finalInstanceLocations = instances.map { (k,v) -> k to v.origin }.toMap().toMutableMap()
+            it.triggers = observableMapOf(it.triggers)
+            it.activeAreas = observableMapOf(it.activeAreas)
+            it.finalInstanceLocations = instances.map { (k, v) -> k to v.origin }.toMap().toMutableMap()
         }
     }
 
@@ -82,21 +83,7 @@ class FinalDungeon(val id: Int,
         val id = predefinedId ?: instances.keys.lastOrNull()?.plus(1) ?: 0
         val newOrigin = target.blockVector
 
-        val newTriggers = triggers
-                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
-                .toMap()
-
-        val newActiveAreas = activeAreas
-                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
-                .toMap()
-
-        val newInstance = DungeonFinalInstance(
-                id,
-                this,
-                newOrigin,
-                newTriggers,
-                newActiveAreas
-        )
+        val newInstance = DungeonFinalInstance(id, this.id, newOrigin)
 
         if (predefinedId == null) {
             try {

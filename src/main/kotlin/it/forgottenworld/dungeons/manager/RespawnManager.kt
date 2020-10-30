@@ -17,10 +17,24 @@ object RespawnManager {
                     ?: playerRespawnLocations.remove(uniqueId)
         }
 
+    var UUID.respawnLocation
+        get() = playerRespawnLocations[this]
+        set(value) {
+            value?.let { playerRespawnLocations[this] = it }
+                    ?: playerRespawnLocations.remove(this)
+        }
+
     var Player.respawnGameMode
         get() = playerRespawnGameModes[uniqueId]
         set(value) {
             value?.let { playerRespawnGameModes[uniqueId] = it }
                     ?: playerRespawnGameModes.remove(uniqueId)
+        }
+
+    var UUID.respawnGameMode
+        get() = playerRespawnGameModes[this]
+        set(value) {
+            value?.let { playerRespawnGameModes[this] = it }
+                    ?: playerRespawnGameModes.remove(this)
         }
 }

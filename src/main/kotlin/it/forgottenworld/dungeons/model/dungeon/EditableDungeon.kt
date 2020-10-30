@@ -7,21 +7,22 @@ import it.forgottenworld.dungeons.model.instance.DungeonTestInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.utils.firstMissing
+import it.forgottenworld.dungeons.utils.ktx.firstMissing
+import it.forgottenworld.dungeons.utils.observableMapOf
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 
-class EditableDungeon(val id: Int) : Dungeon {
+class EditableDungeon(override val id: Int) : Dungeon {
 
-    var name = "NEW DUNGEON"
-    var description = ""
-    var difficulty = Difficulty.MEDIUM
-    var numberOfPlayers = IntRange(1, 2)
-    var box: Box? = null
-    var startingLocation: BlockVector? = null
-    var triggers = mutableMapOf<Int, Trigger>()
-    var activeAreas = mutableMapOf<Int, ActiveArea>()
-    var points = 0
+    override var name = "NEW DUNGEON"
+    override var description = ""
+    override var difficulty = Difficulty.MEDIUM
+    override var numberOfPlayers = IntRange(1, 2)
+    override var box: Box? = null
+    override var startingLocation: BlockVector? = null
+    override var triggers = observableMapOf<Int, Trigger>()
+    override var activeAreas = observableMapOf<Int, ActiveArea>()
+    override var points = 0
 
     var testInstance: DungeonTestInstance? = null
     var finalInstanceLocations = mutableMapOf<Int, BlockVector>()
@@ -65,12 +66,8 @@ class EditableDungeon(val id: Int) : Dungeon {
         return if (type == InteractiveElementType.TRIGGER) unmakeTrigger() else unmakeActiveArea()
     }
 
-    fun newInteractiveElement(type: InteractiveElementType, box: Box): Int {
-        val inst = testInstance ?: return -1
-        val id = if (type == InteractiveElementType.TRIGGER) newTrigger(box) else newActiveArea(box)
-        inst.newInteractiveElement(type, id, box)
-        return id
-    }
+    fun newInteractiveElement(type: InteractiveElementType, box: Box) =
+            if (type == InteractiveElementType.TRIGGER) newTrigger(box) else newActiveArea(box)
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
@@ -78,11 +75,8 @@ class EditableDungeon(val id: Int) : Dungeon {
         return id
     }
 
-    private fun unmakeActiveArea(): Int {
-        activeAreas.keys.lastOrNull()?.let { activeAreas.remove(it) }
-        val inst = testInstance ?: return -1
-        return inst.activeAreas.keys.last().also { inst.activeAreas.remove(it) }
-    }
+    private fun unmakeActiveArea() =
+            activeAreas.keys.lastOrNull()?.also { activeAreas.remove(it) } ?: -1
 
     private fun labelActiveArea(label: String) {
         activeAreas.values.lastOrNull()?.label = label
@@ -96,11 +90,8 @@ class EditableDungeon(val id: Int) : Dungeon {
         return id
     }
 
-    private fun unmakeTrigger(): Int {
-        triggers.keys.lastOrNull()?.let { triggers.remove(it) }
-        val inst = testInstance ?: return -1
-        return inst.triggers.keys.last().also { inst.triggers.remove(it) }
-    }
+    private fun unmakeTrigger() =
+            triggers.keys.lastOrNull()?.also { triggers.remove(it) } ?: -1
 
     private fun labelTrigger(label: String) {
         triggers.values.lastOrNull()?.label = label
@@ -109,16 +100,13 @@ class EditableDungeon(val id: Int) : Dungeon {
     }
 
     fun createTestInstance(at: BlockVector, creator: Player) {
-        val triggs = triggers
-                .map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), at)}
-                .toMap()
-                .toMutableMap()
+        testInstance = DungeonTestInstance(-1, this, at, creator.uniqueId)
+    }
 
-        val aas = activeAreas.map { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), at)}
-                .toMap()
-                .toMutableMap()
-
-        testInstance = DungeonTestInstance(-1, this, at, triggs, aas, creator)
+    fun onDestroy() {
+        testInstance?.onDestroy()
+        triggers.clearObservers()
+        activeAreas.clearObservers()
     }
 
     fun whatIsMissingForWriteout() = StringBuilder().apply {

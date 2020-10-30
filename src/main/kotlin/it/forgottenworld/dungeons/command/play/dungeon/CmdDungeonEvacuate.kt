@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.manager.DungeonManager
-import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonEvacuate(sender: CommandSender, args: Array<out String>): Boolean {

@@ -24,11 +24,25 @@ object DungeonManager {
                     ?: playerReturnPositions.remove(uniqueId)
         }
 
+    var UUID.returnPosition
+        get() = playerReturnPositions[this]
+        set(value) {
+            value?.let { playerReturnPositions[this] = it }
+                    ?: playerReturnPositions.remove(this)
+        }
+
     var Player.returnGameMode
         get() = playerReturnGameModes[uniqueId]
         set(value) {
             value?.let { playerReturnGameModes[uniqueId] = it }
                     ?: playerReturnGameModes.remove(uniqueId)
+        }
+
+    var UUID.returnGameMode
+        get() = playerReturnGameModes[this]
+        set(value) {
+            value?.let { playerReturnGameModes[this] = it }
+                    ?: playerReturnGameModes.remove(this)
         }
 
     var Player.collidingTrigger
@@ -38,12 +52,27 @@ object DungeonManager {
                     ?: playersTriggering.remove(uniqueId)
         }
 
+    var UUID.collidingTrigger
+        get() = playersTriggering[this]
+        set(value) {
+            value?.let { playersTriggering[this] = it }
+                    ?: playersTriggering.remove(this)
+        }
+
     var Player.dungeonInstance
         get() = playerInstances[uniqueId]
         set(value) {
             value?.let {
                 playerInstances[uniqueId] = value
             } ?: playerInstances.remove(uniqueId)
+        }
+
+    var UUID.dungeonInstance
+        get() = playerInstances[this]
+        set(value) {
+            value?.let {
+                playerInstances[this] = value
+            } ?: playerInstances.remove(this)
         }
 }
 

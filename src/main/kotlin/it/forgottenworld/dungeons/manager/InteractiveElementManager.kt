@@ -6,9 +6,9 @@ import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementTyp
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.TRIGGER
 import it.forgottenworld.dungeons.manager.DungeonEditManager.activeAreaBoxBuilder
 import it.forgottenworld.dungeons.manager.DungeonEditManager.triggerBoxBuilder
-import it.forgottenworld.dungeons.utils.blockVector
-import it.forgottenworld.dungeons.utils.sendFWDMessage
-import it.forgottenworld.dungeons.utils.targetBlock
+import it.forgottenworld.dungeons.utils.ktx.blockVector
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.targetBlock
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment

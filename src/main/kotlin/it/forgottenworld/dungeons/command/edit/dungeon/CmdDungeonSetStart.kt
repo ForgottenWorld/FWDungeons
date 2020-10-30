@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager
-import it.forgottenworld.dungeons.utils.sendFWDMessage
-import it.forgottenworld.dungeons.utils.toBlockVector
-import it.forgottenworld.dungeons.utils.withRefSystemOrigin
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.toBlockVector
+import it.forgottenworld.dungeons.utils.ktx.withRefSystemOrigin
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 

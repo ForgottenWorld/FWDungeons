@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.manager.DungeonManager
-import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.command.CommandSender
 

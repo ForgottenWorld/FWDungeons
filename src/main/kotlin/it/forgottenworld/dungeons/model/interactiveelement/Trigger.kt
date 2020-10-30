@@ -6,13 +6,14 @@ import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.instance.DungeonInstance
 import it.forgottenworld.dungeons.scripting.parseCode
-import it.forgottenworld.dungeons.utils.sendFWDMessage
-import it.forgottenworld.dungeons.utils.toVector
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.toVector
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
+import java.util.*
 
 class Trigger(
         override val id: Int,
@@ -23,20 +24,9 @@ class Trigger(
     var label: String? = null
     var procced = false
 
-    private val playersCurrentlyInside = mutableListOf<Player>()
+    private val playersCurrentlyInside = mutableListOf<UUID>()
     val origin : BlockVector
         get() = box.origin
-
-    /*
-    fun applyMeta() =
-        box.getAllBlocks().forEach {
-            it.removeMetadata("FWD_triggers", FWDungeonsPlugin.instance)
-            it.setMetadata(
-                    "FWD_triggers",
-                    FixedMetadataValue(FWDungeonsPlugin.instance, id)
-            )
-        }
-    */
 
     fun clearCurrentlyInsidePlayers() = playersCurrentlyInside.clear()
 
@@ -46,10 +36,10 @@ class Trigger(
         if (ConfigManager.isInDebugMode)
             player.sendFWDMessage("Entered trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE}")
 
-        if (playersCurrentlyInside.contains(player)) return
+        if (playersCurrentlyInside.contains(player.uniqueId)) return
 
         player.collidingTrigger = this
-        playersCurrentlyInside.add(player)
+        playersCurrentlyInside.add(player.uniqueId)
         if (instance is DungeonFinalInstance) proc(instance)
     }
 
@@ -57,7 +47,7 @@ class Trigger(
         if (ConfigManager.isInDebugMode)
             player.sendFWDMessage("Exited trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE}")
 
-        playersCurrentlyInside.remove(player)
+        playersCurrentlyInside.remove(player.uniqueId)
         player.collidingTrigger = null
     }
 

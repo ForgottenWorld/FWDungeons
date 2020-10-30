@@ -11,11 +11,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
 class FWDungeonsPlugin : JavaPlugin() {
-    companion object {
-        lateinit var instance: FWDungeonsPlugin
-        lateinit var pluginDataFolder: File
-        lateinit var pluginConfig: FileConfiguration
-    }
 
     override fun onEnable() {
         logger.info("Enabling FWDungeons...")
@@ -45,6 +40,12 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")
+    }
+
+    companion object {
+        lateinit var instance: FWDungeonsPlugin
+        lateinit var pluginDataFolder: File
+        lateinit var pluginConfig: FileConfiguration
     }
 
 }

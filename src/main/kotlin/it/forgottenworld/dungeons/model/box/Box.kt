@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.model.box
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.utils.max
-import it.forgottenworld.dungeons.utils.min
+import it.forgottenworld.dungeons.utils.ktx.max
+import it.forgottenworld.dungeons.utils.ktx.min
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import org.bukkit.Particle
 import org.bukkit.block.Block

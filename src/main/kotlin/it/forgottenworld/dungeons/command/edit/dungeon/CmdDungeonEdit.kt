@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.manager.DungeonEditManager
 import it.forgottenworld.dungeons.manager.DungeonManager
-import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.entity.Player
 
 fun cmdDungeonEdit(sender: Player, args: Array<out String>): Boolean {

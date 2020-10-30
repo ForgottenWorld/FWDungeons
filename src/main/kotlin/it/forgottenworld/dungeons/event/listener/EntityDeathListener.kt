@@ -10,6 +10,6 @@ class EntityDeathListener: Listener {
     @EventHandler
     fun onEntityDeath(event: EntityDeathEvent) {
         val uuid = event.entity.uniqueId
-        InstanceObjectiveManager.entityObjectives.remove(uuid)?.onMobKilled(uuid)
+        InstanceObjectiveManager.entityObjectives[uuid]?.onMobKilled(uuid)
     }
 }

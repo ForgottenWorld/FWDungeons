@@ -17,10 +17,14 @@ import it.forgottenworld.dungeons.manager.RespawnManager.respawnGameMode
 import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
 import it.forgottenworld.dungeons.model.combat.InstanceObjective
 import it.forgottenworld.dungeons.model.combat.MobSpawnData
-import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
-import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.utils.*
+import it.forgottenworld.dungeons.model.dungeon.finalDungeons
+import it.forgottenworld.dungeons.model.interactiveelement.instanceActiveAreas
+import it.forgottenworld.dungeons.model.interactiveelement.instanceTriggers
+import it.forgottenworld.dungeons.utils.getRandomString
+import it.forgottenworld.dungeons.utils.ktx.*
+import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.utils.launchAsync
+import it.forgottenworld.dungeons.utils.mutablePlayerListOf
 import kotlinx.coroutines.delay
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
@@ -36,36 +40,34 @@ import java.util.*
 
 class DungeonFinalInstance(
         override val id: Int,
-        override val dungeon: FinalDungeon,
-        override val origin: BlockVector,
-        override val triggers: Map<Int, Trigger>,
-        override val activeAreas: Map<Int, ActiveArea>) : DungeonInstance {
+        dungeonId: Int,
+        override val origin: BlockVector) : DungeonInstance {
 
-    companion object {
-        fun fromConfig(config: ConfigurationSection): DungeonFinalInstance? {
-            val dungeon = DungeonManager.dungeons[config.getInt("dungeon_id")] ?: return null
-            val instOriginBlock = ConfigManager.dungeonWorld.getBlockAt(
-                    config.getDouble("x").toInt(),
-                    config.getDouble("y").toInt(),
-                    config.getDouble("z").toInt()
-            )
-
-            return dungeon.createInstance(instOriginBlock, config.getInt("instance_id"))
-        }
-    }
+    override val dungeon by finalDungeons(dungeonId)
+    override val box = dungeon.box.withOrigin(origin)
+    override val triggers by instanceTriggers()
+    override val activeAreas by instanceActiveAreas()
 
     var isTpSafe = true
-    val players: MutableList<Player> = mutableListOf()
-    var leader: Player? = null
+    val players = mutablePlayerListOf()
+    var leader by safePlayer()
     val minPlayers = dungeon.numberOfPlayers.first
     val maxPlayers = dungeon.numberOfPlayers.last
     var isLocked = false
+    var inGame = false
+    var partyKey = ""
+    val instanceObjectives = mutableListOf<InstanceObjective>()
 
-    override val box = dungeon.box.withOrigin(origin)
 
     private val startingPostion = dungeon
             .startingLocation
             .withRefSystemOrigin(BlockVector(0, 0, 0), origin)
+
+    val playerCount
+        get() = players.size
+
+    val isFull
+        get() = playerCount == maxPlayers
 
     fun resetInstance() {
         disbandParty()
@@ -79,15 +81,6 @@ class DungeonFinalInstance(
         inGame = false
     }
 
-    var inGame = false
-    var partyKey = ""
-
-    val playerCount: Int
-        get() = players.size
-
-    val isFull: Boolean
-        get() = playerCount == maxPlayers
-
     fun lock() {
         isLocked = true
         partyKey = getRandomString(10)
@@ -99,7 +92,7 @@ class DungeonFinalInstance(
     }
 
     private fun disbandParty() {
-        players.forEach { it.run {
+        players.uuids.forEach { it.run {
             returnPosition = null
             returnGameMode = null
             collidingTrigger = null
@@ -111,7 +104,7 @@ class DungeonFinalInstance(
     private fun checkUpdateLeader(player: Player) {
         if (leader != player) return
         if (players.isEmpty()) resetInstance()
-        else leader = players.first().apply { sendFWDMessage("You're now the party leader") }
+        else leader = players.first()?.apply { sendFWDMessage("You're now the party leader") }
     }
 
     fun onPlayerJoin(player: Player) {
@@ -134,7 +127,7 @@ class DungeonFinalInstance(
                     })
         } else {
             player.sendFWDMessage("You joined the dungeon party")
-            players.forEach { it.sendFWDMessage("${player.name} joined the dungeon party") }
+            players.forEach { it?.sendFWDMessage("${player.name} joined the dungeon party") }
         }
 
         players.add(player)
@@ -158,13 +151,13 @@ class DungeonFinalInstance(
             return
         }
         players.forEach {
-            it.sendFWDMessage("${if (player.name == it.name) "You" else player.name} left the dungeon party")
+            it?.sendFWDMessage("${if (player.name == it.name) "You" else player.name} left the dungeon party")
         }
         onPlayerRemoved(player)
     }
 
     fun onPlayerDeath(player: Player) {
-        players.forEach { it.sendFWDMessage("${player.name} died in the dungeon") }
+        players.forEach { it?.sendFWDMessage("${player.name} died in the dungeon") }
         player.respawnLocation = player.returnPosition
         player.respawnGameMode = player.returnGameMode
         onPlayerRemoved(player)
@@ -173,32 +166,31 @@ class DungeonFinalInstance(
     fun onStart() {
         // triggers.values.forEach { it.applyMeta() }
         inGame = true
-        players.runForEach {
+        players.forEach { it?.run {
             returnPosition = location.clone()
             returnGameMode = gameMode
             gameMode = GameMode.ADVENTURE
             val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
             teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
             sendFWDMessage("Good luck out there!")
-        }
+        } }
         isTpSafe = false
         startCheckingTriggers()
     }
-    
+
     fun onInstanceFinish(givePoints: Boolean) {
-        if (givePoints && dungeon.points != 0)
-            players
-                    .map { it.uniqueId }
-                    .let { DungeonCompletedEvent(it, dungeon.points.toFloat()) }
-                    .let { Bukkit.getPluginManager().callEvent(it) }
+        if (givePoints && dungeon.points != 0) players
+                .mapNotNull { it?.uniqueId }
+                .let { DungeonCompletedEvent(it, dungeon.points.toFloat()) }
+                .let { Bukkit.getPluginManager().callEvent(it) }
 
         isTpSafe = true
 
-        players.forEach {
-            it.sendFWDMessage("${ChatColor.GREEN}Congratulations, you made it out alive!")
-            it.returnPosition?.let { pos -> it.teleport(pos, PlayerTeleportEvent.TeleportCause.PLUGIN) }
-            it.returnGameMode?.let { gm -> it.gameMode = gm }
-        }
+        players.forEach { p -> p?.run {
+            sendFWDMessage("${ChatColor.GREEN}Congratulations, you made it out alive!")
+            returnPosition?.let { teleport(it, PlayerTeleportEvent.TeleportCause.PLUGIN) }
+            returnGameMode?.let { gameMode = it }
+         } }
 
         resetInstance()
     }
@@ -231,16 +223,14 @@ class DungeonFinalInstance(
     private fun startCheckingTriggers() = launch {
         while (inGame) {
             delay(500)
-            players.forEach {
+            players.forEach { p -> p?.run {
                 checkTriggers(
-                        it.uniqueId,
-                        it.location.toVector(),
-                        it.collidingTrigger?.id)
-            }
+                        uniqueId,
+                        location.toVector(),
+                        collidingTrigger?.id)
+            } }
         }
     }
-
-    val instanceObjectives = mutableListOf<InstanceObjective>()
 
     fun attachNewObjective(
             mobs: List<MobSpawnData>,
@@ -248,7 +238,8 @@ class DungeonFinalInstance(
         val mobUuids = mobs.mapNotNull {
             spawnMob(it.isMythic,
                     it.mob,
-                    (activeAreas[it.activeAreaId] ?: error("Active area not found")).getRandomLocationOnFloor()
+                    (activeAreas[it.activeAreaId] ?: error("Active area not found"))
+                            .getRandomLocationOnFloor()
                             .clone()
                             .add(0.5, 0.5, 0.5)
             )
@@ -276,6 +267,19 @@ class DungeonFinalInstance(
             set("x", origin.x)
             set("y", origin.y)
             set("z", origin.z)
+        }
+    }
+
+    companion object {
+        fun fromConfig(config: ConfigurationSection): DungeonFinalInstance? {
+            val dungeon = DungeonManager.dungeons[config.getInt("dungeon_id")] ?: return null
+            val instOriginBlock = ConfigManager.dungeonWorld.getBlockAt(
+                    config.getDouble("x").toInt(),
+                    config.getDouble("y").toInt(),
+                    config.getDouble("z").toInt()
+            )
+
+            return dungeon.createInstance(instOriginBlock, config.getInt("instance_id"))
         }
     }
 }

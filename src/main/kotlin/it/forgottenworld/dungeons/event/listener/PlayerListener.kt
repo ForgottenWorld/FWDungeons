@@ -7,7 +7,7 @@ import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
 import it.forgottenworld.dungeons.manager.RespawnManager.respawnGameMode
 import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
 import it.forgottenworld.dungeons.utils.launch
-import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import kotlinx.coroutines.delay
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
