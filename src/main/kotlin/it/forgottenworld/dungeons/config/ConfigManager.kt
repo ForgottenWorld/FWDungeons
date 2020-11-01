@@ -1,154 +1,87 @@
 package it.forgottenworld.dungeons.config
 
-import it.forgottenworld.dungeons.state.DungeonState
-import it.forgottenworld.dungeons.model.activearea.ActiveArea
-import it.forgottenworld.dungeons.model.box.Box
-import it.forgottenworld.dungeons.model.dungeon.Dungeon
-import it.forgottenworld.dungeons.model.trigger.Trigger
-import it.forgottenworld.dungeons.utils.parseEffectCode
-import it.forgottenworld.dungeons.utils.toVector
-import org.bukkit.Material
-import org.bukkit.configuration.InvalidConfigurationException
+import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
+import it.forgottenworld.dungeons.utils.launchAsync
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.util.BlockVector
 import java.io.File
-import java.io.IOException
 
 
 object ConfigManager {
+
     lateinit var config: FileConfiguration
 
-    val isInDebugMode: Boolean by lazy { config.getBoolean("debugMode") }
-    val dungeonWorld: String by lazy { config.getString("dungeonWorld")!! }
+    val isInDebugMode by lazy { config.getBoolean("debugMode", false) }
 
-    fun loadConfig(config: FileConfiguration) {
+    private val dungeonWorldId by lazy {
+        config.getString("dungeonWorld")
+                ?.let { Bukkit.getWorld(it)?.uid ?: throw Exception("Dungeon world not found!") }
+                ?: throw Exception("dungeonWorld missing from config!")
+    }
+
+    val dungeonWorld
+        get() = Bukkit.getWorld(dungeonWorldId) ?: throw Exception("Dungeon world not found!")
+
+    private fun loadConfig(config: FileConfiguration) {
         this.config = config
     }
 
-    fun loadDungeonConfigs(dataFolder: File) {
-        val regex = Regex("""[0-9]+\.yml""")
-        val dir = File(dataFolder, "dungeons")
-        if (!dir.isFile && !dir.exists()) dir.mkdir()
-        dir.list()?.filter {
-            it.matches(regex)
-        }?.forEach {
-            try {
-                val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                DungeonState.dungeons[conf.getInt("id")] =
-                        Dungeon(
-                                conf.getInt("id"),
-                                conf.getString("name")!!,
-                                conf.getString("description")!!,
-                                Dungeon.Difficulty.fromString(conf.getString("difficulty")!!)!!,
-                                conf.getInt("points", 0),
-                                conf.getIntegerList("numberOfPlayers").let{ IntRange(it.first(), it.last()) },
-                                Box(
-                                        BlockVector(0,0,0),
-                                        conf.getInt("width"),
-                                        conf.getInt("height"),
-                                        conf.getInt("depth")
-                                ),
-                                conf.getVector("startingLocation")!!.toBlockVector(),
-                                mutableListOf(),
-                                mutableListOf(),
-                                mutableListOf()
-                        ).apply {
-                            triggers.addAll(
-                                    conf.getConfigurationSection("triggers")
-                                    !!.getKeys(false)
-                                            .map { k ->
-                                                Trigger(
-                                                        k.toInt(),
-                                                        this,
-                                                        Box(
-                                                                conf.getVector("triggers.$k.origin")!!.toBlockVector(),
-                                                                conf.getInt("triggers.$k.width"),
-                                                                conf.getInt("triggers.$k.height"),
-                                                                conf.getInt("triggers.$k.depth")
-                                                        ),
-                                                        { inst -> parseEffectCode(inst, conf.getStringList("triggers.$k.effect")) },
-                                                        conf.getBoolean("triggers.$k.requiresWholeParty")
-                                                ).apply {
-                                                    conf.getString("triggers.$k.label")?.let {
-                                                        label = it
-                                                    }
-                                                }
-                                            }
-                            )
-                            activeAreas.addAll(
-                                    conf.getConfigurationSection("activeAreas")
-                                    !!.getKeys(false)
-                                            .map { k ->
-                                                ActiveArea(
-                                                        k.toInt(),
-                                                        Box(
-                                                                conf.getVector("activeAreas.$k.origin")!!.toBlockVector(),
-                                                                conf.getInt("activeAreas.$k.width"),
-                                                                conf.getInt("activeAreas.$k.height"),
-                                                                conf.getInt("activeAreas.$k.depth")
-                                                        ),
-                                                        Material.getMaterial(conf.getString("activeAreas.$k.startingMaterial")!!)!!
-                                                ).apply {
-                                                    conf.getString("activeAreas.$k.label")?.let {
-                                                        label = it
-                                                    }
-                                                }
-                                            }
-                            )
-                            DungeonState.activeDungeons[id] = true
-                        }
-            } catch (e : Exception) {
-                e.printStackTrace()
+    private val dungeonNameRegex = Regex("""[0-9]+\.yml""")
+    private fun loadDungeonConfigs(dataFolder: File) {
+        val dir = File(dataFolder, "dungeons").apply { if (isFile || (!exists() && mkdir())) return }
+        dir.list()
+                ?.filter { it.matches(dungeonNameRegex) }
+                ?.forEach {
+                    try {
+                        val dId = it.removeSuffix(".yml").toInt()
+                        val conf = YamlConfiguration().apply { load(File(dir, it)) }
+                        FinalDungeon.dungeons[dId] = FinalDungeon.fromConfig(dId, conf)
+                    } catch (e : Exception) {
+                        e.printStackTrace()
+                    }
+                }
+    }
+
+    fun saveDungeonConfig(dataFolder: File, dungeon: FinalDungeon, eraseEffects: Boolean = false) {
+        try {
+            val dir = File(dataFolder, "dungeons").apply { if (!exists() && !mkdir()) return }
+            val file = File(dir, "${dungeon.id}.yml")
+
+            val existsAlready = file.exists()
+            if (!existsAlready && !file.createNewFile()) return
+
+            val conf = YamlConfiguration()
+            if (existsAlready) conf.load(file)
+
+            dungeon.toConfig(conf, eraseEffects)
+            launchAsync { conf.save(file) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getInstancesFromConfig() {
+        val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
+        YamlConfiguration().run {
+            if (file.exists()) load(file) else file.createNewFile()
+
+            for (dId in getKeys(false)) {
+                val sec = getConfigurationSection(dId) ?: continue
+                val nDId = dId.toInt()
+                for (iId in sec.getKeys(false)) {
+                    DungeonFinalInstance.fromConfig(nDId, sec.getConfigurationSection(iId)!!)
+                }
             }
         }
     }
 
-    fun saveDungeonConfig(dataFolder: File, dungeon: Dungeon, eraseEffects: Boolean = false) {
-        try {
-            val dir = File(dataFolder, "dungeons")
-            if (!dir.exists() && !dir.mkdir()) return
-            val file = File(dir, "${dungeon.id}.yml")
-            if (!file.exists()) file.createNewFile()
-
-            YamlConfiguration().apply {
-                load(file)
-                set("id", dungeon.id)
-                set("name", dungeon.name)
-                set("description", dungeon.description)
-                set("difficulty", dungeon.difficulty.toString())
-                set("points", dungeon.points)
-                set("numberOfPlayers", listOf(dungeon.numberOfPlayers.first, dungeon.numberOfPlayers.last))
-                set("width", dungeon.box.width)
-                set("height", dungeon.box.height)
-                set("depth", dungeon.box.depth)
-                set("startingLocation", dungeon.startingLocation.toVector())
-                dungeon.triggers.forEach {
-                    set("triggers.${it.id}.id", it.id)
-                    it.label?.let { l -> set("triggers.${it.id}.label", l) }
-                    set("triggers.${it.id}.origin", it.origin.toVector())
-                    set("triggers.${it.id}.width", it.box.width)
-                    set("triggers.${it.id}.height", it.box.height)
-                    set("triggers.${it.id}.depth", it.box.depth)
-                    if (eraseEffects)
-                        set("triggers.${it.id}.effect", "")
-                    set("triggers.${it.id}.requiresWholeParty", it.requiresWholeParty)
-                }
-                dungeon.activeAreas.forEach {
-                    set("activeAreas.${it.id}.id", it.id)
-                    it.label?.let { l -> set("activeAreas.${it.id}.label", l) }
-                    set("activeAreas.${it.id}.origin", it.box.origin.toVector())
-                    set("activeAreas.${it.id}.width", it.box.width)
-                    set("activeAreas.${it.id}.height", it.box.height)
-                    set("activeAreas.${it.id}.depth", it.box.depth)
-                    set("activeAreas.${it.id}.startingMaterial", it.startingMaterial.name)
-                }
-                save(file)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: InvalidConfigurationException) {
-            e.printStackTrace()
-        }
+    fun loadData() {
+        FWDungeonsPlugin.instance.reloadConfig()
+        loadConfig(FWDungeonsPlugin.pluginConfig)
+        loadDungeonConfigs(FWDungeonsPlugin.pluginDataFolder)
+        getInstancesFromConfig()
     }
 }

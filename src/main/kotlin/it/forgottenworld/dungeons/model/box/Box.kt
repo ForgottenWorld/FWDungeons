@@ -1,18 +1,17 @@
 package it.forgottenworld.dungeons.model.box
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.utils.maxBlockVector
-import it.forgottenworld.dungeons.utils.minBlockVector
+import it.forgottenworld.dungeons.utils.ktx.max
+import it.forgottenworld.dungeons.utils.ktx.min
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
-import org.bukkit.Bukkit.getWorld
-import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.block.Block
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
-import kotlin.random.Random
+import org.bukkit.util.Vector
 
-class Box {
+class Box : Cloneable {
     var origin : BlockVector
     var width : Int
     var height : Int
@@ -28,21 +27,13 @@ class Box {
         this.depth = depth
     }
 
-    constructor(block1: Block, block2: Block) {
-        origin = minBlockVector(block1, block2)
-        val opposite = maxBlockVector(block1, block2)
+    constructor(pos1: BlockVector, pos2: BlockVector) {
+        origin = pos1 min pos2
+        val opposite = pos1 max pos2
         this.width = opposite.blockX - origin.blockX + 1
         this.height = opposite.blockY - origin.blockY + 1
         this.depth = opposite.blockZ - origin.blockZ + 1
     }
-
-    /*constructor(blockVector1: BlockVector, blockVector2: BlockVector) {
-        origin = minBlockVector(blockVector1, blockVector2)
-        val opposite = maxBlockVector(blockVector1, blockVector2)
-        this.width = opposite.blockX - origin.blockX + 1
-        this.height = opposite.blockY - origin.blockY + 1
-        this.depth = opposite.blockZ - origin.blockZ + 1
-    }*/
 
     fun containsPlayer(player: Player) = player.location.let {
         it.x >= origin.blockX && it.x <= origin.blockX + width &&
@@ -56,9 +47,15 @@ class Box {
                 it.z >= origin.blockZ && it.z < origin.blockZ + depth
     }
 
-    fun withOriginZero() : Box = Box(BlockVector(0, 0, 0), width, height, depth)
+    fun containsVector(vector: Vector) = vector.run {
+        x >= origin.blockX && x < origin.blockX + width &&
+                y >= origin.blockY && y < origin.blockY + height &&
+                z >= origin.blockZ && z < origin.blockZ + depth
+    }
 
-    fun withOrigin(origin: BlockVector) : Box = Box(origin, width, height, depth)
+    fun withOriginZero() = Box(BlockVector(0, 0, 0), width, height, depth)
+
+    fun withOrigin(origin: BlockVector) = Box(origin, width, height, depth)
 
     fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) = Box(
             BlockVector(
@@ -67,28 +64,21 @@ class Box {
                     origin.z - oldContainerOrigin.z + newOrigin.z),
             width, height, depth)
 
-    fun randomLocationOnFloor() = Location(
-            getWorld(ConfigManager.dungeonWorld),
-            Random.nextDouble(origin.x, origin.x + width),
-            origin.y,
-            Random.nextDouble(origin.z, origin.z + depth))
-
     fun getAllBlocks(): Set<Block> {
         val blocks = mutableSetOf<Block>()
-        val world = getWorld(ConfigManager.dungeonWorld)
+        val world = ConfigManager.dungeonWorld
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
-                    blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
+                    blocks.add(world.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
         }
         return blocks
     }
 
-    fun getFrontierBlocks() : Set<Block> {
-        val blocks = mutableSetOf<Block>()
-        val world = getWorld(ConfigManager.dungeonWorld)
+    fun getFrontier() : Set<BlockVector> {
+        val vecs = mutableSetOf<BlockVector>()
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
@@ -97,43 +87,11 @@ class Box {
                     if (y == 0 || y == height - 1) ++c
                     if (z == 0 || z == depth - 1) ++c
                     if (c > 1)
-                        blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
+                        vecs.add(BlockVector(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
         }
-        return blocks
-    }
-
-    fun getFloorBlocks() : Set<Block> {
-        val blocks = mutableSetOf<Block>()
-        val world = getWorld(ConfigManager.dungeonWorld)
-        for (x in 0 until width) {
-            for (z in 0 until depth) {
-                blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY, origin.blockZ + z))
-            }
-        }
-        return blocks
-    }
-
-    fun getCeilingBlocks() : Set<Block> {
-        val blocks = mutableSetOf<Block>()
-        val world = getWorld(ConfigManager.dungeonWorld)
-        for (x in 0 until width) {
-            for (z in 0 until depth) {
-                blocks.add(world!!.getBlockAt(origin.blockX + x, origin.blockY + height - 1, origin.blockZ + z))
-            }
-        }
-        return blocks
-    }
-
-    fun highlightFrame() {
-        repeatedlySpawnParticles(
-                Particle.COMPOSTER,
-                getFrontierBlocks().map{ it.location }.toSet(),
-                1,
-                10,
-                20
-        )
+        return vecs
     }
 
     fun highlightAll() {
@@ -141,8 +99,19 @@ class Box {
                 Particle.COMPOSTER,
                 getAllBlocks().map{ it.location }.toSet(),
                 1,
-                10,
+                500,
                 20
         )
+    }
+
+    public override fun clone() = Box(origin.clone(), width, height, depth)
+
+    companion object {
+
+        fun fromConfig(config: ConfigurationSection) = Box(
+                config.getVector("origin")!!.toBlockVector(),
+                config.getInt("width"),
+                config.getInt("height"),
+                config.getInt("depth"))
     }
 }

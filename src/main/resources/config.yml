@@ -1,9 +1,2 @@
-dbHost: "localhost"
-dbPort: 3306
-dbDatabase: "fwdungeons"
-dbUsername: "fwdUser"
-dbPassword: "forgottenworld"
-
 dungeonWorld: "world"
-
 debugMode: true
