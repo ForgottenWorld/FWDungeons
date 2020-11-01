@@ -1,14 +1,14 @@
-package it.forgottenworld.dungeons.manager
+package it.forgottenworld.dungeons.command.edit.helpers
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.ACTIVE_AREA
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.TRIGGER
-import it.forgottenworld.dungeons.manager.DungeonEditManager.activeAreaBoxBuilder
-import it.forgottenworld.dungeons.manager.DungeonEditManager.triggerBoxBuilder
 import it.forgottenworld.dungeons.utils.ktx.blockVector
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.targetBlock
+import it.forgottenworld.dungeons.utils.launch
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-object InteractiveElementManager {
+object InteractiveElementCommandHelper {
 
     fun setInteractiveElementPos(sender: Player, posNo: Int, type: InteractiveElementType) {
         val block = sender.targetBlock
@@ -26,7 +26,7 @@ object InteractiveElementManager {
             return
         }
 
-        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = sender.editableDungeon ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }
@@ -45,9 +45,9 @@ object InteractiveElementManager {
         }
 
         val builder = if (type == TRIGGER)
-            sender.triggerBoxBuilder
+            dungeon.triggerBoxBuilder
         else
-            sender.activeAreaBoxBuilder
+            dungeon.activeAreaBoxBuilder
 
         if (posNo == 1)
             builder.pos1(block.blockVector)
@@ -63,15 +63,14 @@ object InteractiveElementManager {
             return
         }
 
-        val id = dungeon.newInteractiveElement(type, box)
-        sender.sendFWDMessage("Created ${
-            if (type == TRIGGER) "trigger"
-            else "active area"
-        } with id $id")
-        if (type == TRIGGER)
-            DungeonEditManager.triggerBoxBuilders.remove(sender.uniqueId)
-        else
-            DungeonEditManager.activeAreaBoxBuilders.remove(sender.uniqueId)
+        launch {
+            val id = dungeon.newInteractiveElement(type, box)
+            sender.sendFWDMessage("Created ${
+                if (type == TRIGGER) "trigger"
+                else "active area"
+            } with id $id")
+        }
+
     }
 
     fun labelInteractiveElement(sender: Player, label: String, type: InteractiveElementType) {
@@ -80,7 +79,7 @@ object InteractiveElementManager {
             return
         }
 
-        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = sender.editableDungeon ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }
@@ -95,7 +94,7 @@ object InteractiveElementManager {
     }
 
     fun unMakeInteractiveElement(sender: Player, type: InteractiveElementType) {
-        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = sender.editableDungeon ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }

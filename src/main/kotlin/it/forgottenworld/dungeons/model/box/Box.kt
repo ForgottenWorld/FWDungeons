@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
 
-class Box {
+class Box : Cloneable {
     var origin : BlockVector
     var width : Int
     var height : Int
@@ -53,9 +53,9 @@ class Box {
                 z >= origin.blockZ && z < origin.blockZ + depth
     }
 
-    fun withOriginZero() : Box = Box(BlockVector(0, 0, 0), width, height, depth)
+    fun withOriginZero() = Box(BlockVector(0, 0, 0), width, height, depth)
 
-    fun withOrigin(origin: BlockVector) : Box = Box(origin, width, height, depth)
+    fun withOrigin(origin: BlockVector) = Box(origin, width, height, depth)
 
     fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) = Box(
             BlockVector(
@@ -77,9 +77,8 @@ class Box {
         return blocks
     }
 
-    fun getFrontierBlocks() : Set<Block> {
-        val blocks = mutableSetOf<Block>()
-        val world = ConfigManager.dungeonWorld
+    fun getFrontier() : Set<BlockVector> {
+        val vecs = mutableSetOf<BlockVector>()
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
@@ -88,11 +87,11 @@ class Box {
                     if (y == 0 || y == height - 1) ++c
                     if (z == 0 || z == depth - 1) ++c
                     if (c > 1)
-                        blocks.add(world.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
+                        vecs.add(BlockVector(origin.blockX + x, origin.blockY + y, origin.blockZ + z))
                 }
             }
         }
-        return blocks
+        return vecs
     }
 
     fun highlightAll() {
@@ -104,6 +103,8 @@ class Box {
                 20
         )
     }
+
+    public override fun clone() = Box(origin.clone(), width, height, depth)
 
     companion object {
 

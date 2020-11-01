@@ -1,11 +1,10 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.utils.ktx.bukkitThreadTimer
 import kotlinx.coroutines.delay
 import org.bukkit.Location
 import org.bukkit.Particle
-import org.bukkit.scheduler.BukkitTask
+import org.bukkit.util.BlockVector
 
 fun repeatedlySpawnParticles(
         particle: Particle,
@@ -27,18 +26,31 @@ fun repeatedlySpawnParticles(
     }
 }
 
-fun repeatedlySpawnParticles(
+class ParticleSpammer(
         particle: Particle,
         count: Int,
         interval: Long,
-        getLocations: () -> Set<Location>): BukkitTask {
-    val world = ConfigManager.dungeonWorld
-    return bukkitThreadTimer(0L, interval) {
-        getLocations().forEach {
-            world.spawnParticle(
-                    particle,
-                    Location(it.world, it.x + 0.5, it.y + 0.5, it.z + 0.5),
-                    count)
+        getLocations: () -> Set<BlockVector>) {
+
+    private var doRun = true
+
+    fun stop() {
+        doRun = false
+    }
+
+    init {
+        launch {
+            while (doRun) {
+                delay(interval)
+                val world = ConfigManager.dungeonWorld
+                getLocations().forEach {
+                    world.spawnParticle(
+                            particle,
+                            Location(ConfigManager.dungeonWorld, it.x + 0.5, it.y + 0.5, it.z + 0.5),
+                            count)
+                }
+            }
         }
     }
+
 }

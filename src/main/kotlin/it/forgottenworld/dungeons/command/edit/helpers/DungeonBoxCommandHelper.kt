@@ -1,13 +1,14 @@
-package it.forgottenworld.dungeons.manager
+package it.forgottenworld.dungeons.command.edit.helpers
 
-import it.forgottenworld.dungeons.manager.DungeonEditManager.dungeonBoxBuilder
+
+import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.utils.ktx.blockVector
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.targetBlock
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-object DungeonBoxCreationManager {
+object DungeonBoxCommandHelper {
 
     fun setDungeonBoxPos(sender: Player, posNo: Int) {
         val block = sender.targetBlock
@@ -17,12 +18,12 @@ object DungeonBoxCreationManager {
             return
         }
 
-        val dungeon = DungeonEditManager.wipDungeons[sender.uniqueId] ?: run {
+        val dungeon = sender.editableDungeon ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
         }
 
-        val builder = sender.dungeonBoxBuilder
+        val builder = dungeon.dungeonBoxBuilder
         if (posNo == 1)
             builder.pos1(block.blockVector)
         else
@@ -40,9 +41,9 @@ object DungeonBoxCreationManager {
         }
 
         dungeon.box = box.withOriginZero()
-        DungeonEditManager.dungeonBoxBuilders.remove(sender.uniqueId)
 
-        dungeon.createTestInstance(box.origin, sender)
+        dungeon.finalInstanceLocations.add(box.origin)
+        dungeon.createTestInstance(sender)
 
         sender.sendFWDMessage("Dungeon box set")
     }

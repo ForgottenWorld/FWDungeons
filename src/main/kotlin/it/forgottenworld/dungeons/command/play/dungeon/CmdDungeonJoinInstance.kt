@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeons
+import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -21,7 +21,7 @@ fun cmdDungeonJoinInstance(sender: Player, args: Array<out String>): Boolean {
 
     val pass = if (args.count() > 2) args[2] else ""
 
-    val dungeon = dungeons[dungeonId] ?: run {
+    val dungeon = FinalDungeon.dungeons[dungeonId] ?: run {
         sender.sendFWDMessage("Invalid dungeon id")
         return true
     }
@@ -31,7 +31,7 @@ fun cmdDungeonJoinInstance(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    if (sender.dungeonInstance != null) {
+    if (sender.finalInstance != null) {
         sender.sendFWDMessage("You're already in a party")
         return true
     }

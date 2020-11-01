@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.model.interactiveelement
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.manager.DungeonManager.collidingTrigger
+import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.instance.DungeonInstance
@@ -18,8 +18,11 @@ import java.util.*
 class Trigger(
         override val id: Int,
         override val box: Box,
-        private val effect: ((DungeonFinalInstance) -> Unit)? = null,
-        private val requiresWholeParty: Boolean = false) : InteractiveElement {
+        private val effectCode: List<String> = listOf(),
+        private val requiresWholeParty: Boolean = false,
+        ) : InteractiveElement {
+
+    private val effect: ((DungeonFinalInstance) -> Unit)? = parseCode(effectCode)
 
     var label: String? = null
     var procced = false
@@ -54,7 +57,7 @@ class Trigger(
     fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
             Trigger(id,
                     box.withContainerOrigin(oldOrigin, newOrigin),
-                    effect,
+                    effectCode,
                     requiresWholeParty
             ).also { it.label = label }
 
@@ -64,14 +67,14 @@ class Trigger(
         effect?.invoke(instance)
     }
 
-    fun toConfig(config: ConfigurationSection, eraseEffects: Boolean) = config.run {
+    fun toConfig(config: ConfigurationSection) = config.run {
         set("id", id)
         label?.let { l -> set("label", l) }
         set("origin", origin.toVector())
         set("width", box.width)
         set("height", box.height)
         set("depth", box.depth)
-        if (eraseEffects) set("effect", getString("effect", ""))
+        set("effect", effectCode)
         set("requiresWholeParty", requiresWholeParty)
     }
     
@@ -80,7 +83,7 @@ class Trigger(
                 Trigger(
                         id,
                         Box.fromConfig(config),
-                        parseCode(config.getStringList("effect")),
+                        config.getStringList("effect"),
                         config.getBoolean("requiresWholeParty")
                 ).apply { config.getString("label")?.let { label = it } }
     }

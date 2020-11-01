@@ -1,14 +1,13 @@
 package it.forgottenworld.dungeons.utils.ktx
 
 import org.bukkit.entity.Player
-import java.util.*
 import kotlin.reflect.KProperty
 
-fun safePlayer() = SafePlayer()
+fun safePlayer(player: Player? = null) = SafePlayer(player)
 
-class SafePlayer {
+class SafePlayer(player: Player? = null) {
 
-    var uuid: UUID? = null
+    var uuid = player?.uniqueId
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = uuid?.let { getPlayer(it) }
 

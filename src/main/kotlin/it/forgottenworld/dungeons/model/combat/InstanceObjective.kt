@@ -12,6 +12,7 @@ class InstanceObjective(
 
     fun onMobKilled(uuid: UUID) {
         mobsToKill.remove(uuid)
+        uuid.instanceObjective = null
         if (mobsToKill.isNotEmpty()) return
         instance.instanceObjectives.remove(this)
         onAllKilled(instance)
@@ -23,5 +24,18 @@ class InstanceObjective(
                 .map { getEntity(it) }
                 .filterIsInstance<LivingEntity>()
                 .forEach { it.health = 0.0 }
+    }
+
+    companion object {
+
+        private val entityObjectives = mutableMapOf<UUID, InstanceObjective>()
+
+        var UUID.instanceObjective
+            get() = entityObjectives[this]
+            set(value) {
+                value?.let {
+                    entityObjectives[this] = it
+                } ?: entityObjectives.remove(this)
+            }
     }
 }

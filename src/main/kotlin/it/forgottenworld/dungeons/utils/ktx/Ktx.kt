@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.utils.ktx
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.cli.Strings
 import it.forgottenworld.dungeons.cli.getString
 import org.bukkit.Bukkit
@@ -10,7 +9,6 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
 import java.util.*
@@ -42,13 +40,6 @@ infix fun BlockVector.min(other: BlockVector) = BlockVector(min(x, other.x), min
 
 infix fun BlockVector.max(other: BlockVector) = BlockVector(max(x, other.x), max(y, other.y), max(z, other.z))
 
-inline fun <T> Iterable<T>.runForEach(action: T.() -> Unit) { forEach { it.action() } }
-
 fun Iterable<Int>.firstMissing() = find { !contains(it+1) }?.plus(1) ?: 0
-
-inline fun bukkitThreadTimer(delay: Long, interval: Long, crossinline action: BukkitRunnable.() -> Unit) =
-        object: BukkitRunnable() {
-            override fun run() = action()
-        }.runTaskTimer(FWDungeonsPlugin.instance, delay, interval)
 
 fun getPlayer(uuid: UUID) = Bukkit.getPlayer(uuid)

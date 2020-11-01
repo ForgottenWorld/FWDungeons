@@ -1,11 +1,11 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
+import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.entity.Player
 
 fun cmdDungeonStart(sender: Player, args: Array<out String>): Boolean {
-    val instance = sender.dungeonInstance ?: run {
+    val instance = sender.finalInstance ?: run {
         sender.sendFWDMessage("You're currently not in a dungeon party")
         return true
     }
@@ -16,7 +16,7 @@ fun cmdDungeonStart(sender: Player, args: Array<out String>): Boolean {
         instance.players.size < instance.minPlayers ->
             sender.sendFWDMessage("Not enough players for this dungeon")
         else -> {
-            sender.dungeonInstance?.onStart()
+            sender.finalInstance?.onStart()
             sender.sendFWDMessage("Dungeon party members have been teleported to the dungeon entrance")
         }
     }

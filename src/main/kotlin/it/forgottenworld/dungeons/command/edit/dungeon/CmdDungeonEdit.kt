@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.manager.DungeonEditManager
-import it.forgottenworld.dungeons.manager.DungeonManager
+import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -17,16 +17,16 @@ fun cmdDungeonEdit(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    if (DungeonEditManager.wipDungeons.containsKey(sender.uniqueId)) {
+    if (sender.editableDungeon != null) {
         sender.sendFWDMessage("You're already editing a dungeon")
         return true
     }
 
-    val res = DungeonManager.dungeons[id]?.let { d ->
+    val res = FinalDungeon.dungeons[id]?.let { d ->
         when {
             d.active -> false
             else -> {
-                DungeonEditManager.wipDungeons[sender.uniqueId] = d.makeEditable()!!
+                d.putInEditMode(sender)!!
                 true
             }
         }

@@ -7,24 +7,17 @@ import it.forgottenworld.dungeons.cli.getString
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.event.DungeonCompletedEvent
 import it.forgottenworld.dungeons.event.TriggerEvent
-import it.forgottenworld.dungeons.manager.DungeonManager
-import it.forgottenworld.dungeons.manager.DungeonManager.collidingTrigger
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
-import it.forgottenworld.dungeons.manager.DungeonManager.returnGameMode
-import it.forgottenworld.dungeons.manager.DungeonManager.returnPosition
-import it.forgottenworld.dungeons.manager.InstanceObjectiveManager
-import it.forgottenworld.dungeons.manager.RespawnManager.respawnGameMode
-import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
+import it.forgottenworld.dungeons.event.listener.RespawnHandler.Companion.respawnData
+import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.model.combat.InstanceObjective
+import it.forgottenworld.dungeons.model.combat.InstanceObjective.Companion.instanceObjective
 import it.forgottenworld.dungeons.model.combat.MobSpawnData
+import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.dungeon.finalDungeons
 import it.forgottenworld.dungeons.model.interactiveelement.instanceActiveAreas
 import it.forgottenworld.dungeons.model.interactiveelement.instanceTriggers
-import it.forgottenworld.dungeons.utils.getRandomString
+import it.forgottenworld.dungeons.utils.*
 import it.forgottenworld.dungeons.utils.ktx.*
-import it.forgottenworld.dungeons.utils.launch
-import it.forgottenworld.dungeons.utils.launchAsync
-import it.forgottenworld.dungeons.utils.mutablePlayerListOf
 import kotlinx.coroutines.delay
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
@@ -58,6 +51,8 @@ class DungeonFinalInstance(
     var partyKey = ""
     val instanceObjectives = mutableListOf<InstanceObjective>()
 
+    private val warpbackData = mutableMapOf<UUID, WarpbackData>()
+
 
     private val startingPostion = dungeon
             .startingLocation
@@ -70,7 +65,14 @@ class DungeonFinalInstance(
         get() = playerCount == maxPlayers
 
     fun resetInstance() {
-        disbandParty()
+        players.uuids.forEach { it.run {
+            warpbackData.remove(this)
+            collidingTrigger = null
+            finalInstance = null
+        } }
+        unlock()
+        leader = null
+        players.clear()
         isTpSafe = true
         triggers.values.forEach {
             it.procced = false
@@ -89,16 +91,6 @@ class DungeonFinalInstance(
     fun unlock() {
         isLocked = false
         partyKey = ""
-    }
-
-    private fun disbandParty() {
-        players.uuids.forEach { it.run {
-            returnPosition = null
-            returnGameMode = null
-            collidingTrigger = null
-            dungeonInstance = null
-        } }
-        players.clear()
     }
 
     private fun checkUpdateLeader(player: Player) {
@@ -131,16 +123,15 @@ class DungeonFinalInstance(
         }
 
         players.add(player)
-        player.dungeonInstance = this
+        player.finalInstance = this
         return
     }
 
     private fun onPlayerRemoved(player: Player) {
         players.remove(player.apply {
-            returnPosition = null
-            returnGameMode = null
+            warpbackData.remove(uniqueId)
             collidingTrigger?.onPlayerExit(player)
-            dungeonInstance = null
+            finalInstance = null
         })
         checkUpdateLeader(player)
     }
@@ -158,17 +149,14 @@ class DungeonFinalInstance(
 
     fun onPlayerDeath(player: Player) {
         players.forEach { it?.sendFWDMessage("${player.name} died in the dungeon") }
-        player.respawnLocation = player.returnPosition
-        player.respawnGameMode = player.returnGameMode
+        player.respawnData = warpbackData[player.uniqueId]
         onPlayerRemoved(player)
     }
 
     fun onStart() {
-        // triggers.values.forEach { it.applyMeta() }
         inGame = true
         players.forEach { it?.run {
-            returnPosition = location.clone()
-            returnGameMode = gameMode
+            warpbackData[it.uniqueId] = WarpbackData(gameMode, location.toVector())
             gameMode = GameMode.ADVENTURE
             val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
             teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
@@ -179,6 +167,7 @@ class DungeonFinalInstance(
     }
 
     fun onInstanceFinish(givePoints: Boolean) {
+
         if (givePoints && dungeon.points != 0) players
                 .mapNotNull { it?.uniqueId }
                 .let { DungeonCompletedEvent(it, dungeon.points.toFloat()) }
@@ -188,9 +177,13 @@ class DungeonFinalInstance(
 
         players.forEach { p -> p?.run {
             sendFWDMessage("${ChatColor.GREEN}Congratulations, you made it out alive!")
-            returnPosition?.let { teleport(it, PlayerTeleportEvent.TeleportCause.PLUGIN) }
-            returnGameMode?.let { gameMode = it }
+            warpbackData[uniqueId]?.let {
+                teleport(it.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
+                gameMode = it.gameMode
+            }
          } }
+
+        warpbackData.clear()
 
         resetInstance()
     }
@@ -246,7 +239,7 @@ class DungeonFinalInstance(
         }.toMutableList()
 
         val obj = InstanceObjective(this, mobUuids, onAllKilled)
-        mobUuids.forEach { InstanceObjectiveManager.entityObjectives[it] = obj }
+        mobUuids.forEach { it.instanceObjective = obj }
         instanceObjectives.add(obj)
     }
 
@@ -260,26 +253,35 @@ class DungeonFinalInstance(
     private fun spawnVanillaMob(type: String, location: Location) =
             location.world?.spawnEntity(location, EntityType.valueOf(type))?.uniqueId
 
-    fun toConfig(config: ConfigurationSection) {
-        config.run {
-            set("dungeon_id", dungeon.id)
-            set("instance_id", id)
-            set("x", origin.x)
-            set("y", origin.y)
-            set("z", origin.z)
-        }
-    }
-
     companion object {
-        fun fromConfig(config: ConfigurationSection): DungeonFinalInstance? {
-            val dungeon = DungeonManager.dungeons[config.getInt("dungeon_id")] ?: return null
+
+        val finalInstances = mutableMapOf<UUID, DungeonFinalInstance>()
+
+        var Player.finalInstance
+            get() = finalInstances[uniqueId]
+            set(value) {
+                value?.let {
+                    finalInstances[uniqueId] = value
+                } ?: finalInstances.remove(uniqueId)
+            }
+
+        var UUID.finalInstance
+            get() = finalInstances[this]
+            set(value) {
+                value?.let {
+                    finalInstances[this] = value
+                } ?: finalInstances.remove(this)
+            }
+
+        fun fromConfig(dungeonId: Int, config: ConfigurationSection): DungeonFinalInstance? {
+            val dungeon = FinalDungeon.dungeons[dungeonId] ?: return null
             val instOriginBlock = ConfigManager.dungeonWorld.getBlockAt(
-                    config.getDouble("x").toInt(),
-                    config.getDouble("y").toInt(),
-                    config.getDouble("z").toInt()
+                    config.getInt("x"),
+                    config.getInt("y"),
+                    config.getInt("z")
             )
 
-            return dungeon.createInstance(instOriginBlock, config.getInt("instance_id"))
+            return dungeon.createInstance(instOriginBlock)
         }
     }
 }

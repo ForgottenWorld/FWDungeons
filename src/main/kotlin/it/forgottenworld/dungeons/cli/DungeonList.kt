@@ -1,15 +1,14 @@
 package it.forgottenworld.dungeons.cli
 
-import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.model.dungeon.Difficulty
+import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.utils.ktx.append
 import it.forgottenworld.dungeons.utils.ktx.clickEvent
 import it.forgottenworld.dungeons.utils.ktx.component
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
-import java.lang.Integer.max
-import kotlin.math.ceil
+import kotlin.math.floor
 
 private fun getJoinClickable(
         instance: DungeonFinalInstance,
@@ -46,13 +45,13 @@ private fun getPaginator(page: Int) = component {
         append(getPageClickable("PREVIOUS", page - 1))
         append(" ]", ChatColor.DARK_GRAY)
     } else {
-        append("=============", ChatColor.DARK_GRAY)
+        append("==========", ChatColor.DARK_GRAY)
     }
 
-    append("===============================", ChatColor.DARK_GRAY)
+    append("================================", ChatColor.DARK_GRAY)
 
-    if (page < DungeonManager.dungeons.count() - 1) {
-        append("[ ")
+    if (page < FinalDungeon.dungeons.count() - 1) {
+        append("===[ ")
         color(ChatColor.DARK_GRAY)
         append(getPageClickable("NEXT", page + 1))
         append(" ]=")
@@ -66,7 +65,7 @@ private fun getPaginator(page: Int) = component {
 private fun getChevrons(count: Int) = "${ChatColor.GRAY}${">".repeat(count)} "
 
 private fun getColoredDifficulty(difficulty: Difficulty) = component {
-    append("${difficulty.toString().toUpperCase()}\n")
+    append(difficulty.toString().toUpperCase())
     color(when (difficulty) {
         Difficulty.EASY -> ChatColor.DARK_GREEN
         Difficulty.MEDIUM -> ChatColor.GOLD
@@ -76,8 +75,8 @@ private fun getColoredDifficulty(difficulty: Difficulty) = component {
 
 fun getInteractiveDungeonList(page: Int) = component {
 
-    if (page < 0 || page > DungeonManager.dungeons.count() - 1) return@component
-    val dng = DungeonManager.dungeons.values
+    if (page < 0 || page > FinalDungeon.dungeons.count() - 1) return@component
+    val dng = FinalDungeon.dungeons.values
             .filter { it.active }
             .getOrNull(page) ?: return@component
 
@@ -129,6 +128,6 @@ fun getInteractiveDungeonList(page: Int) = component {
         append(inst.leader?.let{ "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
     }
 
-    append("\n".repeat(12 - dng.instances.count() - ceil(max((dng.description.length - 48), 0) / 60.0).toInt()))
+    append("\n".repeat(13 - dng.instances.size - floor((dng.description.length + 17) / 60.0).toInt()))
     append(getPaginator(page))
 }

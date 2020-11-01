@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
+import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 fun cmdDungeonUnlockParty(sender: CommandSender, args: Array<out String>): Boolean {
     if (sender !is Player) return true
 
-    val instance = sender.dungeonInstance ?: run {
+    val instance = sender.finalInstance ?: run {
         sender.sendFWDMessage("You're currently not in a dungeon party")
         return true
     }

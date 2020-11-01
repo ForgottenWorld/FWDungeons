@@ -1,14 +1,9 @@
 package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.manager.DungeonEditManager
-import it.forgottenworld.dungeons.manager.DungeonEditManager.isEditingDungeon
-import it.forgottenworld.dungeons.manager.DungeonManager.dungeonInstance
-import it.forgottenworld.dungeons.manager.RespawnManager.respawnGameMode
-import it.forgottenworld.dungeons.manager.RespawnManager.respawnLocation
-import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import kotlinx.coroutines.delay
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -18,16 +13,16 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.persistence.PersistentDataType
 
 
 class PlayerListener: Listener {
+
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent?) {
         val player = event?.entity ?: return
-        val instance = player.dungeonInstance ?: return
+        val instance = player.finalInstance ?: return
 
         instance.onPlayerDeath(player)
         player.sendFWDMessage("${ChatColor.RED}You died in the dungeon")
@@ -36,14 +31,14 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent?) {
         val player = event?.player ?: return
-        DungeonEditManager.playerExitEditMode(player)
-        player.dungeonInstance?.onPlayerLeave(player)
+        player.editableDungeon?.onDestroy()
+        player.finalInstance?.onPlayerLeave(player)
     }
 
     @EventHandler
     fun onPlayerTeleport(event: PlayerTeleportEvent?) {
         val player = event?.player ?: return
-        if (player.dungeonInstance?.isTpSafe != false) return
+        if (player.finalInstance?.isTpSafe != false) return
 
         when (event.cause) {
             PlayerTeleportEvent.TeleportCause.ENDER_PEARL, PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT -> {
@@ -63,7 +58,7 @@ class PlayerListener: Listener {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.player.dungeonInstance != null &&
+        if (event.player.finalInstance != null &&
                 event.item?.type == Material.ENDER_PEARL &&
                 (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)) {
             event.player.sendFWDMessage("No ender pearls in the dungeon!")
@@ -71,7 +66,7 @@ class PlayerListener: Listener {
             return
         }
 
-        if (!event.player.isEditingDungeon) return
+        if (event.player.editableDungeon == null) return
 
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
         val isTriggerWand =
@@ -93,23 +88,5 @@ class PlayerListener: Listener {
         }
         event.player.performCommand(cmd)
         event.isCancelled = true
-    }
-
-    @EventHandler
-    fun onPlayerRespawn(event: PlayerRespawnEvent) {
-        event.player.run {
-            respawnLocation?.let {
-                sendFWDMessage("You will be teleported shortly")
-                launch {
-                    delay(1500)
-                    teleport(it, PlayerTeleportEvent.TeleportCause.PLUGIN)
-                    respawnLocation = null
-                }
-            }
-            respawnGameMode?.let {
-                gameMode = it
-                respawnGameMode = null
-            }
-        }
     }
 }

@@ -10,6 +10,11 @@ class BoxBuilder {
     private val canBeBuilt
         get() = pos1 != null && pos2 != null
 
+    fun clear() {
+        pos1 = null
+        pos2 = null
+    }
+
     fun pos1(pos: BlockVector) {
         pos1 = pos
     }
@@ -18,5 +23,10 @@ class BoxBuilder {
         pos2 = pos
     }
 
-    fun build() = if (canBeBuilt) Box(pos1!!, pos2!!) else null
+    fun build(): Box? {
+        if (!canBeBuilt) return null
+        val box = Box(pos1!!, pos2!!)
+        clear()
+        return box
+    }
 }

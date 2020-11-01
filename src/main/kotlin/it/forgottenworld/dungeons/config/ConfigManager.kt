@@ -1,7 +1,6 @@
 package it.forgottenworld.dungeons.config
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
-import it.forgottenworld.dungeons.manager.DungeonManager
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.utils.launchAsync
@@ -37,8 +36,9 @@ object ConfigManager {
                 ?.filter { it.matches(dungeonNameRegex) }
                 ?.forEach {
                     try {
+                        val dId = it.removeSuffix(".yml").toInt()
                         val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                        DungeonManager.dungeons[conf.getInt("id")] = FinalDungeon.fromConfig(conf)
+                        FinalDungeon.dungeons[dId] = FinalDungeon.fromConfig(dId, conf)
                     } catch (e : Exception) {
                         e.printStackTrace()
                     }
@@ -67,8 +67,14 @@ object ConfigManager {
         val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
         YamlConfiguration().run {
             if (file.exists()) load(file) else file.createNewFile()
-            getKeys(false)
-                    .map { it to DungeonFinalInstance.fromConfig(getConfigurationSection(it)!!) }
+
+            for (dId in getKeys(false)) {
+                val sec = getConfigurationSection(dId) ?: continue
+                val nDId = dId.toInt()
+                for (iId in sec.getKeys(false)) {
+                    DungeonFinalInstance.fromConfig(nDId, sec.getConfigurationSection(iId)!!)
+                }
+            }
         }
     }
 

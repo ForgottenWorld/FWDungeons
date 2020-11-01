@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.model.interactiveelement
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.model.box.Box
-import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import it.forgottenworld.dungeons.utils.ktx.toVector
+import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -35,9 +35,9 @@ class ActiveArea(
 
     fun getRandomLocationOnFloor() = Location(
             ConfigManager.dungeonWorld,
-            Random.nextInt(box.origin.x.toInt(), box.origin.x.toInt() + box.width) + 0.5,
+            Random.nextInt(box.origin.x.toInt(), box.origin.x.toInt() + box.width - 1) + 0.5,
             box.origin.y,
-            Random.nextInt(box.origin.z.toInt(), box.origin.z.toInt() + box.depth) + 0.5
+            Random.nextInt(box.origin.z.toInt(), box.origin.z.toInt() + box.depth - 1) + 0.5
     )
 
     fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =

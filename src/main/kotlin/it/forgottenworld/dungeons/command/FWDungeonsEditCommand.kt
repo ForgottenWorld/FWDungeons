@@ -10,21 +10,21 @@ import it.forgottenworld.dungeons.command.edit.trigger.*
 class FWDungeonsEditCommand : TreeCommand(
         "fwdungeonsedit",
         BranchingCommand(mapOf(
-            "activearea" to BranchingCommand(mapOf(
+            *(BranchingCommand(mapOf(
                     "pos1" to PlayerCommand(::cmdActiveAreaPos1),
                     "pos2" to PlayerCommand(::cmdActiveAreaPos2),
                     "unmake" to PlayerCommand(::cmdActiveAreaUnmake),
                     "label" to PlayerCommand(::cmdActiveAreaLabel),
                     "wand" to PlayerCommand(::cmdActiveAreaWand)
-            )),
-            "trigger" to BranchingCommand(mapOf(
+            )).let{ arrayOf("activearea" to it, "aa" to it) }),
+            *(BranchingCommand(mapOf(
                     "pos1" to PlayerCommand(::cmdTriggerPos1),
                     "pos2" to PlayerCommand(::cmdTriggerPos2),
                     "unmake" to PlayerCommand(::cmdTriggerUnmake),
                     "label" to PlayerCommand(::cmdTriggerLabel),
                     "wand" to PlayerCommand(::cmdTriggerWand)
-            )),
-            "dungeon" to BranchingCommand(mapOf(
+            )).let{ arrayOf("trigger" to it, "t" to it) }),
+            *(BranchingCommand(mapOf(
                     "create" to PlayerCommand(::cmdDungeonCreate),
                     "edit" to PlayerCommand(::cmdDungeonEdit),
                     "name" to PlayerCommand(::cmdDungeonName),
@@ -41,5 +41,5 @@ class FWDungeonsEditCommand : TreeCommand(
                     "save" to PlayerCommand(::cmdDungeonSave),
                     "points" to PlayerCommand(::cmdDungeonPoints),
                     "hlframes" to PlayerCommand(::cmdDungeonHlFrames)
-            ))
+            )).let{ arrayOf("dungeon" to it, "d" to it) })
     )))
