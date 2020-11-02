@@ -6,7 +6,7 @@
 
     <groupId>it.forgottenworld</groupId>
     <artifactId>fwdungeons</artifactId>
-    <version>0.8.0</version>
+    <version>0.8.1</version>
 
     <properties>
         <kotlin.version>1.4.10</kotlin.version>

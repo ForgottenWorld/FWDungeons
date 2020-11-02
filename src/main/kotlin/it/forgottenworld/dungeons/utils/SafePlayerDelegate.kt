@@ -1,11 +1,12 @@
-package it.forgottenworld.dungeons.utils.ktx
+package it.forgottenworld.dungeons.utils
 
+import it.forgottenworld.dungeons.utils.ktx.getPlayer
 import org.bukkit.entity.Player
 import kotlin.reflect.KProperty
 
-fun safePlayer(player: Player? = null) = SafePlayer(player)
+fun safePlayer(player: Player? = null) = SafePlayerDelegate(player)
 
-class SafePlayer(player: Player? = null) {
+class SafePlayerDelegate(player: Player? = null) {
 
     var uuid = player?.uniqueId
 

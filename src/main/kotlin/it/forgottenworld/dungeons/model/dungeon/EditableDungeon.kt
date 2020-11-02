@@ -9,10 +9,10 @@ import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ktx.firstMissing
-import it.forgottenworld.dungeons.utils.ktx.safePlayer
+import it.forgottenworld.dungeons.utils.safePlayer
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import it.forgottenworld.dungeons.utils.launchAsync
-import it.forgottenworld.dungeons.utils.minecraft
+import it.forgottenworld.dungeons.utils.ktx.launchAsync
+import it.forgottenworld.dungeons.utils.ktx.minecraft
 import it.forgottenworld.dungeons.utils.observableMapOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

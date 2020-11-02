@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.cli
 
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElement
+import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ktx.append
 import it.forgottenworld.dungeons.utils.ktx.clickEvent
 import it.forgottenworld.dungeons.utils.ktx.component
@@ -9,14 +10,27 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import kotlin.math.floor
 
-private fun getClickables(activeArea: InteractiveElement, type: String) = component {
+private fun getClickables(interactiveEl: InteractiveElement, type: String) = component {
     append("  [", ChatColor.WHITE)
     append(" HL ", ChatColor.GREEN)
-    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type hl ${activeArea.id}")
+    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type hl ${interactiveEl.id}")
     append("] [", ChatColor.WHITE)
     append(" X ", ChatColor.RED)
-    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${activeArea.id}")
-    append("]\n", ChatColor.WHITE)
+    clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${interactiveEl.id}")
+    append("]", ChatColor.WHITE)
+    if (interactiveEl is Trigger) {
+        if (interactiveEl.effectCode.isEmpty()) {
+            append(" [", ChatColor.WHITE)
+            append(" NO CODE ", ChatColor.GRAY)
+            append("]", ChatColor.WHITE)
+        } else {
+            append(" [", ChatColor.WHITE)
+            append(" SHOW CODE ", ChatColor.LIGHT_PURPLE)
+            clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde trigger code ${interactiveEl.id}")
+            append("]", ChatColor.WHITE)
+        }
+    }
+    append("\n")
 }
 
 private fun getPageClickable(text: String, page: Int, type: String) = component {

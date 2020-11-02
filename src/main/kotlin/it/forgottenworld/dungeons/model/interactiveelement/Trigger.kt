@@ -18,7 +18,7 @@ import java.util.*
 class Trigger(
         override val id: Int,
         override val box: Box,
-        private val effectCode: List<String> = listOf(),
+        val effectCode: List<String> = listOf(),
         private val requiresWholeParty: Boolean = false,
         ) : InteractiveElement {
 

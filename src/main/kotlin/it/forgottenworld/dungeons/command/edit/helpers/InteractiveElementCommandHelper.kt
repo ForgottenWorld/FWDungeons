@@ -8,7 +8,7 @@ import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementTyp
 import it.forgottenworld.dungeons.utils.ktx.blockVector
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.targetBlock
-import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.utils.ktx.launch
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment

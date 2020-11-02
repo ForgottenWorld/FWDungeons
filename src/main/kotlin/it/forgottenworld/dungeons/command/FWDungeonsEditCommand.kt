@@ -26,7 +26,8 @@ class FWDungeonsEditCommand : TreeCommand(
                     "label" to PlayerCommand(::cmdTriggerLabel),
                     "wand" to PlayerCommand(::cmdTriggerWand),
                     "list" to PlayerCommand(::cmdTriggerList),
-                    "hl" to PlayerCommand(::cmdTriggerHl)
+                    "hl" to PlayerCommand(::cmdTriggerHl),
+                    "code" to PlayerCommand(::cmdTriggerCode)
             )).let{ arrayOf("trigger" to it, "t" to it) }),
             *(BranchingCommand(mapOf(
                     "create" to PlayerCommand(::cmdDungeonCreate),

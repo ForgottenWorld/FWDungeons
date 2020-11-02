@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package it.forgottenworld.dungeons.utils
+package it.forgottenworld.dungeons.utils.ktx
 
 import com.github.shynixn.mccoroutine.asyncDispatcher
 import com.github.shynixn.mccoroutine.launch

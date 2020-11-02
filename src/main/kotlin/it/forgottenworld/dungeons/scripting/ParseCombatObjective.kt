@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.scripting
 
-import it.forgottenworld.dungeons.model.combat.MobSpawnData
+import it.forgottenworld.dungeons.utils.MobSpawnData
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 
 fun parseCombatObjective(

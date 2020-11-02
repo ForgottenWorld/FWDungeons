@@ -7,8 +7,8 @@ import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ParticleSpammer
 import it.forgottenworld.dungeons.utils.ktx.getPlayer
-import it.forgottenworld.dungeons.utils.launch
-import it.forgottenworld.dungeons.utils.launchAsync
+import it.forgottenworld.dungeons.utils.ktx.launch
+import it.forgottenworld.dungeons.utils.ktx.launchAsync
 import it.forgottenworld.dungeons.utils.mapObserver
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit

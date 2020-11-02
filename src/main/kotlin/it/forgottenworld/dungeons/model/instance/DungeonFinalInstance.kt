@@ -11,7 +11,7 @@ import it.forgottenworld.dungeons.event.listener.RespawnHandler.Companion.respaw
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.model.combat.InstanceObjective
 import it.forgottenworld.dungeons.model.combat.InstanceObjective.Companion.instanceObjective
-import it.forgottenworld.dungeons.model.combat.MobSpawnData
+import it.forgottenworld.dungeons.utils.MobSpawnData
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.dungeon.finalDungeons
 import it.forgottenworld.dungeons.model.interactiveelement.instanceActiveAreas

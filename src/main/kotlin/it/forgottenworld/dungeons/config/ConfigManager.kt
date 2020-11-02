@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.config
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.utils.launchAsync
+import it.forgottenworld.dungeons.utils.ktx.launchAsync
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration

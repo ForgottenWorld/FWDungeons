@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.model.combat
+package it.forgottenworld.dungeons.utils
 
 data class MobSpawnData(
         val activeAreaId: Int,
