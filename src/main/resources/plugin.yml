@@ -1,5 +1,5 @@
 name: FWDungeons
-version: "0.7.2"
+version: "0.8.0"
 api-version: "1.16"
 description: Create multi-instance scriptable co-op dungeons in your Minecraft server
 author: Shivs (OhMeMuffin)
@@ -13,7 +13,7 @@ commands:
     aliases: [fwdungeons,fwd]
   fwdungeonsedit:
     description: Access FWDungeons functions.
-    usage: /fwdungeonsedit [ dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes ] | trigger [ pos1 | pos2 | label | unmake | wand ] | activearea [ pos1 | pos2 | label | unmake | wand ]]
+    usage: /fwdungeonsedit [ dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes ] | trigger [ pos1 | pos2 | label | unmake | wand | list | hl ] | activearea [ pos1 | pos2 | label | unmake | wand | list | hl ]]
     aliases: [fwdungeonsedit,fwde]
 permissions:
   fwdungeonsedit.dungeon.create:
@@ -79,6 +79,12 @@ permissions:
   fwdungeonsedit.trigger.wand:
     description: Allows the player to use /fwdungeonsedit trigger wand
     default: op
+  fwdungeonsedit.trigger.list:
+    description: Allows the player to use /fwdungeonsedit trigger list
+    default: op
+  fwdungeonsedit.trigger.hl:
+    description: Allows the player to use /fwdungeonsedit trigger hl
+    default: op
   fwdungeonsedit.activearea.pos1:
     description: Allows the player to use /fwdungeonsedit activearea pos1
     default: op
@@ -93,6 +99,12 @@ permissions:
     default: op
   fwdungeonsedit.activearea.wand:
     description: Allows the player to use /fwdungeonsedit activearea wand
+    default: op
+  fwdungeonsedit.activearea.list:
+    description: Allows the player to use /fwdungeonsedit activearea list
+    default: op
+  fwdungeonsedit.activearea.hl:
+    description: Allows the player to use /fwdungeonsedit activearea hl
     default: op
   fwdungeons.list:
     description: Allows the player to use /fwdungeons list

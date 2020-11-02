@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ktx.blockVector
+import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.toVector
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
@@ -24,13 +25,25 @@ class FinalDungeon(override val id: Int,
                    override val activeAreas: Map<Int, ActiveArea>,
                    var instances: Map<Int, DungeonFinalInstance>) : Dungeon {
 
-    var active = true
+    var isActive = true
+    var isBeingEdited = false
 
     fun putInEditMode(player: Player): EditableDungeon? {
-        if (active) return null
-        dungeons.remove(id)
+        if (isActive) {
+            player.sendFWDMessage("Dungeon with id $id is not disabled")
+            return null
+        }
+
+        if (isBeingEdited) {
+            player.sendFWDMessage("This dungeon is already being edited")
+            return null
+        }
+        isBeingEdited = true
+
+        player.sendFWDMessage("Now editing dungeon with id $id")
 
         return EditableDungeon(player).also {
+            it.id = id
             it.name = name
             it.description = description
             it.difficulty = difficulty
@@ -87,13 +100,11 @@ class FinalDungeon(override val id: Int,
         fun fromConfig(id: Int, conf: YamlConfiguration): FinalDungeon = conf.run {
             val triggers = getConfigurationSection("triggers")!!
                     .getKeys(false)
-                    .map { it.toInt() to Trigger.fromConfig(it.toInt(), getConfigurationSection("triggers.$it")!!) }
-                    .toMap()
+                    .associate { it.toInt() to Trigger.fromConfig(it.toInt(), getConfigurationSection("triggers.$it")!!) }
 
             val activeAreas = getConfigurationSection("activeAreas")!!
                     .getKeys(false)
-                    .map { it.toInt() to ActiveArea.fromConfig(it.toInt(), getConfigurationSection("activeAreas.$it")!!) }
-                    .toMap()
+                    .associate { it.toInt() to ActiveArea.fromConfig(it.toInt(), getConfigurationSection("activeAreas.$it")!!) }
 
             val dungeon = FinalDungeon(
                     id,

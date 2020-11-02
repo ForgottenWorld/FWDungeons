@@ -15,14 +15,23 @@ fun cmdDungeonEnable(sender: CommandSender, args: Array<out String>): Boolean {
         return true
     }
 
-    val res = FinalDungeon
-            .dungeons[dungeonId]
-            ?.let { it.active = true } != null
+    val dungeon = FinalDungeon.dungeons[dungeonId] ?: run {
+        sender.sendFWDMessage("No dungeon found with id $dungeonId")
+        return true
+    }
 
-    sender.sendFWDMessage(
-            if (res) "Dungeon (id: $dungeonId) was enabled"
-            else "No dungeon found with id $dungeonId"
-    )
+    if (dungeon.isBeingEdited) {
+        sender.sendFWDMessage("Dungeon with id $dungeonId is being edited right now")
+        return true
+    }
+
+    if (dungeon.isActive) {
+        sender.sendFWDMessage("Dungeon with id $dungeonId is already active")
+        return true
+    }
+
+    dungeon.isActive = true
+    sender.sendFWDMessage("Dungeon (id: $dungeonId) was enabled")
 
     return true
 }

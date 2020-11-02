@@ -19,7 +19,7 @@ fun cmdDungeonDisable(sender: CommandSender, args: Array<out String>): Boolean {
 
     val res = FinalDungeon.dungeons[dungeonId]?.let { d ->
         d.instances.values.forEach { it.evacuate() }
-        d.active = false
+        d.isActive = false
     } != null
 
     sender.sendFWDMessage(

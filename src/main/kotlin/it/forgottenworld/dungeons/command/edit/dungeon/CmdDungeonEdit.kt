@@ -22,20 +22,12 @@ fun cmdDungeonEdit(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    val res = FinalDungeon.dungeons[id]?.let { d ->
-        when {
-            d.active -> false
-            else -> {
-                d.putInEditMode(sender)!!
-                true
-            }
-        }
-    } == true
+    val dungeon = FinalDungeon.dungeons[id] ?: run {
+        sender.sendFWDMessage("No dungeon found with id $id")
+        return true
+    }
 
-    sender.sendFWDMessage(
-            if (res) "Now editing dungeon with id $id"
-            else "No currently disabled dungeons found with id $id"
-    )
+    dungeon.putInEditMode(sender)
 
     return true
 }

@@ -22,6 +22,7 @@ fun parseCombatObjective(
                 currentActiveArea = code.removePrefix(PREFIX_ACTIVE_AREA).toInt()
             code == CODE_WHEN_DONE ->
                 return { it.attachNewObjective(mobs, doParseCode(codeIterator)) }
+            else -> code.toIntOrNull()?.let { for (i in 1 until it) mobs.add(mobs.last().clone()) }
         }
     }
     return {}

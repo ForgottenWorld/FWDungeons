@@ -93,7 +93,7 @@ object InteractiveElementCommandHelper {
         sender.sendFWDMessage("Set label $label")
     }
 
-    fun unMakeInteractiveElement(sender: Player, type: InteractiveElementType) {
+    fun unMakeInteractiveElement(sender: Player, type: InteractiveElementType, ieId: Int?) {
         val dungeon = sender.editableDungeon ?: run {
             sender.sendFWDMessage("You're not editing any dungeons")
             return
@@ -104,8 +104,24 @@ object InteractiveElementCommandHelper {
             return
         }
 
-        val id = dungeon.unmakeInteractiveElement(type)
+        val id = dungeon.unmakeInteractiveElement(type, ieId)
         sender.sendFWDMessage("Deleted ${if (type == TRIGGER) "trigger" else "active area"} with id $id")
+    }
+
+    fun highlightInteractiveElement(sender: Player, type: InteractiveElementType, ieId: Int?) {
+        val dungeon = sender.editableDungeon ?: run {
+            sender.sendFWDMessage("You're not editing any dungeons")
+            return
+        }
+
+        if (type == TRIGGER  && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
+            sender.sendFWDMessage("This dungeon has no ${if (type == TRIGGER) "triggers" else "active areas"} yet")
+            return
+        }
+
+        (if (type == TRIGGER) dungeon.testInstance?.triggers else dungeon.testInstance?.activeAreas)
+                ?.get(ieId)?.box?.highlightAll()
+        sender.sendFWDMessage("Highlighted ${if (type == TRIGGER) "trigger" else "active area"} with id $ieId")
     }
 
     fun grantWandForInteractiveElement(sender: Player, type: InteractiveElementType) {

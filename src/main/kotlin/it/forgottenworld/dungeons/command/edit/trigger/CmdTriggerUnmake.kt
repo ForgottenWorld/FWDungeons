@@ -5,6 +5,10 @@ import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementTyp
 import org.bukkit.entity.Player
 
 fun cmdTriggerUnmake(sender: Player, args: Array<out String>): Boolean {
-    InteractiveElementCommandHelper.unMakeInteractiveElement(sender, InteractiveElementType.TRIGGER)
+    InteractiveElementCommandHelper.unMakeInteractiveElement(
+            sender,
+            InteractiveElementType.TRIGGER,
+            args.getOrNull(0)?.toIntOrNull()
+    )
     return true
 }

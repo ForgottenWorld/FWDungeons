@@ -31,7 +31,7 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent?) {
         val player = event?.player ?: return
-        player.editableDungeon?.onDestroy()
+        player.editableDungeon?.onDestroy(true)
         player.finalInstance?.onPlayerLeave(player)
     }
 

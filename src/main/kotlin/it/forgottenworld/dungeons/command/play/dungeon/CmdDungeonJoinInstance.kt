@@ -26,7 +26,7 @@ fun cmdDungeonJoinInstance(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    if (!dungeon.active) {
+    if (!dungeon.isActive) {
         sender.sendFWDMessage("This dugeons is disabled")
         return true
     }

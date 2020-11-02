@@ -15,14 +15,18 @@ class FWDungeonsEditCommand : TreeCommand(
                     "pos2" to PlayerCommand(::cmdActiveAreaPos2),
                     "unmake" to PlayerCommand(::cmdActiveAreaUnmake),
                     "label" to PlayerCommand(::cmdActiveAreaLabel),
-                    "wand" to PlayerCommand(::cmdActiveAreaWand)
+                    "wand" to PlayerCommand(::cmdActiveAreaWand),
+                    "list" to PlayerCommand(::cmdActiveAreaList),
+                    "hl" to PlayerCommand(::cmdActiveAreaHl)
             )).let{ arrayOf("activearea" to it, "aa" to it) }),
             *(BranchingCommand(mapOf(
                     "pos1" to PlayerCommand(::cmdTriggerPos1),
                     "pos2" to PlayerCommand(::cmdTriggerPos2),
                     "unmake" to PlayerCommand(::cmdTriggerUnmake),
                     "label" to PlayerCommand(::cmdTriggerLabel),
-                    "wand" to PlayerCommand(::cmdTriggerWand)
+                    "wand" to PlayerCommand(::cmdTriggerWand),
+                    "list" to PlayerCommand(::cmdTriggerList),
+                    "hl" to PlayerCommand(::cmdTriggerHl)
             )).let{ arrayOf("trigger" to it, "t" to it) }),
             *(BranchingCommand(mapOf(
                     "create" to PlayerCommand(::cmdDungeonCreate),

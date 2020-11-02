@@ -17,7 +17,7 @@ class FWDungeonsCommand : TreeCommand(
                 "unlock" to PlayerCommand(::cmdDungeonUnlockParty),
                 "start" to PlayerCommand(::cmdDungeonStart),
                 "evacuate" to SenderCommand(::cmdDungeonEvacuate),
-                "lookup" to SenderCommand(::cmdDungeonPlayerLookup),
+                "lookup" to SenderCommand(::cmdDungeonLookup),
                 "enable" to SenderCommand(::cmdDungeonEnable),
                 "disable" to SenderCommand(::cmdDungeonDisable),
                 "reload" to SenderCommand(::cmdDungeonReload),

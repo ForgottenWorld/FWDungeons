@@ -26,7 +26,7 @@ import java.util.*
 
 class EditableDungeon(editor: Player) : Dungeon {
 
-    override val id: Int = -1000
+    override var id: Int = -1000
     override var name = "NEW DUNGEON"
     override var description = ""
     override var difficulty = Difficulty.MEDIUM
@@ -47,7 +47,7 @@ class EditableDungeon(editor: Player) : Dungeon {
     val hasTestInstance get() = testInstance != null
 
     fun finalize(): FinalDungeon {
-        val newId = FinalDungeon.dungeons.keys.firstMissing()
+        val newId = if (id == -1000) FinalDungeon.dungeons.keys.firstMissing() else id
 
         val finalDungeon = FinalDungeon(
             newId,
@@ -92,8 +92,8 @@ class EditableDungeon(editor: Player) : Dungeon {
         if (type == InteractiveElementType.TRIGGER) labelTrigger(label) else labelActiveArea(label)
     }
 
-    fun unmakeInteractiveElement(type: InteractiveElementType): Int {
-        return if (type == InteractiveElementType.TRIGGER) unmakeTrigger() else unmakeActiveArea()
+    fun unmakeInteractiveElement(type: InteractiveElementType, ieId: Int?): Int {
+        return if (type == InteractiveElementType.TRIGGER) unmakeTrigger(ieId) else unmakeActiveArea(ieId)
     }
 
     suspend fun newInteractiveElement(type: InteractiveElementType, box: Box) =
@@ -105,8 +105,13 @@ class EditableDungeon(editor: Player) : Dungeon {
         return id
     }
 
-    private fun unmakeActiveArea() =
-            activeAreas.keys.lastOrNull()?.also { activeAreas.remove(it) } ?: -1
+    private fun unmakeActiveArea(aaId: Int?) =
+            if (aaId == null) activeAreas.keys.last().also { activeAreas.remove(it) }
+            else {
+                activeAreas.remove(aaId)
+                aaId
+            }
+
 
     private fun labelActiveArea(label: String) {
         activeAreas.values.lastOrNull()?.label = label
@@ -124,8 +129,12 @@ class EditableDungeon(editor: Player) : Dungeon {
         }
     }
 
-    private fun unmakeTrigger() =
-            triggers.keys.lastOrNull()?.also { triggers.remove(it) } ?: -1
+    private fun unmakeTrigger(tId: Int?) =
+            if (tId == null) triggers.keys.last().also { triggers.remove(it) }
+            else {
+                triggers.remove(tId)
+                tId
+            }
 
     private fun labelTrigger(label: String) {
         triggers.values.lastOrNull()?.label = label
@@ -137,7 +146,7 @@ class EditableDungeon(editor: Player) : Dungeon {
         testInstance = DungeonTestInstance(this, finalInstanceLocations.first(), creator.uniqueId)
     }
 
-    fun onDestroy() {
+    fun onDestroy(restoreFormer: Boolean = false) {
         val player = editor ?: return
         triggers.clearObservers()
         activeAreas.clearObservers()
@@ -147,6 +156,7 @@ class EditableDungeon(editor: Player) : Dungeon {
         triggerBoxBuilder.clear()
         activeAreaBoxBuilder.clear()
         player.editableDungeon = null
+        if (restoreFormer) FinalDungeon.dungeons[id]?.isBeingEdited = false
         player.sendFWDMessage("${ChatColor.GRAY}You're no longer editing a dungeon")
     }
 

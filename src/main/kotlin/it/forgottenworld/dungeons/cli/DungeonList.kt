@@ -77,7 +77,7 @@ fun getInteractiveDungeonList(page: Int) = component {
 
     if (page < 0 || page > FinalDungeon.dungeons.count() - 1) return@component
     val dng = FinalDungeon.dungeons.values
-            .filter { it.active }
+            .filter { it.isActive }
             .getOrNull(page) ?: return@component
 
     append("====================[ ", ChatColor.DARK_GRAY)
@@ -128,6 +128,6 @@ fun getInteractiveDungeonList(page: Int) = component {
         append(inst.leader?.let{ "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
     }
 
-    append("\n".repeat(13 - dng.instances.size - floor((dng.description.length + 17) / 60.0).toInt()))
+    append("\n".repeat(13 - dng.instances.size - floor((dng.description.length + 17) / 55.0).toInt()))
     append(getPaginator(page))
 }
