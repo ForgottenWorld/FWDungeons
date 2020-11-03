@@ -9,11 +9,11 @@ import it.forgottenworld.dungeons.event.DungeonCompletedEvent
 import it.forgottenworld.dungeons.event.TriggerEvent
 import it.forgottenworld.dungeons.event.listener.RespawnHandler.Companion.respawnData
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
-import it.forgottenworld.dungeons.model.combat.InstanceObjective
-import it.forgottenworld.dungeons.model.combat.InstanceObjective.Companion.instanceObjective
-import it.forgottenworld.dungeons.utils.MobSpawnData
+import it.forgottenworld.dungeons.model.combat.CombatObjective
+import it.forgottenworld.dungeons.model.combat.CombatObjective.Companion.combatObjective
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.dungeon.finalDungeons
+import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.model.interactiveelement.instanceActiveAreas
 import it.forgottenworld.dungeons.model.interactiveelement.instanceTriggers
 import it.forgottenworld.dungeons.utils.*
@@ -39,6 +39,7 @@ class DungeonFinalInstance(
     override val dungeon by finalDungeons(dungeonId)
     override val box = dungeon.box.withOrigin(origin)
     override val triggers by instanceTriggers()
+    val unproccedTriggers = mutableListOf<Trigger>()
     override val activeAreas by instanceActiveAreas()
 
     var isTpSafe = true
@@ -49,10 +50,9 @@ class DungeonFinalInstance(
     var isLocked = false
     var inGame = false
     var partyKey = ""
-    val instanceObjectives = mutableListOf<InstanceObjective>()
+    val instanceObjectives = mutableListOf<CombatObjective>()
 
     private val warpbackData = mutableMapOf<UUID, WarpbackData>()
-
 
     private val startingPostion = dungeon
             .startingLocation
@@ -74,6 +74,8 @@ class DungeonFinalInstance(
         leader = null
         players.clear()
         isTpSafe = true
+        unproccedTriggers.clear()
+        unproccedTriggers.addAll(triggers.values)
         triggers.values.forEach {
             it.procced = false
             it.clearCurrentlyInsidePlayers()
@@ -82,6 +84,7 @@ class DungeonFinalInstance(
         instanceObjectives.forEach { it.abort() }
         inGame = false
     }
+
 
     fun lock() {
         isLocked = true
@@ -198,7 +201,7 @@ class DungeonFinalInstance(
             posVector: Vector,
             oldTriggerId: Int?
     ) = launchAsync {
-        val triggerId = triggers.values.find {
+        val triggerId = unproccedTriggers.find {
             it.containsVector(posVector)
         }?.id
 
@@ -238,8 +241,8 @@ class DungeonFinalInstance(
             )
         }.toMutableList()
 
-        val obj = InstanceObjective(this, mobUuids, onAllKilled)
-        mobUuids.forEach { it.instanceObjective = obj }
+        val obj = CombatObjective(this, mobUuids, onAllKilled)
+        mobUuids.forEach { it.combatObjective = obj }
         instanceObjectives.add(obj)
     }
 

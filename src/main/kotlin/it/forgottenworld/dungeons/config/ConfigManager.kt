@@ -65,15 +65,18 @@ object ConfigManager {
 
     private fun getInstancesFromConfig() {
         val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
-        YamlConfiguration().run {
-            if (file.exists()) load(file) else file.createNewFile()
+        val conf = YamlConfiguration()
+        if (file.exists()) conf.load(file) else file.createNewFile()
 
-            for (dId in getKeys(false)) {
-                val sec = getConfigurationSection(dId) ?: continue
-                val nDId = dId.toInt()
-                for (iId in sec.getKeys(false)) {
-                    DungeonFinalInstance.fromConfig(nDId, sec.getConfigurationSection(iId)!!)
-                }
+        for (dId in FinalDungeon.dungeons.keys) {
+            val sec = conf.getConfigurationSection("$dId")
+            if (sec?.getKeys(false)?.isEmpty() != false) {
+                Bukkit.getLogger().warning("Dungeon $dId has no instances, create one with /fwde d import $dId")
+                FinalDungeon.dungeons[dId]?.isActive = false
+                continue
+            }
+            for (iId in sec.getKeys(false)) {
+                DungeonFinalInstance.fromConfig(dId, sec.getConfigurationSection(iId)!!)
             }
         }
     }

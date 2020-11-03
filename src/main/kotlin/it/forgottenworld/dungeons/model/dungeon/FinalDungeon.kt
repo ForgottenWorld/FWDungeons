@@ -1,17 +1,21 @@
 package it.forgottenworld.dungeons.model.dungeon
 
+import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ktx.blockVector
+import it.forgottenworld.dungeons.utils.ktx.launchAsync
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.toVector
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
+import java.io.File
 
 class FinalDungeon(override val id: Int,
                    override val name: String,
@@ -57,6 +61,22 @@ class FinalDungeon(override val id: Int,
             it.triggers.putAll(triggers)
             it.activeAreas.putAll(activeAreas)
         }
+    }
+
+    fun import(at: BlockVector): Boolean {
+        if (instances.isNotEmpty()) return false
+        val config = YamlConfiguration()
+        val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
+        if (file.exists()) config.load(file)
+        val dgconf = config.createSection("$id")
+        dgconf.createSection("$0").run {
+            set("x", at.blockX)
+            set("y", at.blockY)
+            set("z", at.blockZ)
+        }
+        createInstance(ConfigManager.dungeonWorld.getBlockAt(at.blockX, at.blockY, at.blockZ))
+        launchAsync { config.save(file) }
+        return true
     }
 
     fun createInstance(target: Block): DungeonFinalInstance {

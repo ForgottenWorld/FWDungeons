@@ -20,9 +20,9 @@ class Trigger(
         override val box: Box,
         val effectCode: List<String> = listOf(),
         private val requiresWholeParty: Boolean = false,
-        ) : InteractiveElement {
+) : InteractiveElement {
 
-    private val effect: ((DungeonFinalInstance) -> Unit)? = parseCode(effectCode)
+    private val effect = parseCode(effectCode)
 
     var label: String? = null
     var procced = false
@@ -64,12 +64,13 @@ class Trigger(
     private fun proc(instance: DungeonFinalInstance) {
         if (procced || requiresWholeParty && instance.playerCount != playersCurrentlyInside.size) return
         procced = true
-        effect?.invoke(instance)
+        instance.unproccedTriggers.remove(this)
+        effect.invoke(instance)
     }
 
     fun toConfig(config: ConfigurationSection) = config.run {
         set("id", id)
-        label?.let { l -> set("label", l) }
+        label?.let { set("label", it) }
         set("origin", origin.toVector())
         set("width", box.width)
         set("height", box.height)

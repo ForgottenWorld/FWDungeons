@@ -45,6 +45,7 @@ class FWDungeonsEditCommand : TreeCommand(
                     "players" to PlayerCommand(::cmdDungeonNumberOfPlayers),
                     "save" to PlayerCommand(::cmdDungeonSave),
                     "points" to PlayerCommand(::cmdDungeonPoints),
-                    "hlframes" to PlayerCommand(::cmdDungeonHlFrames)
+                    "hlframes" to PlayerCommand(::cmdDungeonHlFrames),
+                    "import" to PlayerCommand(::cmdDungeonImport)
             )).let{ arrayOf("dungeon" to it, "d" to it) })
     )))
