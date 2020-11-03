@@ -5,7 +5,7 @@
 
 
 
-<b>FWDungeons</b> is a SpigotMC plugin for creating multi-instance scriptable co-op dungeons.
+<b>FWDungeons</b> is a PaperMC plugin for creating multi-instance scriptable co-op dungeons.
 
 ## COMMANDS
 <details>
