@@ -6,20 +6,22 @@ import org.bukkit.entity.LivingEntity
 import java.util.*
 
 class CombatObjective(
-        private val instance: DungeonFinalInstance,
+        val instance: DungeonFinalInstance,
         private val mobsToKill: MutableList<UUID>,
-        private val onAllKilled: (DungeonFinalInstance) -> Unit) {
+        var onAllKilled: (DungeonFinalInstance) -> Unit) {
+
+    var aborting = false
+    val shouldBeRemoved
+        get() = mobsToKill.isEmpty()
+
 
     fun onMobKilled(uuid: UUID) {
         mobsToKill.remove(uuid)
         uuid.combatObjective = null
-        if (mobsToKill.isNotEmpty()) return
-        instance.instanceObjectives.remove(this)
-        onAllKilled(instance)
     }
 
     fun abort() {
-        instance.instanceObjectives.remove(this)
+        aborting = true
         mobsToKill
                 .map { getEntity(it) }
                 .filterIsInstance<LivingEntity>()

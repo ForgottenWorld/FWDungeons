@@ -22,8 +22,8 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent?) {
         val player = event?.entity ?: return
+        player.editableDungeon?.onDestroy(true)
         val instance = player.finalInstance ?: return
-
         instance.onPlayerDeath(player)
         player.sendFWDMessage("${ChatColor.RED}You died in the dungeon")
     }

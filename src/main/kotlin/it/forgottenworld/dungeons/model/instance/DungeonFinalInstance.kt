@@ -67,21 +67,18 @@ class DungeonFinalInstance(
     fun resetInstance() {
         players.uuids.forEach { it.run {
             warpbackData.remove(this)
-            collidingTrigger = null
             finalInstance = null
         } }
         unlock()
         leader = null
         players.clear()
         isTpSafe = true
+        triggers.values.forEach { it.reset() }
         unproccedTriggers.clear()
         unproccedTriggers.addAll(triggers.values)
-        triggers.values.forEach {
-            it.procced = false
-            it.clearCurrentlyInsidePlayers()
-        }
         activeAreas.values.forEach { it.fillWithMaterial(it.startingMaterial) }
         instanceObjectives.forEach { it.abort() }
+        instanceObjectives.clear()
         inGame = false
     }
 
@@ -131,11 +128,12 @@ class DungeonFinalInstance(
     }
 
     private fun onPlayerRemoved(player: Player) {
-        players.remove(player.apply {
+        player.run {
             warpbackData.remove(uniqueId)
             collidingTrigger?.onPlayerExit(player)
             finalInstance = null
-        })
+        }
+        players.remove(player)
         checkUpdateLeader(player)
     }
 
@@ -185,8 +183,6 @@ class DungeonFinalInstance(
                 gameMode = it.gameMode
             }
          } }
-
-        warpbackData.clear()
 
         resetInstance()
     }

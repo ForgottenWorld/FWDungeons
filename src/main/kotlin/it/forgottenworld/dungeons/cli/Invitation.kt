@@ -16,5 +16,5 @@ fun formatInvitation(
     append("${getString(Strings.CHAT_PREFIX)}$senderName invited you to join a dungeon party, click ")
     append("HERE", ChatColor.GREEN)
     clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons join $dungeonId $instanceId $partyKey")
-    append(" to accept")
+    append(" to accept", ChatColor.WHITE)
 }

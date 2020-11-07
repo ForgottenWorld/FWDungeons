@@ -11,8 +11,8 @@ class FinalInstanceActiveAreaDelegate(dungeon: FinalDungeon, newOrigin: BlockVec
 
     private val activeAreas = dungeon
             .activeAreas
-            .map { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
-            .toMap()
+            .entries
+            .associate { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = activeAreas
 }

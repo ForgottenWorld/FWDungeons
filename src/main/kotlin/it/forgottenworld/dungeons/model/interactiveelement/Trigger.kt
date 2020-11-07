@@ -25,13 +25,17 @@ class Trigger(
     private val effect = parseCode(effectCode)
 
     var label: String? = null
-    var procced = false
+    private var procced = false
 
-    private val playersCurrentlyInside = mutableListOf<UUID>()
+    private val playersCurrentlyInside = mutableSetOf<UUID>()
     val origin : BlockVector
         get() = box.origin
 
-    fun clearCurrentlyInsidePlayers() = playersCurrentlyInside.clear()
+    fun reset() {
+        procced = false
+        playersCurrentlyInside.forEach { it.collidingTrigger = null }
+        playersCurrentlyInside.clear()
+    }
 
     fun containsVector(vector: Vector) = box.containsVector(vector)
 

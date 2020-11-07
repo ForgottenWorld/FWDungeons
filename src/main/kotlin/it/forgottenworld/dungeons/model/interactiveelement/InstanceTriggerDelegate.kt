@@ -12,8 +12,8 @@ class FinalInstanceTriggerDelegate(dungeon: Dungeon, newOrigin: BlockVector) {
 
     private val triggers = dungeon
             .triggers
-            .map { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
-            .toMap()
+            .entries
+            .associate { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = triggers
 }
