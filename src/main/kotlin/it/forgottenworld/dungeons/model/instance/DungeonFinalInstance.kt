@@ -5,7 +5,6 @@ import it.forgottenworld.dungeons.cli.Strings
 import it.forgottenworld.dungeons.cli.getLockClickable
 import it.forgottenworld.dungeons.cli.getString
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.event.DungeonCompletedEvent
 import it.forgottenworld.dungeons.event.TriggerEvent
 import it.forgottenworld.dungeons.event.listener.RespawnHandler.Companion.respawnData
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
@@ -19,12 +18,15 @@ import it.forgottenworld.dungeons.model.interactiveelement.instanceTriggers
 import it.forgottenworld.dungeons.utils.*
 import it.forgottenworld.dungeons.utils.ktx.*
 import kotlinx.coroutines.delay
+import me.kaotich00.easyranking.service.ERBoardService
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Item
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.util.BlockVector
@@ -69,9 +71,9 @@ class DungeonFinalInstance(
             warpbackData.remove(this)
             finalInstance = null
         } }
+        players.clear()
         unlock()
         leader = null
-        players.clear()
         isTpSafe = true
         triggers.values.forEach { it.reset() }
         unproccedTriggers.clear()
@@ -79,9 +81,19 @@ class DungeonFinalInstance(
         activeAreas.values.forEach { it.fillWithMaterial(it.startingMaterial) }
         instanceObjectives.forEach { it.abort() }
         instanceObjectives.clear()
-        inGame = false
+        ConfigManager.dungeonWorld
+                .getNearbyEntities(box.boundingBox)
+                .filter { it is LivingEntity && it !is Player }
+                .forEach { (it as LivingEntity).health = 0.0 }
+        launch {
+            delay(500)
+            ConfigManager.dungeonWorld
+                    .getNearbyEntities(box.boundingBox)
+                    .filterIsInstance<Item>()
+                    .forEach { it.remove() }
+            inGame = false
+        }
     }
-
 
     fun lock() {
         isLocked = true
@@ -157,7 +169,7 @@ class DungeonFinalInstance(
     fun onStart() {
         inGame = true
         players.forEach { it?.run {
-            warpbackData[it.uniqueId] = WarpbackData(gameMode, location.toVector())
+            warpbackData[it.uniqueId] = WarpbackData(gameMode, location.world.uid, location.toVector())
             gameMode = GameMode.ADVENTURE
             val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
             teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
@@ -169,10 +181,20 @@ class DungeonFinalInstance(
 
     fun onInstanceFinish(givePoints: Boolean) {
 
-        if (givePoints && dungeon.points != 0) players
-                .mapNotNull { it?.uniqueId }
-                .let { DungeonCompletedEvent(it, dungeon.points.toFloat()) }
-                .let { Bukkit.getPluginManager().callEvent(it) }
+        if (ConfigManager.useEasyRanking && givePoints && dungeon.points != 0) {
+            val er = ERBoardService.getInstance()
+            val board = er.getBoardById("dungeons").unwrap() ?: er.createBoard(
+                    "dungeons",
+                    "Dungeons",
+                    "This leaderboard tracks players' dungeon points",
+                    100,
+                    "points",
+                    false
+            )
+
+            players.mapNotNull { it?.uniqueId }
+                    .forEach { er.addScoreToPlayer(board, it, dungeon.points.toFloat()) }
+        }
 
         isTpSafe = true
 
@@ -232,8 +254,6 @@ class DungeonFinalInstance(
                     it.mob,
                     (activeAreas[it.activeAreaId] ?: error("Active area not found"))
                             .getRandomLocationOnFloor()
-                            .clone()
-                            .add(0.5, 0.5, 0.5)
             )
         }.toMutableList()
 

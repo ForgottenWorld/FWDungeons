@@ -9,15 +9,6 @@ class EntityDeathListener: Listener {
 
     @EventHandler
     fun onEntityDeath(event: EntityDeathEvent) {
-        val co = event.entity.uniqueId.combatObjective ?: return
-        co.onMobKilled(event.entity.uniqueId)
-        if (!co.shouldBeRemoved) return
-        if (co.aborting)
-            co.aborting = false
-        else {
-            co.onAllKilled(co.instance)
-            co.instance.instanceObjectives.remove(co)
-        }
-
+        event.entity.uniqueId.combatObjective?.onMobKilled(event.entity.uniqueId)
     }
 }

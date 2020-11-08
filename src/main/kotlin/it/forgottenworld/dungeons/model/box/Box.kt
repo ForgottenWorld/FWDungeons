@@ -9,6 +9,7 @@ import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
+import org.bukkit.util.BoundingBox
 import org.bukkit.util.Vector
 
 class Box : Cloneable {
@@ -34,6 +35,12 @@ class Box : Cloneable {
         this.height = opposite.blockY - origin.blockY + 1
         this.depth = opposite.blockZ - origin.blockZ + 1
     }
+
+    val boundingBox
+        get() = BoundingBox.of(origin, BlockVector(
+                origin.x + width,
+                origin.y + height,
+                origin.z + depth))
 
     fun containsPlayer(player: Player) = player.location.let {
         it.x >= origin.blockX && it.x <= origin.blockX + width &&

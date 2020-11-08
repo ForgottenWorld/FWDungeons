@@ -41,8 +41,8 @@ interface MapObserver<K,V> {
 
 class MapObserverDelegate<K,V>(
         observed: ObservableMap<K, V>,
-        private val processPut: ((Pair<K,V>) -> Pair<K,V>)? = null,
-        private val onPut: ((Map<K, V>) -> Unit)? = null,
+        private val beforePut: ((Pair<K,V>) -> Pair<K,V>)? = null,
+        private val afterPut: ((Map<K, V>) -> Unit)? = null,
         private val onRemove: ((K) -> Unit)? = null
 ) : MapObserver<K,V> {
 
@@ -53,13 +53,13 @@ class MapObserverDelegate<K,V>(
     }
 
     override fun onPut(entry: Pair<K, V>) {
-        current = current + (processPut?.invoke(entry) ?: entry)
-        onPut?.invoke(current)
+        current = current + (beforePut?.invoke(entry) ?: entry)
+        afterPut?.invoke(current)
     }
 
     override fun onPutAll(map: Map<K,V>) {
-        current = current + map.entries.map { (k,v) -> processPut?.invoke(k to v) ?: k to v }
-        onPut?.invoke(current)
+        current = current + map.entries.map { (k,v) -> beforePut?.invoke(k to v) ?: k to v }
+        afterPut?.invoke(current)
     }
 
     override fun onRemove(key: K) {

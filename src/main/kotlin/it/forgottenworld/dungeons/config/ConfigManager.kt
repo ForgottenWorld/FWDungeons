@@ -22,6 +22,9 @@ object ConfigManager {
                 ?: throw Exception("dungeonWorld missing from config!")
     }
 
+    val easyRankingIntegration by lazy { config.getBoolean("easyRankingIntegration", false) }
+    var useEasyRanking = false
+
     val dungeonWorld
         get() = Bukkit.getWorld(dungeonWorldId) ?: throw Exception("Dungeon world not found!")
 

@@ -20,9 +20,7 @@ class ActiveArea(
 
     fun fillWithMaterial(material: Material) {
         box.getAllBlocks().run {
-            forEach {
-                it.setType(material, true)
-            }
+            forEach { it.setType(material, true) }
             repeatedlySpawnParticles(
                     Particle.PORTAL,
                     map{ it.location }.toSet(),

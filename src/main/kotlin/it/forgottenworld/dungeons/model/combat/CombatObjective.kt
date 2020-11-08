@@ -11,13 +11,20 @@ class CombatObjective(
         var onAllKilled: (DungeonFinalInstance) -> Unit) {
 
     var aborting = false
-    val shouldBeRemoved
+    private val shouldBeRemoved
         get() = mobsToKill.isEmpty()
 
 
     fun onMobKilled(uuid: UUID) {
         mobsToKill.remove(uuid)
         uuid.combatObjective = null
+        if (!shouldBeRemoved) return
+        if (aborting) {
+            aborting = false
+            return
+        }
+        onAllKilled(instance)
+        instance.instanceObjectives.remove(this)
     }
 
     fun abort() {

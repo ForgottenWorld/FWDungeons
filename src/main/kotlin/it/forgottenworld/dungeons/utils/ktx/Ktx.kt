@@ -43,3 +43,5 @@ infix fun BlockVector.max(other: BlockVector) = BlockVector(max(x, other.x), max
 fun Iterable<Int>.firstMissing() = find { !contains(it+1) }?.plus(1) ?: 0
 
 fun getPlayer(uuid: UUID) = Bukkit.getPlayer(uuid)
+
+fun <T> Optional<T>.unwrap(): T? = orElse(null)
