@@ -14,6 +14,6 @@ fun getLockClickable() = component {
 
 fun getUnlockClickable() = component {
     append("HERE")
-    color(ChatColor.RED)
+    color(ChatColor.GREEN)
     clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons unlock")
 }
