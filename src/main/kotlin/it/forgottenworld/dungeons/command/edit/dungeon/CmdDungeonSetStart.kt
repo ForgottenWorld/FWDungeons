@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.toBlockVector
@@ -9,18 +10,18 @@ import org.bukkit.util.BlockVector
 
 fun cmdDungeonSetStart(sender: Player, args: Array<out String>): Boolean {
     val dungeon = sender.editableDungeon ?: run {
-        sender.sendFWDMessage("You're not editing any dungeons")
+        sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
         return true
     }
 
     val testInstance = dungeon.testInstance
     if (dungeon.box == null || testInstance == null) {
-        sender.sendFWDMessage("Dungeon box should be set before adding a starting position")
+        sender.sendFWDMessage(Strings.DUNGEON_BOX_SHOULD_BE_SET_BEFORE_ADDING_STARTPOS)
         return true
     }
 
     if (!testInstance.box.containsPlayer(sender)) {
-        sender.sendFWDMessage("You're outside of the dungeon box")
+        sender.sendFWDMessage(Strings.OUTSIDE_OF_DUNGEON_BOX)
         return true
     }
 
@@ -28,7 +29,7 @@ fun cmdDungeonSetStart(sender: Player, args: Array<out String>): Boolean {
             .toBlockVector()
             .withRefSystemOrigin(testInstance.origin, BlockVector(0, 0, 0))
 
-    sender.sendFWDMessage("Dungeon starting location set succesfully")
+    sender.sendFWDMessage(Strings.DUNGEON_STARTPOS_SET)
 
     return true
 }

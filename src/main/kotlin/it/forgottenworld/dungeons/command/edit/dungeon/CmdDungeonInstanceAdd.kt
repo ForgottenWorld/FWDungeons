@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.utils.ktx.blockVector
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
@@ -11,18 +12,18 @@ fun cmdDungeonInstanceAdd(sender: Player, args: Array<out String>): Boolean {
     val block = sender.targetBlock
 
     if (block.blockData.material == Material.AIR) {
-        sender.sendFWDMessage("You need to be targeting a block within 5 blocks of you before calling this")
+        sender.sendFWDMessage(Strings.YOU_NEED_TO_BE_TARGETING)
         return true
     }
 
     val dungeon = sender.editableDungeon ?: run {
-        sender.sendFWDMessage("You're not editing any dungeons")
+        sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
         return true
     }
 
     dungeon.finalInstanceLocations.add(block.blockVector)
 
-    sender.sendFWDMessage("Instance added")
+    sender.sendFWDMessage(Strings.INSTANCE_ADDED)
 
     return true
 }

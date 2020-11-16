@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
@@ -34,17 +35,17 @@ class FinalDungeon(override val id: Int,
 
     fun putInEditMode(player: Player): EditableDungeon? {
         if (isActive) {
-            player.sendFWDMessage("Dungeon with id $id is not disabled")
+            player.sendFWDMessage(Strings.DUNGEON_WITH_ID_DISABLED.format(id))
             return null
         }
 
         if (isBeingEdited) {
-            player.sendFWDMessage("This dungeon is already being edited")
+            player.sendFWDMessage(Strings.DUNGEON_ALREADY_BEING_EDITED)
             return null
         }
         isBeingEdited = true
 
-        player.sendFWDMessage("Now editing dungeon with id $id")
+        player.sendFWDMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
 
         return EditableDungeon(player).also {
             it.id = id

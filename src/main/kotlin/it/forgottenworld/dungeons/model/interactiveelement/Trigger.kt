@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.model.interactiveelement
 
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
@@ -8,7 +9,6 @@ import it.forgottenworld.dungeons.model.instance.DungeonInstance
 import it.forgottenworld.dungeons.scripting.parseCode
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.toVector
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
@@ -41,7 +41,7 @@ class Trigger(
 
     fun onPlayerEnter(player: Player, instance: DungeonInstance) {
         if (ConfigManager.isInDebugMode)
-            player.sendFWDMessage("Entered trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE}")
+            player.sendFWDMessage(Strings.DEBUG_ENTERED_TRIGGER.format(label?.plus(" ") ?: "", id))
 
         if (playersCurrentlyInside.contains(player.uniqueId)) return
 
@@ -52,7 +52,7 @@ class Trigger(
 
     fun onPlayerExit(player: Player) {
         if (ConfigManager.isInDebugMode)
-            player.sendFWDMessage("Exited trigger ${ChatColor.DARK_GREEN}${label?.plus(" ") ?: ""}(id: $id)${ChatColor.WHITE}")
+            player.sendFWDMessage(Strings.DEBUG_EXITED_TRIGGER.format(label?.plus(" ") ?: "", id))
 
         playersCurrentlyInside.remove(player.uniqueId)
         player.collidingTrigger = null

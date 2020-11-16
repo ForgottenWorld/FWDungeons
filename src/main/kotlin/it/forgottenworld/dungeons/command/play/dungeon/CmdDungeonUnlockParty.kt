@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
-import it.forgottenworld.dungeons.cli.Strings
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.cli.getLockClickable
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.ktx.component
@@ -12,12 +12,12 @@ fun cmdDungeonUnlockParty(sender: CommandSender, args: Array<out String>): Boole
     if (sender !is Player) return true
 
     val instance = sender.finalInstance ?: run {
-        sender.sendFWDMessage("You're currently not in a dungeon party")
+        sender.sendFWDMessage(Strings.CURRENTLY_NOT_IN_DUNGEON_PARTY)
         return true
     }
 
     when {
-        !instance.isLocked -> sender.sendFWDMessage("This dungeon party is already public")
+        !instance.isLocked -> sender.sendFWDMessage(Strings.DUNGEON_PARTY_ALREADY_PUBLIC)
         sender == instance.leader -> {
             instance.unlock()
             sender.spigot().sendMessage(*component {
@@ -25,7 +25,7 @@ fun cmdDungeonUnlockParty(sender: CommandSender, args: Array<out String>): Boole
                 append(getLockClickable())
             })
         }
-        else -> sender.sendFWDMessage("Only the dungeon party leader may make the party public")
+        else -> sender.sendFWDMessage(Strings.ONLY_LEADER_MAY_OPEN_PARTY)
     }
 
     return true

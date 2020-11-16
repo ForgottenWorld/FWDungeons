@@ -1,19 +1,20 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonDisable(sender: CommandSender, args: Array<out String>): Boolean {
     if (args.count() < 1) {
-        sender.sendFWDMessage("Please provide a dungeon id")
+        sender.sendFWDMessage(Strings.PROVIDE_DUNGEON_ID)
         return true
     }
 
     val dungeonId = args[0].toIntOrNull()
 
     if (dungeonId == null) {
-        sender.sendFWDMessage("Dungeon id should be an integer")
+        sender.sendFWDMessage(Strings.DUNGEON_ID_SHOULD_BE_INT)
         return true
     }
 
@@ -24,9 +25,10 @@ fun cmdDungeonDisable(sender: CommandSender, args: Array<out String>): Boolean {
 
     sender.sendFWDMessage(
             if (res)
-                "Dungeon (id: $dungeonId) was disabled"
+                Strings.DUNGEON_WITH_ID_WAS_DISABLED.format(dungeonId)
             else
-                "No dungeon found with id $dungeonId")
+                Strings.NO_DUNGEON_FOUND_WITH_ID.format(dungeonId)
+    )
 
     return true
 }

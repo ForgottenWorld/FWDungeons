@@ -1,10 +1,9 @@
 package it.forgottenworld.dungeons.model.instance
 
 import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
-import it.forgottenworld.dungeons.cli.Strings
 import it.forgottenworld.dungeons.cli.getLockClickable
-import it.forgottenworld.dungeons.cli.getString
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.event.TriggerEvent
 import it.forgottenworld.dungeons.event.listener.RespawnHandler.Companion.respawnData
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
@@ -19,7 +18,6 @@ import it.forgottenworld.dungeons.utils.*
 import it.forgottenworld.dungeons.utils.ktx.*
 import kotlinx.coroutines.delay
 import me.kaotich00.easyranking.service.ERBoardService
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -108,17 +106,17 @@ class DungeonFinalInstance(
     private fun checkUpdateLeader(player: Player) {
         if (leader != player) return
         if (players.isEmpty()) resetInstance()
-        else leader = players.first()?.apply { sendFWDMessage("You're now the party leader") }
+        else leader = players.first()?.apply { sendFWDMessage(Strings.NOT_PARTY_LEADER) }
     }
 
     fun onPlayerJoin(player: Player) {
         if (isFull) {
-            player.sendFWDMessage("This dungeon party is full")
+            player.sendFWDMessage(Strings.DUNGEON_PARTY_IS_FULL)
             return
         }
 
         if (inGame) {
-            player.sendFWDMessage("This dungeon party has already entered the dungeon")
+            player.sendFWDMessage(Strings.PARTY_HAS_ALREADY_ENTERED_DUNGEON)
             return
         }
 
@@ -126,12 +124,12 @@ class DungeonFinalInstance(
             leader = player
             player.spigot()
                     .sendMessage(*component {
-                        append("${getString(Strings.CHAT_PREFIX)}Dungeon party created. To make it private, click ")
+                        append("${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} ")
                         append(getLockClickable())
                     })
         } else {
-            player.sendFWDMessage("You joined the dungeon party")
-            players.forEach { it?.sendFWDMessage("${player.name} joined the dungeon party") }
+            player.sendFWDMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
+            players.forEach { it?.sendFWDMessage(Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name)) }
         }
 
         players.add(player)
@@ -155,13 +153,17 @@ class DungeonFinalInstance(
             return
         }
         players.forEach {
-            it?.sendFWDMessage("${if (player.name == it.name) "You" else player.name} left the dungeon party")
+            it?.sendFWDMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(if (player.name == it.name)
+                Strings.YOU
+            else
+                player.name
+            ))
         }
         onPlayerRemoved(player)
     }
 
     fun onPlayerDeath(player: Player) {
-        players.forEach { it?.sendFWDMessage("${player.name} died in the dungeon") }
+        players.forEach { it?.sendFWDMessage(Strings.PLAYER_DIED_IN_DUNGEON.format(player.name)) }
         player.respawnData = warpbackData[player.uniqueId]
         onPlayerRemoved(player)
     }
@@ -173,7 +175,7 @@ class DungeonFinalInstance(
             gameMode = GameMode.ADVENTURE
             val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
             teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
-            sendFWDMessage("Good luck out there!")
+            sendFWDMessage(Strings.GOOD_LUCK_OUT_THERE)
         } }
         isTpSafe = false
         startCheckingTriggers()
@@ -183,14 +185,14 @@ class DungeonFinalInstance(
 
         if (ConfigManager.useEasyRanking && givePoints && dungeon.points != 0) {
             val er = ERBoardService.getInstance()
-            val board = er.getBoardById("dungeons").unwrap() ?: er.createBoard(
+            val board = er.getBoardById("dungeons").orElse(er.createBoard(
                     "dungeons",
-                    "Dungeons",
-                    "This leaderboard tracks players' dungeon points",
+                    Strings.LEADERBOARD_TITLE,
+                    Strings.LEADERBOARD_DESCR,
                     100,
-                    "points",
+                    Strings.LEADERBOARD_POINTS,
                     false
-            )
+            ))
 
             players.mapNotNull { it?.uniqueId }
                     .forEach { er.addScoreToPlayer(board, it, dungeon.points.toFloat()) }
@@ -199,7 +201,7 @@ class DungeonFinalInstance(
         isTpSafe = true
 
         players.forEach { p -> p?.run {
-            sendFWDMessage("${ChatColor.GREEN}Congratulations, you made it out alive!")
+            sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
             warpbackData[uniqueId]?.let {
                 teleport(it.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
                 gameMode = it.gameMode

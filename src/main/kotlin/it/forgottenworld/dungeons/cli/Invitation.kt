@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.cli
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.utils.ktx.append
 import it.forgottenworld.dungeons.utils.ktx.clickEvent
 import it.forgottenworld.dungeons.utils.ktx.component
@@ -13,8 +14,8 @@ fun formatInvitation(
         instanceId: Int,
         partyKey: String
 ) = component {
-    append("${getString(Strings.CHAT_PREFIX)}$senderName invited you to join a dungeon party, click ")
-    append("HERE", ChatColor.GREEN)
+    append("${Strings.CHAT_PREFIX}${Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(senderName)} ")
+    append(Strings.HERE, ChatColor.GREEN)
     clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons join $dungeonId $instanceId $partyKey")
-    append(" to accept", ChatColor.WHITE)
+    append(" ${Strings.TO_ACCEPT}", ChatColor.WHITE)
 }

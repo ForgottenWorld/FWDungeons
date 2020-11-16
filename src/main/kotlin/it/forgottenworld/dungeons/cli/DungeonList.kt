@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.cli
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.Difficulty
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
@@ -18,11 +19,11 @@ private fun getJoinClickable(
         inGame: Boolean) = component {
     append("  [ ", ChatColor.WHITE)
     append(when {
-        leader -> "CREATE"
-        locked -> "PRIVATE"
-        full -> "FULL"
-        inGame -> "IN DUNGEON"
-        else -> "JOIN"
+        leader -> Strings.CREATE
+        locked -> Strings.PRIVATE
+        full -> Strings.FULL
+        inGame -> Strings.IN_DUNGEON
+        else -> Strings.JOIN
     })
     color(when {
         locked -> ChatColor.GOLD
@@ -42,22 +43,22 @@ private fun getPageClickable(text: String, page: Int) = component {
 private fun getPaginator(page: Int) = component {
     if (page > 0) {
         append("=[ ", ChatColor.DARK_GRAY)
-        append(getPageClickable("PREVIOUS", page - 1))
-        append(" ]", ChatColor.DARK_GRAY)
+        append(getPageClickable("<<<<", page - 1))
+        append(" ]=", ChatColor.DARK_GRAY)
     } else {
-        append("==========", ChatColor.DARK_GRAY)
+        append("=======", ChatColor.DARK_GRAY)
     }
 
-    append("================================", ChatColor.DARK_GRAY)
+    append("=====================================", ChatColor.DARK_GRAY)
 
     if (page < FinalDungeon.dungeons.count() - 1) {
-        append("===[ ")
+        append("=[ ")
         color(ChatColor.DARK_GRAY)
-        append(getPageClickable("NEXT", page + 1))
+        append(getPageClickable(">>>>", page + 1))
         append(" ]=")
         color(ChatColor.DARK_GRAY)
     } else {
-        append("=========")
+        append("=======")
         color(ChatColor.DARK_GRAY)
     }
 }
@@ -81,7 +82,7 @@ fun getInteractiveDungeonList(page: Int) = component {
             .getOrNull(page) ?: return@component
 
     append("====================[ ", ChatColor.DARK_GRAY)
-    append(getString(Strings.CHAT_PREFIX).dropLast(1))
+    append(Strings.CHAT_PREFIX.dropLast(1))
     append("ungeons ", ChatColor.GRAY)
     append("]====================\n\n", ChatColor.DARK_GRAY)
 
@@ -90,16 +91,16 @@ fun getInteractiveDungeonList(page: Int) = component {
     append("${dng.name}\n", ChatColor.WHITE)
 
     append(getChevrons(3))
-    append("DESCRIPTION: ", ChatColor.DARK_AQUA)
+    append("${Strings.DESCRIPTION}: ", ChatColor.DARK_AQUA)
     append("${dng.description}\n", ChatColor.WHITE)
 
     append(getChevrons(3))
-    append("DIFFICULTY: ", ChatColor.DARK_AQUA)
+    append("${Strings.DIFFICULTY}: ", ChatColor.DARK_AQUA)
     append(getColoredDifficulty(dng.difficulty))
     append("\n")
 
     append(getChevrons(3))
-    append("PLAYERS: ", ChatColor.DARK_AQUA)
+    append("${Strings.PLAYERS}: ", ChatColor.DARK_AQUA)
 
     val minPl = dng.numberOfPlayers.first
     val maxPl = dng.numberOfPlayers.last
@@ -108,7 +109,7 @@ fun getInteractiveDungeonList(page: Int) = component {
     dng.instances.values.forEachIndexed { ii, inst ->
 
         append(getChevrons(1))
-        append("Room ${ii + 1} ")
+        append("${Strings.ROOM} ${ii + 1} ")
         append("| ", ChatColor.DARK_GRAY)
         append("Leader: ", ChatColor.GRAY)
         inst.leader?.name?.let {
@@ -128,6 +129,6 @@ fun getInteractiveDungeonList(page: Int) = component {
         append(inst.leader?.let{ "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
     }
 
-    append("\n".repeat(13 - dng.instances.size - floor((dng.description.length + 17) / 55.0).toInt()))
+    append("\n".repeat(13 - dng.instances.size - floor((dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0).toInt()))
     append(getPaginator(page))
 }

@@ -1,10 +1,10 @@
 package it.forgottenworld.dungeons.scripting
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.utils.ktx.launch
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import kotlinx.coroutines.delay
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
 
 fun doParseCode(codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit {
@@ -21,7 +21,7 @@ fun doParseCode(codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit 
             }
             CODE_FINISH ->
                 return {
-                    it.players.forEach { p -> p?.sendFWDMessage("${ChatColor.GREEN}You will exit the dungeon in 5 seconds...") }
+                    it.players.forEach { p -> p?.sendFWDMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS) }
                     launch {
                         delay(5000)
                         it.onInstanceFinish(true)

@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
@@ -7,7 +8,7 @@ import org.bukkit.entity.Player
 
 fun cmdDungeonJoinInstance(sender: Player, args: Array<out String>): Boolean {
     if (args.count() < 2) {
-        sender.sendFWDMessage("Please provide both a dungeon and instance id")
+        sender.sendFWDMessage(Strings.PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID)
         return true
     }
 
@@ -15,34 +16,34 @@ fun cmdDungeonJoinInstance(sender: Player, args: Array<out String>): Boolean {
     val instanceId = args[1].toIntOrNull()
 
     if (dungeonId == null || instanceId == null) {
-        sender.sendFWDMessage("Dungeon id and instance id should both be integers")
+        sender.sendFWDMessage(Strings.DUNGEON_AND_INSTANCE_ID_SHOULD_BE_INT)
         return true
     }
 
     val pass = if (args.count() > 2) args[2] else ""
 
     val dungeon = FinalDungeon.dungeons[dungeonId] ?: run {
-        sender.sendFWDMessage("Invalid dungeon id")
+        sender.sendFWDMessage(Strings.INVALID_DUNGEON_ID)
         return true
     }
 
     if (!dungeon.isActive) {
-        sender.sendFWDMessage("This dugeons is disabled")
+        sender.sendFWDMessage(Strings.DUNGEON_IS_NOT_DISABLED)
         return true
     }
 
     if (sender.finalInstance != null) {
-        sender.sendFWDMessage("You're already in a party")
+        sender.sendFWDMessage(Strings.ALREADY_IN_PARTY)
         return true
     }
 
     val instance = dungeon.instances[instanceId] ?: run {
-        sender.sendFWDMessage("Invalid instance id")
+        sender.sendFWDMessage(Strings.INVALID_INSTANCE_ID)
         return true
     }
 
     if (instance.isLocked && pass != instance.partyKey) {
-        sender.sendFWDMessage("This dungeon party is private and you were not invited")
+        sender.sendFWDMessage(Strings.DUNGEON_PARTY_IS_PRIVATE_YOURE_NOT_INVITED)
         return true
     }
 

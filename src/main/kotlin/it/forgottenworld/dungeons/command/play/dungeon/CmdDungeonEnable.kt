@@ -1,42 +1,43 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonEnable(sender: CommandSender, args: Array<out String>): Boolean {
     if (args.count() < 1) {
-        sender.sendFWDMessage("Please provide a dungeon id")
+        sender.sendFWDMessage(Strings.PROVIDE_DUNGEON_ID)
         return true
     }
 
     val id = args[0].toIntOrNull() ?: run {
-        sender.sendFWDMessage("Dungeon id should be an integer")
+        sender.sendFWDMessage(Strings.DUNGEON_ID_SHOULD_BE_INT)
         return true
     }
 
     val dungeon = FinalDungeon.dungeons[id] ?: run {
-        sender.sendFWDMessage("No dungeon found with id $id")
+        sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
         return true
     }
 
     if (dungeon.isBeingEdited) {
-        sender.sendFWDMessage("Dungeon with id $id is being edited right now")
+        sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_IS_BEING_EDITED.format(id))
         return true
     }
 
     if (dungeon.isActive) {
-        sender.sendFWDMessage("Dungeon with id $id is already active")
+        sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_ALREADY_ACTIVE.format(id))
         return true
     }
 
     if (dungeon.instances.isEmpty()) {
-        sender.sendFWDMessage("Dungeon with id $id has no instances, import it with /fwde d import $id first")
+        sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
         return true
     }
 
     dungeon.isActive = true
-    sender.sendFWDMessage("Dungeon with id $id was enabled")
+    sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_WAS_ENABLED.format(id))
 
     return true
 }

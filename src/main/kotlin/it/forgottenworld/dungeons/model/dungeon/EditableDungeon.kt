@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.model.dungeon
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.box.BoxBuilder
 import it.forgottenworld.dungeons.model.instance.DungeonTestInstance
@@ -16,7 +17,6 @@ import it.forgottenworld.dungeons.utils.ktx.minecraft
 import it.forgottenworld.dungeons.utils.observableMapOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -112,7 +112,6 @@ class EditableDungeon(editor: Player) : Dungeon {
                 aaId
             }
 
-
     private fun labelActiveArea(label: String) {
         activeAreas.values.lastOrNull()?.label = label
         val inst = testInstance ?: return
@@ -157,14 +156,14 @@ class EditableDungeon(editor: Player) : Dungeon {
         activeAreaBoxBuilder.clear()
         player.editableDungeon = null
         if (restoreFormer) FinalDungeon.dungeons[id]?.isBeingEdited = false
-        player.sendFWDMessage("${ChatColor.GRAY}You're no longer editing a dungeon")
+        player.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }
 
     fun whatIsMissingForWriteout() = StringBuilder().apply {
-        if (!hasTestInstance) append("box, ")
-        if (startingLocation == null) append("starting location, ")
-        if (triggers.isEmpty()) append("at least one trigger, ")
-        if (activeAreas.isEmpty()) append("at least one active area, ")
+        if (!hasTestInstance) append(Strings.WIM_BOX)
+        if (startingLocation == null) append(Strings.WIM_STARTING_LOCATION)
+        if (triggers.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_TRIGGER)
+        if (activeAreas.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_ACTIVE_AREA)
     }.toString().dropLast(2)
 
     companion object {

@@ -1,7 +1,6 @@
 package it.forgottenworld.dungeons.utils.ktx
 
-import it.forgottenworld.dungeons.cli.Strings
-import it.forgottenworld.dungeons.cli.getString
+import it.forgottenworld.dungeons.config.Strings
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -9,6 +8,8 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
 import java.util.*
@@ -34,7 +35,7 @@ fun BlockVector.withRefSystemOrigin(oldOrigin: BlockVector, newOrigin: BlockVect
                 z - oldOrigin.z + newOrigin.z)
 
 fun CommandSender.sendFWDMessage(message: String) =
-        sendMessage("${getString(Strings.CHAT_PREFIX)}$message")
+        sendMessage("${Strings.CHAT_PREFIX}$message")
 
 infix fun BlockVector.min(other: BlockVector) = BlockVector(min(x, other.x), min(y, other.y), min(z, other.z))
 
@@ -44,4 +45,4 @@ fun Iterable<Int>.firstMissing() = find { !contains(it+1) }?.plus(1) ?: 0
 
 fun getPlayer(uuid: UUID) = Bukkit.getPlayer(uuid)
 
-fun <T> Optional<T>.unwrap(): T? = orElse(null)
+fun getPlugin() = Bukkit.getPluginManager().getPlugin("FWDungeons")!!

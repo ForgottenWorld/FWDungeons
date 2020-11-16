@@ -1,12 +1,13 @@
 package it.forgottenworld.dungeons.command.play.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonEvacuate(sender: CommandSender, args: Array<out String>): Boolean {
     if (args.count() < 2) {
-        sender.sendFWDMessage("Please provide both a dungeon and instance id")
+        sender.sendFWDMessage(Strings.PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID)
         return true
     }
 
@@ -14,15 +15,15 @@ fun cmdDungeonEvacuate(sender: CommandSender, args: Array<out String>): Boolean 
     val instanceId = args[1].toIntOrNull()
 
     if (dungeonId == null || instanceId == null) {
-        sender.sendFWDMessage("Dungeon id and instance id should both be integers")
+        sender.sendFWDMessage(Strings.DUNGEON_AND_INSTANCE_ID_SHOULD_BE_INT)
         return true
     }
 
-    sender.sendFWDMessage(
-            if (FinalDungeon.dungeons[dungeonId]?.instances?.get(instanceId)?.evacuate() != null)
-                "All adventurers were brought back to safety and the instance was reset"
+    sender.sendFWDMessage(if (FinalDungeon.dungeons[dungeonId]?.instances?.get(instanceId)?.evacuate() != null)
+                Strings.ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET
             else
-                "Dungeon instance not found")
+                Strings.DUNGEON_INSTANCE_NOT_FOUND
+    )
 
     return true
 }

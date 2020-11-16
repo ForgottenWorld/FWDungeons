@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.event.listener
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.utils.WarpbackData
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.launch
@@ -17,7 +18,7 @@ class RespawnHandler : Listener {
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
         event.player.run {
             respawnData?.let {
-                sendFWDMessage("You will be teleported shortly")
+                sendFWDMessage(Strings.YOU_WILL_BE_TPED_SHORTLY)
                 launch {
                     delay(1500)
                     teleport(it.location, PlayerTeleportEvent.TeleportCause.PLUGIN)

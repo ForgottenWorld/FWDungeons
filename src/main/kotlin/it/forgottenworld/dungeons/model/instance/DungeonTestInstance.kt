@@ -27,16 +27,12 @@ class DungeonTestInstance(
 
     override val triggers: Map<Int, Trigger> by mapObserver(
             dungeon.triggers,
-            { (k,v) ->
-                k to v.withContainerOrigin(BlockVector(0, 0, 0), origin)
-                        .also { it.box.highlightAll() } }
+            { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), origin).also { it.box.highlightAll() } }
     ) { updateHlBlocks() }
 
     override val activeAreas: Map<Int, ActiveArea> by mapObserver(
             dungeon.activeAreas,
-            { (k,v) ->
-                k to v.withContainerOrigin(BlockVector(0, 0, 0), origin)
-                        .also { it.box.highlightAll() } }
+            { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), origin).also { it.box.highlightAll() } }
     ) { updateHlBlocks() }
 
     private var triggerHlFrames = setOf<BlockVector>()

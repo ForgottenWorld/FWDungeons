@@ -3,6 +3,7 @@ package it.forgottenworld.dungeons.config
 import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
+import it.forgottenworld.dungeons.utils.ktx.getPlugin
 import it.forgottenworld.dungeons.utils.ktx.launchAsync
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
@@ -60,6 +61,7 @@ object ConfigManager {
             if (existsAlready) conf.load(file)
 
             dungeon.toConfig(conf, eraseEffects)
+            @Suppress("BlockingMethodInNonBlockingContext")
             launchAsync { conf.save(file) }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -85,7 +87,7 @@ object ConfigManager {
     }
 
     fun loadData() {
-        FWDungeonsPlugin.instance.reloadConfig()
+        getPlugin().reloadConfig()
         loadConfig(FWDungeonsPlugin.pluginConfig)
         loadDungeonConfigs(FWDungeonsPlugin.pluginDataFolder)
         getInstancesFromConfig()

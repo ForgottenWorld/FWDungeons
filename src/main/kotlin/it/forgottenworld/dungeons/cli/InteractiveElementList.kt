@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.cli
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElement
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
@@ -39,24 +40,25 @@ private fun getPageClickable(text: String, page: Int, type: String) = component 
 }
 
 private fun getPaginator(page: Int, maxPage: Int, type: String) = component {
+
     if (page > 0) {
         append("=[ ", ChatColor.DARK_GRAY)
-        append(getPageClickable("PREVIOUS", page - 1, type))
-        append(" ]", ChatColor.DARK_GRAY)
+        append(getPageClickable("<<<<", page - 1, type))
+        append(" ]=", ChatColor.DARK_GRAY)
     } else {
-        append("==========", ChatColor.DARK_GRAY)
+        append("=======", ChatColor.DARK_GRAY)
     }
 
-    append("================================", ChatColor.DARK_GRAY)
+    append("=====================================", ChatColor.DARK_GRAY)
 
     if (page < maxPage) {
-        append("===[ ")
+        append("=[ ")
         color(ChatColor.DARK_GRAY)
-        append(getPageClickable("NEXT", page + 1, type))
+        append(getPageClickable(">>>>", page + 1, type))
         append(" ]=")
         color(ChatColor.DARK_GRAY)
     } else {
-        append("=========")
+        append("=======")
         color(ChatColor.DARK_GRAY)
     }
 }
@@ -65,7 +67,7 @@ const val ITEMS_PER_PAGE = 16
 fun getInteractiveActiveAreaList(dungeon: EditableDungeon, page: Int) = component {
 
     append("====================[ ", ChatColor.DARK_GRAY)
-    append(getString(Strings.CHAT_PREFIX).dropLast(1))
+    append(Strings.CHAT_PREFIX.dropLast(1))
     append("ungeons ", ChatColor.GRAY)
     append("]====================\n", ChatColor.DARK_GRAY)
 
@@ -92,7 +94,7 @@ fun getInteractiveActiveAreaList(dungeon: EditableDungeon, page: Int) = componen
 fun getInteractiveTriggerList(dungeon: EditableDungeon, page: Int) = component {
 
     append("====================[ ", ChatColor.DARK_GRAY)
-    append(getString(Strings.CHAT_PREFIX).dropLast(1))
+    append(Strings.CHAT_PREFIX.dropLast(1))
     append("ungeons ", ChatColor.GRAY)
     append("]====================\n", ChatColor.DARK_GRAY)
 

@@ -10,7 +10,7 @@ class CombatObjective(
         private val mobsToKill: MutableList<UUID>,
         var onAllKilled: (DungeonFinalInstance) -> Unit) {
 
-    var aborting = false
+    private var aborting = false
     private val shouldBeRemoved
         get() = mobsToKill.isEmpty()
 

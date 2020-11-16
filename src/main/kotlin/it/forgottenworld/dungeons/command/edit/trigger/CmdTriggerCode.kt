@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.trigger
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.scripting.*
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
@@ -8,17 +9,17 @@ import org.bukkit.entity.Player
 
 fun cmdTriggerCode(sender: Player, args: Array<out String>): Boolean {
     val dungeon = sender.editableDungeon ?: run {
-        sender.sendFWDMessage("You're not editing any dungeons")
+        sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
         return true
     }
 
     val triggerId = args.getOrNull(0)?.toIntOrNull() ?: run {
-        sender.sendFWDMessage("Please provide a valid trigger id")
+        sender.sendFWDMessage(Strings.PROVIDE_VALID_TRIGGER_ID)
         return true
     }
 
     val trigger = dungeon.triggers[triggerId] ?: run {
-        sender.sendFWDMessage("Trigger not found")
+        sender.sendFWDMessage(Strings.TRIGGER_NOT_FOUND)
         return true
     }
 
@@ -33,7 +34,7 @@ fun cmdTriggerCode(sender: Player, args: Array<out String>): Boolean {
                 .trim()
     }
 
-    sender.sendFWDMessage("\n${ChatColor.GRAY}[ CODE ]")
+    sender.sendFWDMessage("\n§7[ CODE ]")
     sender.sendMessage(code)
 
     return true

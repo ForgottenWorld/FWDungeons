@@ -6,7 +6,7 @@
 
     <groupId>it.forgottenworld</groupId>
     <artifactId>fwdungeons</artifactId>
-    <version>0.9.2</version>
+    <version>0.10.0</version>
 
     <properties>
         <kotlin.version>1.4.10</kotlin.version>
@@ -128,7 +128,9 @@
                     <execution>
                         <id>java-compile</id>
                         <phase>compile</phase>
-                        <goals> <goal>compile</goal> </goals>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

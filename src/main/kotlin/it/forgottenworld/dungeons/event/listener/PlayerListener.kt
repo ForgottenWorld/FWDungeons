@@ -1,10 +1,11 @@
 package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.FWDungeonsPlugin
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
+import it.forgottenworld.dungeons.utils.ktx.getPlugin
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
@@ -25,7 +26,7 @@ class PlayerListener: Listener {
         player.editableDungeon?.onDestroy(true)
         val instance = player.finalInstance ?: return
         instance.onPlayerDeath(player)
-        player.sendFWDMessage("${ChatColor.RED}You died in the dungeon")
+        player.sendFWDMessage(Strings.YOU_DIED_IN_THE_DUNGEON)
     }
 
     @EventHandler
@@ -42,12 +43,12 @@ class PlayerListener: Listener {
 
         when (event.cause) {
             PlayerTeleportEvent.TeleportCause.ENDER_PEARL, PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT -> {
-                player.sendFWDMessage("No ender pearls or chorus fruits in the dungeon!")
+                player.sendFWDMessage(Strings.NO_EPEARLS_OR_CHORUS_FRUIT_ALLOWED)
                 event.isCancelled = true
                 return
             }
             PlayerTeleportEvent.TeleportCause.COMMAND, PlayerTeleportEvent.TeleportCause.PLUGIN -> {
-                player.sendFWDMessage("You wish you could!")
+                player.sendFWDMessage(Strings.YOU_WISH_YOU_COULD)
                 player.damage(2.0)
                 event.isCancelled = true
             }
@@ -61,7 +62,7 @@ class PlayerListener: Listener {
         if (event.player.finalInstance != null &&
                 event.item?.type == Material.ENDER_PEARL &&
                 (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)) {
-            event.player.sendFWDMessage("No ender pearls in the dungeon!")
+            event.player.sendFWDMessage(Strings.NO_EPEARLS_IN_THE_DUNGEON)
             event.isCancelled = true
             return
         }
@@ -71,12 +72,12 @@ class PlayerListener: Listener {
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
         val isTriggerWand =
                 persistentDataContainer
-                        .get(NamespacedKey(FWDungeonsPlugin.instance, "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
+                        .get(NamespacedKey(getPlugin(), "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
                         ?.toShort()
                         ?.equals(1.toShort()) ?: false
         val isActiveAreaWand = !isTriggerWand
                 && persistentDataContainer
-                        .get(NamespacedKey(FWDungeonsPlugin.instance, "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
+                        .get(NamespacedKey(getPlugin(), "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
                         ?.toShort()
                         ?.equals(1.toShort()) ?: false
 

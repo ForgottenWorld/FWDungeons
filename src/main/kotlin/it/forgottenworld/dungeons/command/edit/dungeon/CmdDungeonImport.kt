@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
+import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.utils.ktx.blockVector
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
@@ -9,32 +10,32 @@ import org.bukkit.entity.Player
 
 fun cmdDungeonImport(sender: Player, args: Array<out String>): Boolean {
     if (args.isEmpty()) {
-        sender.sendFWDMessage("Not enough arguments: please provide a dungeon id")
+        sender.sendFWDMessage(Strings.NEA_PROVIDE_DUNGEON_ID)
         return true
     }
 
     val id = args[0].toIntOrNull()
     if (id == null) {
-        sender.sendFWDMessage("Dungeon id should be an integer")
+        sender.sendFWDMessage(Strings.DUNGEON_ID_SHOULD_BE_INT)
         return true
     }
 
     val block = sender.targetBlock
     if (block.blockData.material == Material.AIR) {
-        sender.sendFWDMessage("You need to be targeting a block within 5 blocks of you before calling this")
+        sender.sendFWDMessage(Strings.YOU_NEED_TO_BE_TARGETING)
         return true
     }
 
     val dungeon = FinalDungeon.dungeons[id] ?: run {
-        sender.sendFWDMessage("No dungeon found with id $id")
+        sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
         return true
     }
 
     if (!dungeon.import(block.blockVector)) {
-        sender.sendFWDMessage("This dungeon already has instances")
+        sender.sendFWDMessage(Strings.THIS_DUNGEON_ALREADY_HAS_INSTANCES)
         return true
     }
 
-    sender.sendFWDMessage("Dungeon imported")
+    sender.sendFWDMessage(Strings.DUNGEON_IMPORTED)
     return true
 }
