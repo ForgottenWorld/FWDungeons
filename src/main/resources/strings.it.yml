@@ -9,7 +9,7 @@ COULDNT_FIND_DUNGEON_TEST_INSTANCE: "Impossibile trovare istanza di test del dun
 CREATE: "CREA"
 CREATED_IE_WITH_ID: "Aggiunto %s con id %d"
 CREATED_NEW_DUNGEON_NOW_IN_EDIT_MODE: "Nuovo dungeon creato. Sei ora in modalità modifica."
-CURRENTLY_NOT_IN_DUNGEON_PARTY: "Non sei attualmente in un dungeon party"
+CURRENTLY_NOT_IN_DUNGEON_PARTY: "Non sei attualmente in un party"
 DEBUG_ENTERED_TRIGGER: "Ingresso nel trigger §2%s(id: %d)§f"
 DEBUG_EXITED_TRIGGER: "Uscita dal trigger §2%s(id: %d)§f"
 DELETED_IE_WITH_ID: "Eliminato %s con id %d"
