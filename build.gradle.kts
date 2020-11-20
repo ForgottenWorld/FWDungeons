@@ -12,6 +12,7 @@ repositories {
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://jitpack.io")
     maven("https://mvn.lumine.io/repository/maven-public/")
+    maven("https://rayzr.dev/repo/")
 }
 
 dependencies {
