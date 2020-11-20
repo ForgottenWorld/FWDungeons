@@ -45,15 +45,6 @@ class FWDungeonsPlugin : JavaPlugin() {
         server.pluginManager.registerEvents(RespawnHandler(), this)
 
         checkEasyRankingIntegration()
-
-        val job = launch {
-            logger.info("I will now start counting until the job is stopped")
-            var i = 0
-            while (true) {
-                logger.info("${++i}")
-                delay(1000)
-            }
-        }
     }
 
     private fun loadStrings() {
