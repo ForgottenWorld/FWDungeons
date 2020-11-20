@@ -54,11 +54,6 @@ class FWDungeonsPlugin : JavaPlugin() {
                 delay(1000)
             }
         }
-
-        launch {
-            delay(5000)
-            job.cancel("It bloody fucking works")
-        }
     }
 
     private fun loadStrings() {
