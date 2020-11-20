@@ -12,13 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.coroutines.CoroutineContext
 
-fun launch(f: suspend CoroutineScope.() -> Unit) {
-    JavaPlugin.getPlugin(FWDungeonsPlugin::class.java).launch(f)
-}
+fun launch(f: suspend CoroutineScope.() -> Unit) = JavaPlugin.getPlugin(FWDungeonsPlugin::class.java).launch(f)
 
-fun launchAsync(f: suspend CoroutineScope.() -> Unit) {
-    JavaPlugin.getPlugin(FWDungeonsPlugin::class.java).launchAsync(f)
-}
+fun launchAsync(f: suspend CoroutineScope.() -> Unit) = JavaPlugin.getPlugin(FWDungeonsPlugin::class.java).launchAsync(f)
 
 val Dispatchers.minecraft: CoroutineContext
     get() = JavaPlugin.getPlugin(FWDungeonsPlugin::class.java).minecraftDispatcher

@@ -8,6 +8,9 @@ import it.forgottenworld.dungeons.event.listener.EntityDeathListener
 import it.forgottenworld.dungeons.event.listener.PlayerListener
 import it.forgottenworld.dungeons.event.listener.RespawnHandler
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler
+import it.forgottenworld.dungeons.utils.ktx.launch
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -42,6 +45,20 @@ class FWDungeonsPlugin : JavaPlugin() {
         server.pluginManager.registerEvents(RespawnHandler(), this)
 
         checkEasyRankingIntegration()
+
+        val job = launch {
+            logger.info("I will now start counting until the job is stopped")
+            var i = 0
+            while (true) {
+                logger.info("${++i}")
+                delay(1000)
+            }
+        }
+
+        launch {
+            delay(5000)
+            job.cancel("It bloody fucking works")
+        }
     }
 
     private fun loadStrings() {

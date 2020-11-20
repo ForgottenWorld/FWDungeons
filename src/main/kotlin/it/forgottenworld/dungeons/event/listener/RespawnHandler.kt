@@ -16,15 +16,14 @@ class RespawnHandler : Listener {
 
     @EventHandler
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
-        event.player.run {
-            respawnData?.let {
-                sendFWDMessage(Strings.YOU_WILL_BE_TPED_SHORTLY)
-                launch {
-                    delay(1500)
-                    teleport(it.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
-                    gameMode = it.gameMode
-                    respawnData = null
-                }
+        val player = event.player
+        player.respawnData?.let {
+            player.sendFWDMessage(Strings.YOU_WILL_BE_TPED_SHORTLY)
+            launch {
+                delay(1500)
+                player.teleport(it.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
+                player.gameMode = it.gameMode
+                player.respawnData = null
             }
         }
     }
