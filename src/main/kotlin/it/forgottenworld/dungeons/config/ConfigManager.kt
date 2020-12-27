@@ -1,33 +1,33 @@
 package it.forgottenworld.dungeons.config
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.utils.ktx.getPlugin
 import it.forgottenworld.dungeons.utils.ktx.launchAsync
+import it.forgottenworld.dungeons.utils.ktx.plugin
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
+import javax.naming.ConfigurationException
 
 
 object ConfigManager {
 
     lateinit var config: FileConfiguration
 
-    val isInDebugMode by lazy { config.getBoolean("debugMode", false) }
+    val isDebugMode by lazy { config.getBoolean("debugMode", false) }
 
     private val dungeonWorldId by lazy {
         config.getString("dungeonWorld")
-                ?.let { Bukkit.getWorld(it)?.uid ?: throw Exception("Dungeon world not found!") }
-                ?: throw Exception("dungeonWorld missing from config!")
+                ?.let { Bukkit.getWorld(it)?.uid ?: error("Dungeon world not found!") }
+                ?: throw ConfigurationException("dungeonWorld missing from config!")
     }
 
     val easyRankingIntegration by lazy { config.getBoolean("easyRankingIntegration", false) }
     var useEasyRanking = false
 
     val dungeonWorld
-        get() = Bukkit.getWorld(dungeonWorldId) ?: throw Exception("Dungeon world not found!")
+        get() = Bukkit.getWorld(dungeonWorldId) ?: error("Dungeon world not found!")
 
     private fun loadConfig(config: FileConfiguration) {
         this.config = config
@@ -49,9 +49,9 @@ object ConfigManager {
                 }
     }
 
-    fun saveDungeonConfig(dataFolder: File, dungeon: FinalDungeon, eraseEffects: Boolean = false) {
+    fun saveDungeonConfig(dungeon: FinalDungeon, eraseEffects: Boolean = false) {
         try {
-            val dir = File(dataFolder, "dungeons").apply { if (!exists() && !mkdir()) return }
+            val dir = File(plugin.dataFolder, "dungeons").apply { if (!exists() && !mkdir()) return }
             val file = File(dir, "${dungeon.id}.yml")
 
             val existsAlready = file.exists()
@@ -69,7 +69,7 @@ object ConfigManager {
     }
 
     private fun getInstancesFromConfig() {
-        val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
+        val file = File(plugin.dataFolder, "instances.yml")
         val conf = YamlConfiguration()
         if (file.exists()) conf.load(file) else file.createNewFile()
 
@@ -87,9 +87,9 @@ object ConfigManager {
     }
 
     fun loadData() {
-        getPlugin().reloadConfig()
-        loadConfig(FWDungeonsPlugin.pluginConfig)
-        loadDungeonConfigs(FWDungeonsPlugin.pluginDataFolder)
+        plugin.reloadConfig()
+        loadConfig(plugin.config)
+        loadDungeonConfigs(plugin.dataFolder)
         getInstancesFromConfig()
     }
 }

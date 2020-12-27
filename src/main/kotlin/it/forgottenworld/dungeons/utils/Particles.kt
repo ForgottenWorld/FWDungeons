@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.utils.ktx.launch
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Location
 import org.bukkit.Particle
@@ -9,7 +10,7 @@ import org.bukkit.util.BlockVector
 
 fun repeatedlySpawnParticles(
         particle: Particle,
-        locations: Set<Location>,
+        locations: Iterable<Location>,
         count: Int,
         interval: Long,
         iterations: Int) {
@@ -28,27 +29,30 @@ fun repeatedlySpawnParticles(
 }
 
 class ParticleSpammer(
-        particle: Particle,
-        count: Int,
-        interval: Long,
-        getLocations: () -> Set<BlockVector>) {
+    private val particle: Particle,
+    private val count: Int,
+    private val interval: Long,
+    private val locations: List<BlockVector>
+) {
 
-    private var doRun = true
+    private var job: Job? = null
 
     fun stop() {
-        doRun = false
+        job?.cancel()
+        job = null
     }
 
     init {
-        launch {
-            while (doRun) {
+        job = launch {
+            while (true) {
                 delay(interval)
                 val world = ConfigManager.dungeonWorld
-                getLocations().forEach {
+                locations.forEach {
                     world.spawnParticle(
-                            particle,
-                            Location(ConfigManager.dungeonWorld, it.x + 0.5, it.y + 0.5, it.z + 0.5),
-                            count)
+                        particle,
+                        Location(ConfigManager.dungeonWorld, it.x + 0.5, it.y + 0.5, it.z + 0.5),
+                        count
+                    )
                 }
             }
         }

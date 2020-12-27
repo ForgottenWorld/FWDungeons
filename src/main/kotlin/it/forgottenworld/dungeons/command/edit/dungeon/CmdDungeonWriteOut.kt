@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.utils.ktx.plugin
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -20,7 +20,7 @@ fun cmdDungeonWriteOut(sender: Player, args: Array<out String>): Boolean {
     }
 
     val finalDungeon = dungeon.finalize()
-    ConfigManager.saveDungeonConfig(FWDungeonsPlugin.pluginDataFolder, finalDungeon, true)
+    ConfigManager.saveDungeonConfig(finalDungeon, true)
     sender.sendFWDMessage(Strings.DUNGEON_EXPORTED)
 
     return true

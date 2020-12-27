@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.command.edit.helpers
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
@@ -55,7 +54,9 @@ object InteractiveElementCommandHelper {
         if (box == null) {
             sender.sendFWDMessage(Strings.NTH_POS_SET_PICK_ANOTHER.format(
                     if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                    "${if (type == TRIGGER) "trigger" else "activearea"} pos${if (posNo == 1) "2" else "1"}"))
+                    if (type == TRIGGER) "t" else "aa",
+                    if (posNo == 1) 2 else 1
+            ))
             return
         }
 
@@ -128,7 +129,7 @@ object InteractiveElementCommandHelper {
             itemMeta = itemMeta?.apply {
                 persistentDataContainer
                         .set(NamespacedKey(
-                                getPlugin(),
+                            plugin,
                                 if (type == TRIGGER) "FWD_TRIGGER_WAND" else "FWD_ACTIVE_AREA_WAND"
                         ), PersistentDataType.SHORT, 1)
             }

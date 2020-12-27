@@ -1,10 +1,9 @@
 package it.forgottenworld.dungeons.event.listener
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
-import it.forgottenworld.dungeons.utils.ktx.getPlugin
+import it.forgottenworld.dungeons.utils.ktx.plugin
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -72,12 +71,12 @@ class PlayerListener: Listener {
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
         val isTriggerWand =
                 persistentDataContainer
-                        .get(NamespacedKey(getPlugin(), "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
+                        .get(NamespacedKey(plugin, "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
                         ?.toShort()
                         ?.equals(1.toShort()) ?: false
         val isActiveAreaWand = !isTriggerWand
                 && persistentDataContainer
-                        .get(NamespacedKey(getPlugin(), "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
+                        .get(NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
                         ?.toShort()
                         ?.equals(1.toShort()) ?: false
 

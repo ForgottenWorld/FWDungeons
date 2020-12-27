@@ -4,12 +4,13 @@ import it.forgottenworld.dungeons.event.TriggerEvent
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
+import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElement
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ParticleSpammer
 import it.forgottenworld.dungeons.utils.ktx.getPlayer
 import it.forgottenworld.dungeons.utils.ktx.launch
 import it.forgottenworld.dungeons.utils.ktx.launchAsync
-import it.forgottenworld.dungeons.utils.mapObserver
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
 import org.bukkit.Particle
@@ -25,63 +26,81 @@ class DungeonTestInstance(
     override val id = -1
     override val box = dungeon.box!!.withOrigin(origin)
 
-    override val triggers: Map<Int, Trigger> by mapObserver(
-            dungeon.triggers,
-            { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), origin).also { it.box.highlightAll() } }
-    ) { updateHlBlocks() }
+    private var triggerDetectionJob: Job? = null
 
-    override val activeAreas: Map<Int, ActiveArea> by mapObserver(
-            dungeon.activeAreas,
-            { (k,v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), origin).also { it.box.highlightAll() } }
-    ) { updateHlBlocks() }
+    override var triggers = dungeon.triggers
+    override var activeAreas = dungeon.activeAreas
 
-    private var triggerHlFrames = setOf<BlockVector>()
-    private fun getTriggerHlFrames() = triggerHlFrames
-    private var activeAreaHlFrames = setOf<BlockVector>()
-    private fun getActiveAreaHlFrames() = activeAreaHlFrames
-    private var triggerParticleTask: ParticleSpammer? = null
-    private var activeAreaParticleTask: ParticleSpammer? = null
-    private var checkTriggers = true
+    private var hlFrames = false
+
+    fun updateTriggers(newTriggers: Map<Int, Trigger>) {
+        triggers = newTriggers.mapValues { (_,t) ->
+            t.withContainerOrigin(
+                BlockVector(0, 0, 0),
+                origin
+            )
+        }
+        updateTriggerParticleSpammers()
+    }
+
+    fun updateActiveAreas(newActiveAreas: Map<Int, ActiveArea>) {
+        activeAreas = newActiveAreas.mapValues { (_, t) ->
+            t.withContainerOrigin(
+                BlockVector(0, 0, 0),
+                origin
+            )
+        }
+        updateActiveAreaParticleSpammers()
+    }
+
+    fun highlightNewInteractiveElement(interactiveElement: InteractiveElement) {
+        interactiveElement.withContainerOrigin(BlockVector(0, 0, 0), origin).also { it.box.highlightAll() }
+    }
+
+    private var triggerParticleSpammer: ParticleSpammer? = null
+    private var activeAreaParticleSpammer: ParticleSpammer? = null
 
     init {
         startCheckingTriggers()
     }
 
-    private fun updateHlBlocks() {
-        activeAreaHlFrames = activeAreas
-                .values
-                .flatMap { aa -> aa.box.getFrontier() }.toSet()
-        triggerHlFrames = triggers
-                .values
-                .flatMap { t -> t.box.getFrontier() }.toSet()
+    private fun updateTriggerParticleSpammers() {
+        if (!hlFrames) return
+        triggerParticleSpammer?.stop()
+        triggerParticleSpammer = ParticleSpammer(Particle.DRIP_LAVA, 1, 500, triggers.values.flatMap { it.box.getFrontier() })
     }
 
-    private fun stopSpammers(): Boolean {
-        if (triggerParticleTask == null) return false
-        triggerParticleTask?.stop()
-        triggerParticleTask = null
-        activeAreaParticleTask?.stop()
-        activeAreaParticleTask = null
-        triggerHlFrames = setOf()
-        activeAreaHlFrames = setOf()
-        return true
+    private fun updateActiveAreaParticleSpammers() {
+        if (!hlFrames) return
+        activeAreaParticleSpammer?.stop()
+        activeAreaParticleSpammer = ParticleSpammer(Particle.DRIP_WATER, 1, 500, activeAreas.values.flatMap { it.box.getFrontier() })
     }
 
-    suspend fun stopCheckingTriggersAndWait() {
-        checkTriggers = false
-        delay(1000)
+    private fun updateParticleSpammers() {
+        if (!hlFrames) return
+        updateTriggerParticleSpammers()
+        updateActiveAreaParticleSpammers()
+    }
+
+    private fun stopParticleSpammers() {
+        triggerParticleSpammer?.stop()
+        triggerParticleSpammer = null
+        activeAreaParticleSpammer?.stop()
+        activeAreaParticleSpammer = null
     }
 
     fun toggleEditorHighlights() {
-        if (stopSpammers()) return
-        updateHlBlocks()
-        triggerParticleTask = ParticleSpammer(Particle.DRIP_LAVA, 1, 500, ::getTriggerHlFrames)
-        activeAreaParticleTask = ParticleSpammer(Particle.DRIP_WATER, 1, 500, ::getActiveAreaHlFrames)
+        hlFrames = !hlFrames
+        if (hlFrames)
+            updateParticleSpammers()
+        else
+            stopParticleSpammers()
     }
 
     fun onDestroy() {
-        stopSpammers()
-        checkTriggers = false
+        stopParticleSpammers()
+        triggerDetectionJob?.cancel()
+        triggerDetectionJob = null
     }
 
     private fun checkTriggers(
@@ -102,16 +121,22 @@ class DungeonTestInstance(
         }
     }
 
-    fun startCheckingTriggers() = launch {
-        val player = getPlayer(tester) ?: return@launch
-        checkTriggers = true
-        while (checkTriggers) {
-            delay(500)
-            checkTriggers(
-                    tester,
-                    player.location.toVector(),
-                    tester.collidingTrigger?.id
-            )
+    fun stopCheckingTriggers() {
+        triggerDetectionJob?.cancel()
+        triggerDetectionJob = null
+    }
+
+    fun startCheckingTriggers() {
+        triggerDetectionJob = launch {
+            val player = getPlayer(tester) ?: return@launch
+            while (true) {
+                delay(500)
+                checkTriggers(
+                        tester,
+                        player.location.toVector(),
+                        tester.collidingTrigger?.id
+                )
+            }
         }
     }
 }

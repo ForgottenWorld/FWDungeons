@@ -8,10 +8,7 @@ import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editab
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.utils.ktx.blockVector
-import it.forgottenworld.dungeons.utils.ktx.launchAsync
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import it.forgottenworld.dungeons.utils.ktx.toVector
+import it.forgottenworld.dungeons.utils.ktx.*
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -59,15 +56,15 @@ class FinalDungeon(override val id: Int,
             it.finalInstanceLocations = instances.values.map { ins -> ins.origin.clone() }.toMutableList()
             player.editableDungeon = it
             it.createTestInstance(player)
-            it.triggers.putAll(triggers)
-            it.activeAreas.putAll(activeAreas)
+            it.triggers = triggers
+            it.activeAreas = activeAreas
         }
     }
 
     fun import(at: BlockVector): Boolean {
         if (instances.isNotEmpty()) return false
         val config = YamlConfiguration()
-        val file = File(FWDungeonsPlugin.pluginDataFolder, "instances.yml")
+        val file = File(plugin.dataFolder, "instances.yml")
         if (file.exists()) config.load(file)
         val dgconf = config.createSection("$id")
         dgconf.createSection("$0").run {
@@ -76,6 +73,7 @@ class FinalDungeon(override val id: Int,
             set("z", at.blockZ)
         }
         createInstance(ConfigManager.dungeonWorld.getBlockAt(at.blockX, at.blockY, at.blockZ))
+        @Suppress("BlockingMethodInNonBlockingContext")
         launchAsync { config.save(file) }
         return true
     }

@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
@@ -13,11 +12,7 @@ fun cmdDungeonSave(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    ConfigManager.saveDungeonConfig(
-            FWDungeonsPlugin.pluginDataFolder,
-            dungeon.finalize(),
-            false
-    )
+    ConfigManager.saveDungeonConfig(dungeon.finalize(), false)
 
     sender.sendFWDMessage(Strings.DUNGEON_SAVED)
 

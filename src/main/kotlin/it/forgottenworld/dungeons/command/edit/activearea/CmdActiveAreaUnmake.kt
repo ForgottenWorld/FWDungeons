@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 fun cmdActiveAreaUnmake(sender: Player, args: Array<out String>): Boolean {
     InteractiveElementCommandHelper.unMakeInteractiveElement(
             sender,
-            InteractiveElementType.TRIGGER,
+            InteractiveElementType.ACTIVE_AREA,
             args.getOrNull(0)?.toIntOrNull()
     )
     return true

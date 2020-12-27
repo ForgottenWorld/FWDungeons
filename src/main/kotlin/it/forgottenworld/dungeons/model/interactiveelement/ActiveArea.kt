@@ -11,23 +11,17 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.util.BlockVector
 import kotlin.random.Random
 
-class ActiveArea(
+data class ActiveArea(
         override val id: Int,
         override val box: Box,
-        val startingMaterial: Material = Material.AIR) : InteractiveElement {
-
-    var label: String? = null
+        val startingMaterial: Material = Material.AIR,
+        var label: String? = null
+) : InteractiveElement {
 
     fun fillWithMaterial(material: Material) {
         box.getAllBlocks().run {
             forEach { it.setType(material, true) }
-            repeatedlySpawnParticles(
-                    Particle.PORTAL,
-                    map{ it.location }.toSet(),
-                    1,
-                    500,
-                    4
-            )
+            repeatedlySpawnParticles(Particle.PORTAL, map { it.location }, 1, 500, 4)
         }
     }
 
@@ -38,11 +32,9 @@ class ActiveArea(
             Random.nextInt(box.origin.z.toInt(), box.origin.z.toInt() + box.depth) + 0.5
     )
 
-    fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
-            ActiveArea(id,
-                    box.withContainerOrigin(oldOrigin, newOrigin),
-                    startingMaterial
-            ).also { it.label = label }
+    override fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) = copy(
+            box = box.withContainerOrigin(oldOrigin, newOrigin)
+    )
 
     fun toConfig(config: ConfigurationSection) = config.run {
         set("id", id)
@@ -56,11 +48,11 @@ class ActiveArea(
     
     companion object {
 
-        fun fromConfig(id: Int, config: ConfigurationSection) =
-                ActiveArea(
-                        id,
-                        Box.fromConfig(config),
-                        Material.getMaterial(config.getString("startingMaterial")!!)!!
-                ).apply { config.getString("label")?.let { label = it } }
+        fun fromConfig(id: Int, config: ConfigurationSection) = ActiveArea(
+                id,
+                Box.fromConfig(config),
+                Material.getMaterial(config.getString("startingMaterial")!!)!!,
+                config.getString("label")
+        )
     }
 }

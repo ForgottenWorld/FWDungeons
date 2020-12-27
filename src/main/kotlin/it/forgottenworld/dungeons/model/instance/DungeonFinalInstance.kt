@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.model.instance
 
-import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
 import it.forgottenworld.dungeons.cli.getLockClickable
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
@@ -243,7 +242,8 @@ class DungeonFinalInstance(
                 checkTriggers(
                         uniqueId,
                         location.toVector(),
-                        collidingTrigger?.id)
+                        collidingTrigger?.id
+                )
             } }
         }
     }
@@ -268,8 +268,8 @@ class DungeonFinalInstance(
             if (isMythic) spawnMythicMob(type, location)
             else spawnVanillaMob(type, location)
 
-    private fun spawnMythicMob(type: String, location: Location) =
-            BukkitAPIHelper().spawnMythicMob(type, location).uniqueId
+    private fun spawnMythicMob(type: String, location: Location) = mythicMobsHelper
+        .spawnMythicMob(type, location).uniqueId
 
     private fun spawnVanillaMob(type: String, location: Location) =
             location.world?.spawnEntity(location, EntityType.valueOf(type))?.uniqueId

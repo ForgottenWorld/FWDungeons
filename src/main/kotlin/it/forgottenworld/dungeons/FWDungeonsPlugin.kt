@@ -8,11 +8,7 @@ import it.forgottenworld.dungeons.event.listener.EntityDeathListener
 import it.forgottenworld.dungeons.event.listener.PlayerListener
 import it.forgottenworld.dungeons.event.listener.RespawnHandler
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler
-import it.forgottenworld.dungeons.utils.ktx.launch
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
-import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -21,11 +17,7 @@ import java.io.InputStreamReader
 class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onEnable() {
-        logger.info("Enabling FWDungeons...")
-
         saveDefaultConfig()
-        pluginDataFolder = dataFolder
-        pluginConfig = config
 
         logger.info("Loading data...")
 
@@ -39,10 +31,12 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         logger.info("Registering events...")
 
-        server.pluginManager.registerEvents(EntityDeathListener(), this)
-        server.pluginManager.registerEvents(PlayerListener(), this)
-        server.pluginManager.registerEvents(TriggerActivationHandler(), this)
-        server.pluginManager.registerEvents(RespawnHandler(), this)
+        listOf(
+            EntityDeathListener(),
+            PlayerListener(),
+            TriggerActivationHandler(),
+            RespawnHandler()
+        ).forEach { server.pluginManager.registerEvents(it, this) }
 
         checkEasyRankingIntegration()
     }
@@ -80,12 +74,6 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")
-    }
-
-    companion object {
-
-        lateinit var pluginDataFolder: File
-        lateinit var pluginConfig: FileConfiguration
     }
 
 }

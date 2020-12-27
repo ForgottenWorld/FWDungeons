@@ -23,7 +23,7 @@ fun cmdTriggerCode(sender: Player, args: Array<out String>): Boolean {
         return true
     }
 
-    val code = trigger.effectCode.joinToString("\n") {
+    val code = trigger.effectCode.joinToString(";\n") {
         it.replace(CODE_FILL_ACTIVE_AREA, "${ChatColor.of("#bfff00")}$CODE_FILL_ACTIVE_AREA${ChatColor.WHITE}")
                 .replace(CODE_COMBAT_OBJECTIVE, "${ChatColor.AQUA}$CODE_COMBAT_OBJECTIVE${ChatColor.WHITE}")
                 .replace(CODE_WHEN_DONE, "${ChatColor.LIGHT_PURPLE}$CODE_WHEN_DONE${ChatColor.WHITE}")

@@ -1,5 +1,7 @@
 package it.forgottenworld.dungeons.utils.ktx
 
+import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
+import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.Strings
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -8,7 +10,6 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
@@ -45,4 +46,6 @@ fun Iterable<Int>.firstMissing() = find { !contains(it+1) }?.plus(1) ?: 0
 
 fun getPlayer(uuid: UUID) = Bukkit.getPlayer(uuid)
 
-fun getPlugin() = Bukkit.getPluginManager().getPlugin("FWDungeons")!!
+val plugin get() = JavaPlugin.getPlugin(FWDungeonsPlugin::class.java)
+
+val mythicMobsHelper by lazy { BukkitAPIHelper() }

@@ -6,7 +6,8 @@ import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler.Compan
 import it.forgottenworld.dungeons.model.box.Box
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.instance.DungeonInstance
-import it.forgottenworld.dungeons.scripting.parseCode
+import it.forgottenworld.dungeons.scripting.cleanupCode
+import it.forgottenworld.dungeons.scripting.parseScript
 import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
 import it.forgottenworld.dungeons.utils.ktx.toVector
 import org.bukkit.configuration.ConfigurationSection
@@ -22,7 +23,7 @@ class Trigger(
         private val requiresWholeParty: Boolean = false,
 ) : InteractiveElement {
 
-    private val effect = parseCode(effectCode)
+    private val effect = parseScript(effectCode)
 
     var label: String? = null
     private var procced = false
@@ -40,7 +41,7 @@ class Trigger(
     fun containsVector(vector: Vector) = box.containsVector(vector)
 
     fun onPlayerEnter(player: Player, instance: DungeonInstance) {
-        if (ConfigManager.isInDebugMode)
+        if (ConfigManager.isDebugMode)
             player.sendFWDMessage(Strings.DEBUG_ENTERED_TRIGGER.format(label?.plus(" ") ?: "", id))
 
         if (playersCurrentlyInside.contains(player.uniqueId)) return
@@ -51,14 +52,14 @@ class Trigger(
     }
 
     fun onPlayerExit(player: Player) {
-        if (ConfigManager.isInDebugMode)
+        if (ConfigManager.isDebugMode)
             player.sendFWDMessage(Strings.DEBUG_EXITED_TRIGGER.format(label?.plus(" ") ?: "", id))
 
         playersCurrentlyInside.remove(player.uniqueId)
         player.collidingTrigger = null
     }
 
-    fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
+    override fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
             Trigger(id,
                     box.withContainerOrigin(oldOrigin, newOrigin),
                     effectCode,
@@ -79,16 +80,17 @@ class Trigger(
         set("width", box.width)
         set("height", box.height)
         set("depth", box.depth)
-        set("effect", effectCode)
+        set("effect", effectCode.joinToString("; "))
         set("requiresWholeParty", requiresWholeParty)
     }
-    
+
     companion object {
+
         fun fromConfig(id: Int, config: ConfigurationSection) =
                 Trigger(
                         id,
                         Box.fromConfig(config),
-                        config.getStringList("effect"),
+                        cleanupCode(config.getString("effect")!!),
                         config.getBoolean("requiresWholeParty")
                 ).apply { config.getString("label")?.let { label = it } }
     }

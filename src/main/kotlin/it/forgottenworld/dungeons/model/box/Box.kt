@@ -104,7 +104,7 @@ class Box : Cloneable {
     fun highlightAll() {
         repeatedlySpawnParticles(
                 Particle.COMPOSTER,
-                getAllBlocks().map{ it.location }.toSet(),
+                getAllBlocks().map{ it.location },
                 1,
                 500,
                 20
@@ -119,6 +119,7 @@ class Box : Cloneable {
                 config.getVector("origin")!!.toBlockVector(),
                 config.getInt("width"),
                 config.getInt("height"),
-                config.getInt("depth"))
+                config.getInt("depth")
+        )
     }
 }

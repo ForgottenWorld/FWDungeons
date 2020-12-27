@@ -11,12 +11,12 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import kotlin.math.floor
 
-private fun getJoinClickable(
-        instance: DungeonFinalInstance,
-        leader: Boolean,
-        locked: Boolean,
-        full: Boolean,
-        inGame: Boolean) = component {
+private fun getJoinClickable(instance: DungeonFinalInstance) = component {
+    val leader = instance.leader == null
+    val locked = instance.isLocked
+    val full = instance.isFull
+    val inGame = instance.inGame
+
     append("  [ ", ChatColor.WHITE)
     append(when {
         leader -> Strings.CREATE
@@ -107,25 +107,14 @@ fun getInteractiveDungeonList(page: Int) = component {
     append("$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n", ChatColor.WHITE)
 
     dng.instances.values.forEachIndexed { ii, inst ->
-
         append(getChevrons(1))
         append("${Strings.ROOM} ${ii + 1} ")
         append("| ", ChatColor.DARK_GRAY)
         append("Leader: ", ChatColor.GRAY)
-        inst.leader?.name?.let {
-            append(it, ChatColor.LIGHT_PURPLE)
-        } ?: run {
-            append("none", ChatColor.DARK_GRAY)
-        }
-
-
-        append(getJoinClickable(
-                    inst,
-                    inst.leader == null,
-                    inst.isLocked,
-                    inst.isFull,
-                    inst.inGame))
-
+        inst.leader?.name
+                ?.let { append(it, ChatColor.LIGHT_PURPLE) }
+                ?: append("none", ChatColor.DARK_GRAY)
+        append(getJoinClickable(inst))
         append(inst.leader?.let{ "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
     }
 
