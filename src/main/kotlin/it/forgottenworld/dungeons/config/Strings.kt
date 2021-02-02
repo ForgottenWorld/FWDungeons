@@ -123,6 +123,7 @@ object Strings {
     val PLAYER_LEFT_DUNGEON_PARTY by ResourceString()
     val PLAYER_NOT_FOUND by ResourceString()
     val PLAYERS by ResourceString()
+    val POTION_EFFECT_NOT_ALLOWED by ResourceString()
     val PRIVATE by ResourceString()
     val PROVIDE_NAME_OF_INVITEE by ResourceString()
     val PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID by ResourceString()

@@ -4,10 +4,7 @@ import it.forgottenworld.dungeons.command.FWDungeonsCommand
 import it.forgottenworld.dungeons.command.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
-import it.forgottenworld.dungeons.event.listener.EntityDeathListener
-import it.forgottenworld.dungeons.event.listener.PlayerListener
-import it.forgottenworld.dungeons.event.listener.RespawnHandler
-import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler
+import it.forgottenworld.dungeons.event.listener.*
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
@@ -35,7 +32,8 @@ class FWDungeonsPlugin : JavaPlugin() {
             EntityDeathListener(),
             PlayerListener(),
             TriggerActivationHandler(),
-            RespawnHandler()
+            RespawnHandler(),
+            PotionBlocker()
         ).forEach { server.pluginManager.registerEvents(it, this) }
 
         checkEasyRankingIntegration()

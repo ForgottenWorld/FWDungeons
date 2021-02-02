@@ -25,7 +25,7 @@ dependencies {
 }
 
 group = "it.forgottenworld"
-version = "0.11.4"
+version = "0.12.0"
 description = "fwdungeons"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
