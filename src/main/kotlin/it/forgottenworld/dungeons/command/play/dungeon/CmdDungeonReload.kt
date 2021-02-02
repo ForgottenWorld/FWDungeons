@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.event.listener.TriggerActivationHandler
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonReload(sender: CommandSender, args: Array<out String>): Boolean {

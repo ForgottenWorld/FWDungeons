@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
 fun cmdDungeonSave(sender: Player, args: Array<out String>): Boolean {

@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.model.dungeon
 
-import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.box.Box
@@ -8,7 +7,7 @@ import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editab
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.utils.ktx.*
+import it.forgottenworld.dungeons.utils.*
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -32,7 +31,7 @@ class FinalDungeon(override val id: Int,
 
     fun putInEditMode(player: Player): EditableDungeon? {
         if (isActive) {
-            player.sendFWDMessage(Strings.DUNGEON_WITH_ID_DISABLED.format(id))
+            player.sendFWDMessage(Strings.DUNGEON_WITH_ID_NOT_DISABLED.format(id))
             return null
         }
 
@@ -74,7 +73,7 @@ class FinalDungeon(override val id: Int,
         }
         createInstance(ConfigManager.dungeonWorld.getBlockAt(at.blockX, at.blockY, at.blockZ))
         @Suppress("BlockingMethodInNonBlockingContext")
-        launchAsync { config.save(file) }
+        (launchAsync { config.save(file) })
         return true
     }
 
@@ -102,12 +101,12 @@ class FinalDungeon(override val id: Int,
             dungeon.triggers.values.forEach {
                 if (contains("triggers.${it.id}")) createSection("triggers.${it.id}")
                 it.toConfig(getConfigurationSection("triggers.${it.id}")
-                                ?: createSection("triggers.${it.id}"))
+                    ?: createSection("triggers.${it.id}"))
             }
             dungeon.activeAreas.values.forEach {
                 if (contains("activeAreas.${it.id}")) createSection("activeAreas.${it.id}")
                 it.toConfig(getConfigurationSection("activeAreas.${it.id}")
-                        ?: createSection("activeAreas.${it.id}"))
+                    ?: createSection("activeAreas.${it.id}"))
             }
         }
     }
@@ -118,25 +117,25 @@ class FinalDungeon(override val id: Int,
 
         fun fromConfig(id: Int, conf: YamlConfiguration): FinalDungeon = conf.run {
             val triggers = getConfigurationSection("triggers")!!
-                    .getKeys(false)
-                    .associate { it.toInt() to Trigger.fromConfig(it.toInt(), getConfigurationSection("triggers.$it")!!) }
+                .getKeys(false)
+                .associate { it.toInt() to Trigger.fromConfig(it.toInt(), getConfigurationSection("triggers.$it")!!) }
 
             val activeAreas = getConfigurationSection("activeAreas")!!
-                    .getKeys(false)
-                    .associate { it.toInt() to ActiveArea.fromConfig(it.toInt(), getConfigurationSection("activeAreas.$it")!!) }
+                .getKeys(false)
+                .associate { it.toInt() to ActiveArea.fromConfig(it.toInt(), getConfigurationSection("activeAreas.$it")!!) }
 
             val dungeon = FinalDungeon(
-                    id,
-                    getString("name")!!,
-                    getString("description")!!,
-                    Difficulty.fromString(getString("difficulty")!!)!!,
-                    getInt("points", 0),
-                    getIntegerList("numberOfPlayers").let { IntRange(it.first(), it.last()) },
-                    Box(BlockVector(0, 0, 0), getInt("width"), getInt("height"), getInt("depth")),
-                    getVector("startingLocation")!!.toBlockVector(),
-                    triggers,
-                    activeAreas,
-                    mapOf()
+                id,
+                getString("name")!!,
+                getString("description")!!,
+                Difficulty.fromString(getString("difficulty")!!)!!,
+                getInt("points", 0),
+                getIntegerList("numberOfPlayers").let { IntRange(it.first(), it.last()) },
+                Box(BlockVector(0, 0, 0), getInt("width"), getInt("height"), getInt("depth")),
+                getVector("startingLocation")!!.toBlockVector(),
+                triggers,
+                activeAreas,
+                mapOf()
             )
 
             dungeon

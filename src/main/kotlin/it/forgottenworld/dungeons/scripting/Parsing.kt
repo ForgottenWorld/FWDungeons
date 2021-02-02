@@ -2,14 +2,14 @@ package it.forgottenworld.dungeons.scripting
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.utils.ktx.launch
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import kotlinx.coroutines.delay
 import org.bukkit.Material
 
 fun parseTokens(codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit {
     val parsed = mutableListOf<(DungeonFinalInstance) -> Unit>()
-    while(codeIterator.hasNext()) {
+    while (codeIterator.hasNext()) {
         when (val code = codeIterator.next()) {
             CODE_COMBAT_OBJECTIVE -> {
                 val combatObjective = parseCombatObjective(codeIterator)
@@ -30,12 +30,12 @@ fun parseTokens(codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit 
                     it.onInstanceFinish(true)
                 }
             }
-            CODE_BREAK -> return { for(f in parsed) f(it) }
+            CODE_BREAK -> return { for (f in parsed) f(it) }
             CODE_WHEN_DONE -> throw ScriptingException("whenDone used outside of combatObjective statement")
             else -> throw ScriptingException("Unrecognized code $code")
         }
     }
-    return { for(f in parsed) f(it) }
+    return { for (f in parsed) f(it) }
 }
 
 fun parseScript(lines: List<String>) = parseTokens(lines.iterator())

@@ -11,9 +11,9 @@ fun DungeonFinalInstance.instanceTriggers() = FinalInstanceTriggerDelegate(dunge
 class FinalInstanceTriggerDelegate(dungeon: Dungeon, newOrigin: BlockVector) {
 
     private val triggers = dungeon
-            .triggers
-            .entries
-            .associate { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
+        .triggers
+        .entries
+        .associate { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = triggers
 }

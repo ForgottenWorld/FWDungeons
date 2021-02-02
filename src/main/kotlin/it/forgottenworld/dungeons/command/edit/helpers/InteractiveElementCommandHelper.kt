@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editab
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.ACTIVE_AREA
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType.TRIGGER
-import it.forgottenworld.dungeons.utils.ktx.*
+import it.forgottenworld.dungeons.utils.*
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -30,7 +30,7 @@ object InteractiveElementCommandHelper {
 
         if (!dungeon.hasTestInstance) {
             sender.sendFWDMessage(Strings.DUNGEON_BOX_AND_STARTPOS_SHOULD_BE_SET_BEFORE_ADDING_IE.format(
-                    if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
+                if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
             ))
             return
         }
@@ -53,9 +53,9 @@ object InteractiveElementCommandHelper {
         val box = builder.build()
         if (box == null) {
             sender.sendFWDMessage(Strings.NTH_POS_SET_PICK_ANOTHER.format(
-                    if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                    if (type == TRIGGER) "t" else "aa",
-                    if (posNo == 1) 2 else 1
+                if (posNo == 1) Strings.FIRST else Strings.SECOND,
+                if (type == TRIGGER) "t" else "aa",
+                if (posNo == 1) 2 else 1
             ))
             return
         }
@@ -78,7 +78,7 @@ object InteractiveElementCommandHelper {
             return
         }
 
-        if (type == TRIGGER  && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
+        if (type == TRIGGER && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
             sender.sendFWDMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS))
             return
         }
@@ -93,7 +93,7 @@ object InteractiveElementCommandHelper {
             return
         }
 
-        if (type == TRIGGER  && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
+        if (type == TRIGGER && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
             sender.sendFWDMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS))
             return
         }
@@ -108,13 +108,13 @@ object InteractiveElementCommandHelper {
             return
         }
 
-        if (type == TRIGGER  && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
+        if (type == TRIGGER && dungeon.triggers.isEmpty() || type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()) {
             sender.sendFWDMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS))
             return
         }
 
         (if (type == TRIGGER) dungeon.testInstance?.triggers else dungeon.testInstance?.activeAreas)
-                ?.get(ieId)?.box?.highlightAll()
+            ?.get(ieId)?.box?.highlightAll()
         sender.sendFWDMessage(Strings.HIGHLIGHTED_IE_WITH_ID.format(if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS, ieId))
     }
 
@@ -128,10 +128,14 @@ object InteractiveElementCommandHelper {
         sender.inventory.setItemInMainHand(ItemStack(material, 1).apply {
             itemMeta = itemMeta?.apply {
                 persistentDataContainer
-                        .set(NamespacedKey(
+                    .set(
+                        NamespacedKey(
                             plugin,
-                                if (type == TRIGGER) "FWD_TRIGGER_WAND" else "FWD_ACTIVE_AREA_WAND"
-                        ), PersistentDataType.SHORT, 1)
+                            if (type == TRIGGER) "FWD_TRIGGER_WAND" else "FWD_ACTIVE_AREA_WAND"
+                        ),
+                        PersistentDataType.SHORT,
+                        1
+                    )
             }
             addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10)
         })

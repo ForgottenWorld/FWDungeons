@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonEnable(sender: CommandSender, args: Array<out String>): Boolean {

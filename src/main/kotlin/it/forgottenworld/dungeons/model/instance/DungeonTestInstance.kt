@@ -7,9 +7,9 @@ import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElement
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
 import it.forgottenworld.dungeons.utils.ParticleSpammer
-import it.forgottenworld.dungeons.utils.ktx.getPlayer
-import it.forgottenworld.dungeons.utils.ktx.launch
-import it.forgottenworld.dungeons.utils.ktx.launchAsync
+import it.forgottenworld.dungeons.utils.getPlayer
+import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.utils.launchAsync
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
@@ -19,9 +19,9 @@ import org.bukkit.util.Vector
 import java.util.*
 
 class DungeonTestInstance(
-        override val dungeon: EditableDungeon,
-        override val origin: BlockVector,
-        private val tester: UUID) : DungeonInstance {
+    override val dungeon: EditableDungeon,
+    override val origin: BlockVector,
+    private val tester: UUID) : DungeonInstance {
 
     override val id = -1
     override val box = dungeon.box!!.withOrigin(origin)
@@ -34,7 +34,7 @@ class DungeonTestInstance(
     private var hlFrames = false
 
     fun updateTriggers(newTriggers: Map<Int, Trigger>) {
-        triggers = newTriggers.mapValues { (_,t) ->
+        triggers = newTriggers.mapValues { (_, t) ->
             t.withContainerOrigin(
                 BlockVector(0, 0, 0),
                 origin
@@ -104,9 +104,9 @@ class DungeonTestInstance(
     }
 
     private fun checkTriggers(
-            playerUuid: UUID,
-            posVector: Vector,
-            oldTriggerId: Int?
+        playerUuid: UUID,
+        posVector: Vector,
+        oldTriggerId: Int?
     ) = launchAsync {
         val triggerId = triggers.values.find { it.containsVector(posVector) }?.id
 
@@ -114,9 +114,9 @@ class DungeonTestInstance(
 
         launch {
             Bukkit.getPluginManager().callEvent(TriggerEvent(
-                    playerUuid,
-                    triggerId ?: -1,
-                    oldTriggerId != null
+                playerUuid,
+                triggerId ?: -1,
+                oldTriggerId != null
             ))
         }
     }
@@ -132,9 +132,9 @@ class DungeonTestInstance(
             while (true) {
                 delay(500)
                 checkTriggers(
-                        tester,
-                        player.location.toVector(),
-                        tester.collidingTrigger?.id
+                    tester,
+                    player.location.toVector(),
+                    tester.collidingTrigger?.id
                 )
             }
         }

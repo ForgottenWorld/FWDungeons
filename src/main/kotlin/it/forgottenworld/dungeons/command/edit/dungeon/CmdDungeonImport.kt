@@ -2,9 +2,9 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.utils.ktx.blockVector
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import it.forgottenworld.dungeons.utils.ktx.targetBlock
+import it.forgottenworld.dungeons.utils.blockVector
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.targetBlock
 import org.bukkit.Material
 import org.bukkit.entity.Player
 

@@ -1,7 +1,6 @@
 package it.forgottenworld.dungeons.utils
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.utils.ktx.launch
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Location
@@ -9,20 +8,20 @@ import org.bukkit.Particle
 import org.bukkit.util.BlockVector
 
 fun repeatedlySpawnParticles(
-        particle: Particle,
-        locations: Iterable<Location>,
-        count: Int,
-        interval: Long,
-        iterations: Int) {
+    particle: Particle,
+    locations: Iterable<Location>,
+    count: Int,
+    interval: Long,
+    iterations: Int) {
     val world = ConfigManager.dungeonWorld
     launch {
         for (i in 0 until iterations) {
             delay(interval)
             locations.forEach {
                 world.spawnParticle(
-                        particle,
-                        it.clone().add(0.5, 0.5, 0.5),
-                        count)
+                    particle,
+                    it.clone().add(0.5, 0.5, 0.5),
+                    count)
             }
         }
     }

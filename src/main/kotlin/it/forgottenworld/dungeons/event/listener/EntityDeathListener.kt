@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 
-class EntityDeathListener: Listener {
+class EntityDeathListener : Listener {
 
     @EventHandler
     fun onEntityDeath(event: EntityDeathEvent) {

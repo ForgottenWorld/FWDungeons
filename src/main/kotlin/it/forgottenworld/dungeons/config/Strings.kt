@@ -8,12 +8,12 @@ object Strings {
     lateinit var map: Map<String, String>
 
     private class ResourceString {
-        
+
         var value: String? = null
-        
+
         operator fun getValue(thisRef: Any?, property: KProperty<*>) = value ?: map
-                .getOrDefault(property.name, "STRING_${property.name}")
-                .also { value = it }
+            .getOrDefault(property.name, "STRING_${property.name}")
+            .also { value = it }
     }
 
     fun loadFromRes(conf: FileConfiguration) {
@@ -64,7 +64,7 @@ object Strings {
     val DUNGEON_SAVED by ResourceString()
     val DUNGEON_STARTPOS_SET by ResourceString()
     val DUNGEON_WITH_ID_ALREADY_ACTIVE by ResourceString()
-    val DUNGEON_WITH_ID_DISABLED by ResourceString()
+    val DUNGEON_WITH_ID_NOT_DISABLED by ResourceString()
     val DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT by ResourceString()
     val DUNGEON_WITH_ID_IS_BEING_EDITED by ResourceString()
     val DUNGEON_WITH_ID_WAS_DISABLED by ResourceString()

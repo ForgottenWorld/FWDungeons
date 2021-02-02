@@ -10,22 +10,22 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://rayzr.dev/repo/")
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://jitpack.io")
     maven("https://mvn.lumine.io/repository/maven-public/")
-    maven("https://rayzr.dev/repo/")
 }
 
 dependencies {
-    compileOnly("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:0.0.6")
+    compileOnly("com.github.BrunoSilvaFreire:Skedule:0.1.3")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine.xikage:MythicMobs:4.10.0")
     compileOnly("com.github.ForgottenWorld:EasyRanking:7362fe6420")
 }
 
 group = "it.forgottenworld"
-version = "0.11.3"
+version = "0.11.4"
 description = "fwdungeons"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 

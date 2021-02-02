@@ -7,18 +7,18 @@ import it.forgottenworld.dungeons.command.api.TreeCommand
 import it.forgottenworld.dungeons.command.play.dungeon.*
 
 class FWDungeonsCommand : TreeCommand(
-        "fwdungeons",
-        BranchingCommand(mapOf(
-                "join" to PlayerCommand(::cmdDungeonJoinInstance),
-                "list" to PlayerCommand(::cmdDungeonList),
-                "invite" to PlayerCommand(::cmdDungeonInvite),
-                "leave" to PlayerCommand(::cmdDungeonLeave),
-                "lock" to PlayerCommand(::cmdDungeonLockParty),
-                "unlock" to PlayerCommand(::cmdDungeonUnlockParty),
-                "start" to PlayerCommand(::cmdDungeonStart),
-                "evacuate" to SenderCommand(::cmdDungeonEvacuate),
-                "lookup" to SenderCommand(::cmdDungeonLookup),
-                "enable" to SenderCommand(::cmdDungeonEnable),
-                "disable" to SenderCommand(::cmdDungeonDisable),
-                "reload" to SenderCommand(::cmdDungeonReload),
-        )))
+    "fwdungeons",
+    BranchingCommand(mapOf(
+        "join" to PlayerCommand(::cmdDungeonJoinInstance),
+        "list" to PlayerCommand(::cmdDungeonList),
+        "invite" to PlayerCommand(::cmdDungeonInvite),
+        "leave" to PlayerCommand(::cmdDungeonLeave),
+        "lock" to PlayerCommand(::cmdDungeonLockParty),
+        "unlock" to PlayerCommand(::cmdDungeonUnlockParty),
+        "start" to PlayerCommand(::cmdDungeonStart),
+        "evacuate" to SenderCommand(::cmdDungeonEvacuate),
+        "lookup" to SenderCommand(::cmdDungeonLookup),
+        "enable" to SenderCommand(::cmdDungeonEnable),
+        "disable" to SenderCommand(::cmdDungeonDisable),
+        "reload" to SenderCommand(::cmdDungeonReload),
+    )))

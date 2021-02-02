@@ -6,9 +6,9 @@ import java.util.*
 
 @Suppress("unused")
 class TriggerEvent(
-        val playerUuid: UUID,
-        val triggerId: Int,
-        val erase: Boolean
+    val playerUuid: UUID,
+    val triggerId: Int,
+    val erase: Boolean
 ) : Event() {
 
     override fun getHandlers() = HANDLERS

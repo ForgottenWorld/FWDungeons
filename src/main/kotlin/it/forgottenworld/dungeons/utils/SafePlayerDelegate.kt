@@ -1,6 +1,5 @@
 package it.forgottenworld.dungeons.utils
 
-import it.forgottenworld.dungeons.utils.ktx.getPlayer
 import org.bukkit.entity.Player
 import kotlin.reflect.KProperty
 

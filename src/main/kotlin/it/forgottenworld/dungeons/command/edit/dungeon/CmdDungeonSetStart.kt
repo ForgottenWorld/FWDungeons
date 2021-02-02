@@ -2,9 +2,9 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import it.forgottenworld.dungeons.utils.ktx.toBlockVector
-import it.forgottenworld.dungeons.utils.ktx.withRefSystemOrigin
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.toBlockVector
+import it.forgottenworld.dungeons.utils.withRefSystemOrigin
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
 
@@ -26,8 +26,8 @@ fun cmdDungeonSetStart(sender: Player, args: Array<out String>): Boolean {
     }
 
     dungeon.startingLocation = sender.location
-            .toBlockVector()
-            .withRefSystemOrigin(testInstance.origin, BlockVector(0, 0, 0))
+        .toBlockVector()
+        .withRefSystemOrigin(testInstance.origin, BlockVector(0, 0, 0))
 
     sender.sendFWDMessage(Strings.DUNGEON_STARTPOS_SET)
 

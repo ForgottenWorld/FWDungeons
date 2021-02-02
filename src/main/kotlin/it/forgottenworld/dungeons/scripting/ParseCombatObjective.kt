@@ -4,10 +4,10 @@ import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.utils.MobSpawnData
 
 fun parseCombatObjective(
-        codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit {
+    codeIterator: Iterator<String>): (DungeonFinalInstance) -> Unit {
     var currentActiveArea: Int? = null
     val mobs = mutableListOf<MobSpawnData>()
-    while(codeIterator.hasNext()) {
+    while (codeIterator.hasNext()) {
         val code = codeIterator.next()
         when {
             code.startsWith(PREFIX_MYTHIC_MOB) -> {

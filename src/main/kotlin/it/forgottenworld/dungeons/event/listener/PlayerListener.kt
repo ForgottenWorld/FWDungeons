@@ -3,8 +3,8 @@ package it.forgottenworld.dungeons.event.listener
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance.Companion.finalInstance
-import it.forgottenworld.dungeons.utils.ktx.plugin
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.plugin
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.persistence.PersistentDataType
 
 
-class PlayerListener: Listener {
+class PlayerListener : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent?) {
@@ -59,8 +59,8 @@ class PlayerListener: Listener {
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.player.finalInstance != null &&
-                event.item?.type == Material.ENDER_PEARL &&
-                (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)) {
+            event.item?.type == Material.ENDER_PEARL &&
+            (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)) {
             event.player.sendFWDMessage(Strings.NO_EPEARLS_IN_THE_DUNGEON)
             event.isCancelled = true
             return
@@ -70,19 +70,19 @@ class PlayerListener: Listener {
 
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
         val isTriggerWand =
-                persistentDataContainer
-                        .get(NamespacedKey(plugin, "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
-                        ?.toShort()
-                        ?.equals(1.toShort()) ?: false
+            persistentDataContainer
+                .get(NamespacedKey(plugin, "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
+                ?.toShort()
+                ?.equals(1.toShort()) ?: false
         val isActiveAreaWand = !isTriggerWand
-                && persistentDataContainer
-                        .get(NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
-                        ?.toShort()
-                        ?.equals(1.toShort()) ?: false
+            && persistentDataContainer
+            .get(NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
+            ?.toShort()
+            ?.equals(1.toShort()) ?: false
 
         if (!isTriggerWand && !isActiveAreaWand) return
         val cmd = when (event.action) {
-            Action.LEFT_CLICK_BLOCK ->  "fwde ${if (isTriggerWand) "trigger" else "activearea"} pos1"
+            Action.LEFT_CLICK_BLOCK -> "fwde ${if (isTriggerWand) "trigger" else "activearea"} pos1"
             Action.RIGHT_CLICK_BLOCK -> "fwde ${if (isTriggerWand) "trigger" else "activearea"} pos2"
             else -> return
         }

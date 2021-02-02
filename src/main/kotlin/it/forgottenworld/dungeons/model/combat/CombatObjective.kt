@@ -6,9 +6,9 @@ import org.bukkit.entity.LivingEntity
 import java.util.*
 
 class CombatObjective(
-        val instance: DungeonFinalInstance,
-        private val mobsToKill: MutableList<UUID>,
-        var onAllKilled: (DungeonFinalInstance) -> Unit) {
+    val instance: DungeonFinalInstance,
+    private val mobsToKill: MutableList<UUID>,
+    var onAllKilled: (DungeonFinalInstance) -> Unit) {
 
     private var aborting = false
     private val shouldBeRemoved
@@ -30,9 +30,9 @@ class CombatObjective(
     fun abort() {
         aborting = true
         mobsToKill
-                .map { getEntity(it) }
-                .filterIsInstance<LivingEntity>()
-                .forEach { it.health = 0.0 }
+            .map { getEntity(it) }
+            .filterIsInstance<LivingEntity>()
+            .forEach { it.health = 0.0 }
     }
 
     companion object {

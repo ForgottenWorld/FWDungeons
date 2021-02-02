@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.command.edit.activearea
 import it.forgottenworld.dungeons.command.edit.helpers.InteractiveElementCommandHelper
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
 fun cmdActiveAreaHl(sender: Player, args: Array<out String>): Boolean {

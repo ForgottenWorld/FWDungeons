@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonDisable(sender: CommandSender, args: Array<out String>): Boolean {
@@ -24,10 +24,10 @@ fun cmdDungeonDisable(sender: CommandSender, args: Array<out String>): Boolean {
     } != null
 
     sender.sendFWDMessage(
-            if (res)
-                Strings.DUNGEON_WITH_ID_WAS_DISABLED.format(dungeonId)
-            else
-                Strings.NO_DUNGEON_FOUND_WITH_ID.format(dungeonId)
+        if (res)
+            Strings.DUNGEON_WITH_ID_WAS_DISABLED.format(dungeonId)
+        else
+            Strings.NO_DUNGEON_FOUND_WITH_ID.format(dungeonId)
     )
 
     return true

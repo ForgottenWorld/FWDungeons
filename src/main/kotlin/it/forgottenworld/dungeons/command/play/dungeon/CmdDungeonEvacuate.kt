@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.command.play.dungeon
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 fun cmdDungeonEvacuate(sender: CommandSender, args: Array<out String>): Boolean {
@@ -20,9 +20,9 @@ fun cmdDungeonEvacuate(sender: CommandSender, args: Array<out String>): Boolean 
     }
 
     sender.sendFWDMessage(if (FinalDungeon.dungeons[dungeonId]?.instances?.get(instanceId)?.evacuate() != null)
-                Strings.ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET
-            else
-                Strings.DUNGEON_INSTANCE_NOT_FOUND
+        Strings.ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET
+    else
+        Strings.DUNGEON_INSTANCE_NOT_FOUND
     )
 
     return true

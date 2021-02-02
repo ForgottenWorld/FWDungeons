@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.model.box
 
 import it.forgottenworld.dungeons.config.ConfigManager
-import it.forgottenworld.dungeons.utils.ktx.max
-import it.forgottenworld.dungeons.utils.ktx.min
+import it.forgottenworld.dungeons.utils.max
+import it.forgottenworld.dungeons.utils.min
 import it.forgottenworld.dungeons.utils.repeatedlySpawnParticles
 import org.bukkit.Particle
 import org.bukkit.block.Block
@@ -13,15 +13,15 @@ import org.bukkit.util.BoundingBox
 import org.bukkit.util.Vector
 
 class Box : Cloneable {
-    var origin : BlockVector
-    var width : Int
-    var height : Int
-    var depth : Int
+    var origin: BlockVector
+    var width: Int
+    var height: Int
+    var depth: Int
 
     constructor(origin: BlockVector,
-                width : Int,
-                height : Int,
-                depth : Int) {
+                width: Int,
+                height: Int,
+                depth: Int) {
         this.origin = origin
         this.width = width
         this.height = height
@@ -38,26 +38,26 @@ class Box : Cloneable {
 
     val boundingBox
         get() = BoundingBox.of(origin, BlockVector(
-                origin.x + width,
-                origin.y + height,
-                origin.z + depth))
+            origin.x + width,
+            origin.y + height,
+            origin.z + depth))
 
     fun containsPlayer(player: Player) = player.location.let {
         it.x >= origin.blockX && it.x <= origin.blockX + width &&
-                it.y >= origin.blockY && it.y <= origin.blockY + height &&
-                it.z >= origin.blockZ && it.z <= origin.blockZ + depth
+            it.y >= origin.blockY && it.y <= origin.blockY + height &&
+            it.z >= origin.blockZ && it.z <= origin.blockZ + depth
     }
 
     fun containsBlock(block: Block) = block.location.let {
         it.x >= origin.blockX && it.x < origin.blockX + width &&
-                it.y >= origin.blockY && it.y < origin.blockY + height &&
-                it.z >= origin.blockZ && it.z < origin.blockZ + depth
+            it.y >= origin.blockY && it.y < origin.blockY + height &&
+            it.z >= origin.blockZ && it.z < origin.blockZ + depth
     }
 
     fun containsVector(vector: Vector) = vector.run {
         x >= origin.blockX && x < origin.blockX + width &&
-                y >= origin.blockY && y < origin.blockY + height &&
-                z >= origin.blockZ && z < origin.blockZ + depth
+            y >= origin.blockY && y < origin.blockY + height &&
+            z >= origin.blockZ && z < origin.blockZ + depth
     }
 
     fun withOriginZero() = Box(BlockVector(0, 0, 0), width, height, depth)
@@ -65,11 +65,11 @@ class Box : Cloneable {
     fun withOrigin(origin: BlockVector) = Box(origin, width, height, depth)
 
     fun withContainerOrigin(oldContainerOrigin: BlockVector, newOrigin: BlockVector) = Box(
-            BlockVector(
-                    origin.x - oldContainerOrigin.x + newOrigin.x,
-                    origin.y - oldContainerOrigin.y + newOrigin.y,
-                    origin.z - oldContainerOrigin.z + newOrigin.z),
-            width, height, depth)
+        BlockVector(
+            origin.x - oldContainerOrigin.x + newOrigin.x,
+            origin.y - oldContainerOrigin.y + newOrigin.y,
+            origin.z - oldContainerOrigin.z + newOrigin.z),
+        width, height, depth)
 
     fun getAllBlocks(): Set<Block> {
         val blocks = mutableSetOf<Block>()
@@ -84,7 +84,7 @@ class Box : Cloneable {
         return blocks
     }
 
-    fun getFrontier() : Set<BlockVector> {
+    fun getFrontier(): Set<BlockVector> {
         val vecs = mutableSetOf<BlockVector>()
         for (x in 0 until width) {
             for (y in 0 until height) {
@@ -103,11 +103,11 @@ class Box : Cloneable {
 
     fun highlightAll() {
         repeatedlySpawnParticles(
-                Particle.COMPOSTER,
-                getAllBlocks().map{ it.location },
-                1,
-                500,
-                20
+            Particle.COMPOSTER,
+            getAllBlocks().map { it.location },
+            1,
+            500,
+            20
         )
     }
 
@@ -116,10 +116,10 @@ class Box : Cloneable {
     companion object {
 
         fun fromConfig(config: ConfigurationSection) = Box(
-                config.getVector("origin")!!.toBlockVector(),
-                config.getInt("width"),
-                config.getInt("height"),
-                config.getInt("depth")
+            config.getVector("origin")!!.toBlockVector(),
+            config.getInt("width"),
+            config.getInt("height"),
+            config.getInt("depth")
         )
     }
 }

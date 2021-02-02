@@ -8,8 +8,8 @@ import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.model.instance.DungeonInstance
 import it.forgottenworld.dungeons.scripting.cleanupCode
 import it.forgottenworld.dungeons.scripting.parseScript
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import it.forgottenworld.dungeons.utils.ktx.toVector
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.toVector
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockVector
@@ -17,10 +17,10 @@ import org.bukkit.util.Vector
 import java.util.*
 
 class Trigger(
-        override val id: Int,
-        override val box: Box,
-        val effectCode: List<String> = listOf(),
-        private val requiresWholeParty: Boolean = false,
+    override val id: Int,
+    override val box: Box,
+    val effectCode: List<String> = listOf(),
+    private val requiresWholeParty: Boolean = false,
 ) : InteractiveElement {
 
     private val effect = parseScript(effectCode)
@@ -29,7 +29,7 @@ class Trigger(
     private var procced = false
 
     private val playersCurrentlyInside = mutableSetOf<UUID>()
-    val origin : BlockVector
+    val origin: BlockVector
         get() = box.origin
 
     fun reset() {
@@ -60,11 +60,11 @@ class Trigger(
     }
 
     override fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
-            Trigger(id,
-                    box.withContainerOrigin(oldOrigin, newOrigin),
-                    effectCode,
-                    requiresWholeParty
-            ).also { it.label = label }
+        Trigger(id,
+            box.withContainerOrigin(oldOrigin, newOrigin),
+            effectCode,
+            requiresWholeParty
+        ).also { it.label = label }
 
     private fun proc(instance: DungeonFinalInstance) {
         if (procced || requiresWholeParty && instance.playerCount != playersCurrentlyInside.size) return
@@ -87,11 +87,11 @@ class Trigger(
     companion object {
 
         fun fromConfig(id: Int, config: ConfigurationSection) =
-                Trigger(
-                        id,
-                        Box.fromConfig(config),
-                        cleanupCode(config.getString("effect")!!),
-                        config.getBoolean("requiresWholeParty")
-                ).apply { config.getString("label")?.let { label = it } }
+            Trigger(
+                id,
+                Box.fromConfig(config),
+                cleanupCode(config.getString("effect")!!),
+                config.getBoolean("requiresWholeParty")
+            ).apply { config.getString("label")?.let { label = it } }
     }
 }

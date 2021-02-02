@@ -8,8 +8,7 @@ import it.forgottenworld.dungeons.model.instance.DungeonTestInstance
 import it.forgottenworld.dungeons.model.interactiveelement.ActiveArea
 import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
 import it.forgottenworld.dungeons.model.interactiveelement.Trigger
-import it.forgottenworld.dungeons.utils.ktx.*
-import it.forgottenworld.dungeons.utils.safePlayer
+import it.forgottenworld.dungeons.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
@@ -66,17 +65,17 @@ class EditableDungeon(editor: Player) : Dungeon {
             val file = File(plugin.dataFolder, "instances.yml")
             if (file.exists()) config.load(file)
             val dgConf = config.createSection("$newId")
-            finalDungeon.instances = finalInstanceLocations.withIndex().map { (k,v) ->
+            finalDungeon.instances = finalInstanceLocations.withIndex().map { (k, v) ->
                 dgConf.createSection("$k").run {
                     set("x", v.blockX)
                     set("y", v.blockY)
                     set("z", v.blockZ)
                 }
                 k to finalDungeon.createInstance(
-                        ConfigManager.dungeonWorld.getBlockAt(v.blockX, v.blockY, v.blockZ))
+                    ConfigManager.dungeonWorld.getBlockAt(v.blockX, v.blockY, v.blockZ))
             }.toMap()
             @Suppress("BlockingMethodInNonBlockingContext")
-            launchAsync { config.save(file) }
+            (launchAsync { config.save(file) })
         } catch (e: Exception) {
             Bukkit.getLogger().warning(e.message)
         }
@@ -84,7 +83,7 @@ class EditableDungeon(editor: Player) : Dungeon {
         onDestroy()
         return finalDungeon
     }
-    
+
     fun labelInteractiveElement(type: InteractiveElementType, label: String) {
         if (type == InteractiveElementType.TRIGGER) labelTrigger(label) else labelActiveArea(label)
     }
@@ -94,11 +93,11 @@ class EditableDungeon(editor: Player) : Dungeon {
     }
 
     suspend fun newInteractiveElement(type: InteractiveElementType, box: Box) =
-            if (type == InteractiveElementType.TRIGGER) newTrigger(box) else newActiveArea(box)
+        if (type == InteractiveElementType.TRIGGER) newTrigger(box) else newActiveArea(box)
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
-        ActiveArea(id, box.withContainerOrigin(testInstance!!.origin,BlockVector(0, 0, 0))).let {
+        ActiveArea(id, box.withContainerOrigin(testInstance!!.origin, BlockVector(0, 0, 0))).let {
             activeAreas = activeAreas.plus(id to it)
             testInstance?.highlightNewInteractiveElement(it)
         }
@@ -106,11 +105,11 @@ class EditableDungeon(editor: Player) : Dungeon {
     }
 
     private fun unmakeActiveArea(aaId: Int?) =
-            if (aaId == null) activeAreas.keys.last().also { activeAreas = activeAreas.minus(it) }
-            else {
-                activeAreas = activeAreas.minus(aaId)
-                aaId
-            }
+        if (aaId == null) activeAreas.keys.last().also { activeAreas = activeAreas.minus(it) }
+        else {
+            activeAreas = activeAreas.minus(aaId)
+            aaId
+        }
 
     private fun labelActiveArea(label: String) {
         activeAreas.values.lastOrNull()?.label = label
@@ -133,11 +132,11 @@ class EditableDungeon(editor: Player) : Dungeon {
     }
 
     private fun unmakeTrigger(tId: Int?) =
-            if (tId == null) triggers.keys.last().also { triggers = triggers.minus(it) }
-            else {
-                triggers = triggers.minus(tId)
-                tId
-            }
+        if (tId == null) triggers.keys.last().also { triggers = triggers.minus(it) }
+        else {
+            triggers = triggers.minus(tId)
+            tId
+        }
 
     private fun labelTrigger(label: String) {
         triggers.values.lastOrNull()?.label = label
@@ -176,7 +175,7 @@ class EditableDungeon(editor: Player) : Dungeon {
             get() = editableDungeons[uniqueId]
             set(value) {
                 value?.let { editableDungeons[uniqueId] = it }
-                        ?: editableDungeons.remove(uniqueId)
+                    ?: editableDungeons.remove(uniqueId)
             }
     }
 }

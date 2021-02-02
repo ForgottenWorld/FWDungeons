@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.config
 
 import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.utils.ktx.launchAsync
-import it.forgottenworld.dungeons.utils.ktx.plugin
+import it.forgottenworld.dungeons.utils.launchAsync
+import it.forgottenworld.dungeons.utils.plugin
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -19,8 +19,8 @@ object ConfigManager {
 
     private val dungeonWorldId by lazy {
         config.getString("dungeonWorld")
-                ?.let { Bukkit.getWorld(it)?.uid ?: error("Dungeon world not found!") }
-                ?: throw ConfigurationException("dungeonWorld missing from config!")
+            ?.let { Bukkit.getWorld(it)?.uid ?: error("Dungeon world not found!") }
+            ?: throw ConfigurationException("dungeonWorld missing from config!")
     }
 
     val easyRankingIntegration by lazy { config.getBoolean("easyRankingIntegration", false) }
@@ -37,16 +37,16 @@ object ConfigManager {
     private fun loadDungeonConfigs(dataFolder: File) {
         val dir = File(dataFolder, "dungeons").apply { if (isFile || (!exists() && mkdir())) return }
         dir.list()
-                ?.filter { it.matches(dungeonNameRegex) }
-                ?.forEach {
-                    try {
-                        val dId = it.removeSuffix(".yml").toInt()
-                        val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                        FinalDungeon.dungeons[dId] = FinalDungeon.fromConfig(dId, conf)
-                    } catch (e : Exception) {
-                        e.printStackTrace()
-                    }
+            ?.filter { it.matches(dungeonNameRegex) }
+            ?.forEach {
+                try {
+                    val dId = it.removeSuffix(".yml").toInt()
+                    val conf = YamlConfiguration().apply { load(File(dir, it)) }
+                    FinalDungeon.dungeons[dId] = FinalDungeon.fromConfig(dId, conf)
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            }
     }
 
     fun saveDungeonConfig(dungeon: FinalDungeon, eraseEffects: Boolean = false) {
@@ -76,7 +76,7 @@ object ConfigManager {
         for (dId in FinalDungeon.dungeons.keys) {
             val sec = conf.getConfigurationSection("$dId")
             if (sec?.getKeys(false)?.isEmpty() != false) {
-                Bukkit.getLogger().warning("Dungeon $dId has no instances, create one with /fwde d import $dId")
+                Bukkit.getLogger().warning("Dungeon $dId loaded from config has no instances, create one with /fwde d import $dId")
                 FinalDungeon.dungeons[dId]?.isActive = false
                 continue
             }

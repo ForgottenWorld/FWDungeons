@@ -10,7 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.*
 
-class TriggerActivationHandler: Listener {
+class TriggerActivationHandler : Listener {
 
     @EventHandler
     fun onTrigger(event: TriggerEvent) {
@@ -18,8 +18,8 @@ class TriggerActivationHandler: Listener {
         if (event.erase) player.collidingTrigger?.onPlayerExit(player)
         if (event.triggerId == -1) return
         val inst = player.finalInstance
-                ?: player.editableDungeon?.testInstance
-                ?: return
+            ?: player.editableDungeon?.testInstance
+            ?: return
         inst.triggers[event.triggerId]?.onPlayerEnter(player, inst)
     }
 
@@ -33,14 +33,14 @@ class TriggerActivationHandler: Listener {
             get() = triggerCollisions[uniqueId]
             set(value) {
                 value?.let { triggerCollisions[uniqueId] = it }
-                        ?: triggerCollisions.remove(uniqueId)
+                    ?: triggerCollisions.remove(uniqueId)
             }
 
         var UUID.collidingTrigger
             get() = triggerCollisions[this]
             set(value) {
                 value?.let { triggerCollisions[this] = it }
-                        ?: triggerCollisions.remove(this)
+                    ?: triggerCollisions.remove(this)
             }
     }
 }

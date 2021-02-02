@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.event.listener
 
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.utils.WarpbackData
-import it.forgottenworld.dungeons.utils.ktx.sendFWDMessage
-import it.forgottenworld.dungeons.utils.ktx.launch
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.launch
 import kotlinx.coroutines.delay
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
