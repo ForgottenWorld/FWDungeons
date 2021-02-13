@@ -29,12 +29,25 @@ fun Location.toBlockVector() = BlockVector(blockX, blockY, blockZ)
 
 fun Vector.locationInWorld(world: World) = Location(world, x, y, z)
 
-fun BlockVector.withRefSystemOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
-    BlockVector(
-        x - oldOrigin.x + newOrigin.x,
-        y - oldOrigin.y + newOrigin.y,
-        z - oldOrigin.z + newOrigin.z
-    )
+infix fun Int.euclideanMod(other: Int) = (this % other + other) % other
+
+fun IntRange.intersects(other: IntRange) = last >= other.first && first <= other.last
+
+fun BlockVector.withRefSystemOrigin(
+    oldOrigin: BlockVector,
+    newOrigin: BlockVector
+) = BlockVector(
+    x - oldOrigin.x + newOrigin.x,
+    y - oldOrigin.y + newOrigin.y,
+    z - oldOrigin.z + newOrigin.z
+)
+
+fun Int.toByteArray() = byteArrayOf(
+    (this shr 24).toByte(),
+    (this shr 16).toByte(),
+    (this shr 8).toByte(),
+    this.toByte()
+)
 
 fun CommandSender.sendFWDMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
 

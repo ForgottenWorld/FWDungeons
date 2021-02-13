@@ -3,8 +3,6 @@ package it.forgottenworld.dungeons.utils
 import org.bukkit.entity.Player
 import java.util.*
 
-fun mutablePlayerListOf(vararg elements: Player) = MutablePlayerList().apply { addAll(elements) }
-
 class MutablePlayerList : MutableList<Player?> {
 
     private val list = mutableListOf<UUID>()
@@ -78,4 +76,7 @@ class MutablePlayerList : MutableList<Player?> {
         .map { getPlayer(it) }
         .toMutableList()
 
+    companion object {
+        fun of(vararg elements: Player) = MutablePlayerList().apply { addAll(elements) }
+    }
 }

@@ -4,7 +4,11 @@ import it.forgottenworld.dungeons.command.FWDungeonsCommand
 import it.forgottenworld.dungeons.command.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
-import it.forgottenworld.dungeons.event.listener.*
+import it.forgottenworld.dungeons.listener.PlayerListener
+import it.forgottenworld.dungeons.listener.BypassAttemptListener
+import it.forgottenworld.dungeons.listener.RespawnHandler
+import it.forgottenworld.dungeons.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.game.objectives.CombatObjective
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
@@ -29,11 +33,11 @@ class FWDungeonsPlugin : JavaPlugin() {
         logger.info("Registering events...")
 
         listOf(
-            EntityDeathListener(),
+            CombatObjective.EntityDeathListener(),
             PlayerListener(),
-            TriggerActivationHandler(),
+            Trigger.ActivationHandler(),
             RespawnHandler(),
-            PotionBlocker()
+            BypassAttemptListener()
         ).forEach { server.pluginManager.registerEvents(it, this) }
 
         checkEasyRankingIntegration()

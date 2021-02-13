@@ -1,5 +1,5 @@
 name: FWDungeons
-version: "0.12.0"
+version: "0.13.0"
 api-version: "1.16"
 description: Create multi-instance scriptable co-op dungeons in your Minecraft server
 author: Shivs (OhMeMuffin)
@@ -51,6 +51,9 @@ permissions:
     default: op
   fwdungeonsedit.dungeon.hlframes:
     description: Allows the player to use /fwdungeonsedit dungeon hlframes
+    default: op
+  fwdungeonsedit.dungeon.volmap:
+    description: Allows the player to use /fwdungeonsedit dungeon volmap
     default: op
   fwdungeonsedit.dungeon.instadd:
     description: Allows the player to use /fwdungeonsedit dungeon instadd

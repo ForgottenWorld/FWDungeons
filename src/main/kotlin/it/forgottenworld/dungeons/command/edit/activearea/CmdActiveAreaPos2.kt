@@ -1,10 +1,14 @@
 package it.forgottenworld.dungeons.command.edit.activearea
 
-import it.forgottenworld.dungeons.command.edit.helpers.InteractiveElementCommandHelper
-import it.forgottenworld.dungeons.model.interactiveelement.InteractiveElementType
+import it.forgottenworld.dungeons.command.api.CommandHandler
+import it.forgottenworld.dungeons.command.edit.helpers.InteractiveRegionCommandHelper
+import it.forgottenworld.dungeons.game.interactiveregion.InteractiveRegion
 import org.bukkit.entity.Player
 
-fun cmdActiveAreaPos2(sender: Player, args: Array<out String>): Boolean {
-    InteractiveElementCommandHelper.setInteractiveElementPos(sender, 2, InteractiveElementType.ACTIVE_AREA)
-    return true
+class CmdActiveAreaPos2 : CommandHandler<Player> {
+
+    override fun command(sender: Player, args: Array<out String>): Boolean {
+        InteractiveRegionCommandHelper.setInteractiveRegionPos(sender, 2, InteractiveRegion.Type.ACTIVE_AREA)
+        return true
+    }
 }

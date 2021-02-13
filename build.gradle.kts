@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.4.21"
+    val kotlinVersion = "1.4.30"
     java
     kotlin("jvm") version kotlinVersion
     maven
@@ -25,7 +25,7 @@ dependencies {
 }
 
 group = "it.forgottenworld"
-version = "0.12.0"
+version = "0.13.0"
 description = "fwdungeons"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 

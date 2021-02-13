@@ -1,15 +1,19 @@
 package it.forgottenworld.dungeons.command.edit.dungeon
 
+import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
-import it.forgottenworld.dungeons.model.dungeon.EditableDungeon
-import it.forgottenworld.dungeons.model.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.game.dungeon.EditableDungeon
+import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-fun cmdDungeonCreate(sender: Player, args: Array<out String>): Boolean {
+class CmdDungeonCreate : CommandHandler<Player> {
 
-    EditableDungeon(sender).let { sender.editableDungeon = it }
+    override fun command(sender: Player, args: Array<out String>): Boolean {
 
-    sender.sendFWDMessage(Strings.CREATED_NEW_DUNGEON_NOW_IN_EDIT_MODE)
-    return true
+        EditableDungeon(sender).let { sender.editableDungeon = it }
+
+        sender.sendFWDMessage(Strings.CREATED_NEW_DUNGEON_NOW_IN_EDIT_MODE)
+        return true
+    }
 }

@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.config
 
-import it.forgottenworld.dungeons.model.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.model.instance.DungeonFinalInstance
+import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.utils.launchAsync
 import it.forgottenworld.dungeons.utils.plugin
 import org.bukkit.Bukkit
@@ -60,7 +60,7 @@ object ConfigManager {
             val conf = YamlConfiguration()
             if (existsAlready) conf.load(file)
 
-            dungeon.toConfig(conf, eraseEffects)
+            dungeon.toConfig(conf)
             @Suppress("BlockingMethodInNonBlockingContext")
             launchAsync { conf.save(file) }
         } catch (e: Exception) {
@@ -76,7 +76,9 @@ object ConfigManager {
         for (dId in FinalDungeon.dungeons.keys) {
             val sec = conf.getConfigurationSection("$dId")
             if (sec?.getKeys(false)?.isEmpty() != false) {
-                Bukkit.getLogger().warning("Dungeon $dId loaded from config has no instances, create one with /fwde d import $dId")
+                Bukkit.getLogger().warning(
+                    "Dungeon $dId loaded from config has no instances, create one with /fwde d import $dId"
+                )
                 FinalDungeon.dungeons[dId]?.isActive = false
                 continue
             }
