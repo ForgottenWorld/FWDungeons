@@ -4,7 +4,7 @@ import it.forgottenworld.dungeons.game.box.Box
 import it.forgottenworld.dungeons.game.chest.Chest
 import it.forgottenworld.dungeons.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
-import org.bukkit.util.BlockVector
+import it.forgottenworld.dungeons.utils.Vector3i
 
 interface Dungeon {
     val id: Int
@@ -14,7 +14,7 @@ interface Dungeon {
     val points: Int
     val numberOfPlayers: IntRange
     val box: Box?
-    val startingLocation: BlockVector?
+    val startingLocation: Vector3i?
     val triggers: Map<Int, Trigger>
     val activeAreas: Map<Int, ActiveArea>
     val chests: Map<Int, Chest>

@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.command
+package it.forgottenworld.dungeons.command.edit
 
 import it.forgottenworld.dungeons.command.api.BranchingCommand
 import it.forgottenworld.dungeons.command.api.PlayerCommand

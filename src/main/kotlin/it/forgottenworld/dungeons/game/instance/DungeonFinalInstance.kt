@@ -3,19 +3,32 @@ package it.forgottenworld.dungeons.game.instance
 import it.forgottenworld.dungeons.cli.JsonMessages
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
+import it.forgottenworld.dungeons.game.detection.CubeGridUtils.checkPositionAgainstTriggers
 import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.game.dungeon.FinalDungeon.FinalDungeonsDelegate.Companion.finalDungeons
 import it.forgottenworld.dungeons.game.interactiveregion.ActiveArea.FinalInstanceActiveAreaDelegate.Companion.instanceActiveAreas
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger.ActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger.FinalInstanceTriggerDelegate.Companion.instanceTriggers
-import it.forgottenworld.dungeons.game.objectives.CombatObjective
-import it.forgottenworld.dungeons.game.objectives.CombatObjective.Companion.combatObjective
+import it.forgottenworld.dungeons.game.objective.CombatObjective
+import it.forgottenworld.dungeons.game.objective.CombatObjective.Companion.combatObjective
 import it.forgottenworld.dungeons.listener.RespawnHandler.Companion.respawnData
-import it.forgottenworld.dungeons.utils.*
-import it.forgottenworld.dungeons.utils.PlayerDelegate.Companion.player
+import it.forgottenworld.dungeons.utils.EasyRankingUtils
+import it.forgottenworld.dungeons.utils.MobSpawnData
+import it.forgottenworld.dungeons.utils.MutablePlayerList
+import it.forgottenworld.dungeons.utils.RandomString
+import it.forgottenworld.dungeons.utils.Vector3i
+import it.forgottenworld.dungeons.utils.WarpbackData
+import it.forgottenworld.dungeons.utils.WarpbackData.Companion.currentWarpbackData
+import it.forgottenworld.dungeons.utils.dungeonWorld
+import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.utils.locationInWorld
+import it.forgottenworld.dungeons.utils.mythicMobsHelper
+import it.forgottenworld.dungeons.utils.player
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendJsonMessage
+import it.forgottenworld.dungeons.utils.withRefSystemOrigin
 import kotlinx.coroutines.delay
-import me.kaotich00.easyranking.service.ERBoardService
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -25,20 +38,17 @@ import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerTeleportEvent
-import org.bukkit.util.BlockVector
-import org.bukkit.util.Vector
 import java.util.*
 
 class DungeonFinalInstance(
     override val id: Int,
     dungeonId: Int,
-    override val origin: BlockVector
+    override val origin: Vector3i
 ) : DungeonInstance {
 
     override val dungeon by finalDungeons(dungeonId)
     override val box = dungeon.box.withOrigin(origin)
     override val triggers by instanceTriggers()
-    val unproccedTriggers = mutableListOf<Trigger>()
     override val activeAreas by instanceActiveAreas()
 
     var isTpSafe = true
@@ -55,7 +65,7 @@ class DungeonFinalInstance(
 
     private val startingPostion = dungeon
         .startingLocation
-        .withRefSystemOrigin(BlockVector(0, 0, 0), origin)
+        .withRefSystemOrigin(Vector3i(0, 0, 0), origin)
 
     val playerCount
         get() = players.size
@@ -75,20 +85,16 @@ class DungeonFinalInstance(
         leader = null
         isTpSafe = true
         triggers.values.forEach { it.reset() }
-        unproccedTriggers.clear()
-        unproccedTriggers.addAll(triggers.values)
         activeAreas.values.forEach { it.fillWithMaterial(it.startingMaterial) }
         instanceObjectives.forEach { it.abort() }
         instanceObjectives.clear()
-        ConfigManager
-            .dungeonWorld
+        dungeonWorld
             .getNearbyEntities(box.boundingBox)
             .filter { it is LivingEntity && it !is Player }
             .forEach { (it as LivingEntity).health = 0.0 }
         launch {
             delay(500)
-            ConfigManager
-                .dungeonWorld
+            dungeonWorld
                 .getNearbyEntities(box.boundingBox)
                 .filterIsInstance<Item>()
                 .forEach { it.remove() }
@@ -125,14 +131,15 @@ class DungeonFinalInstance(
 
         if (players.isEmpty()) {
             leader = player
-            player.spigot()
-                .sendMessage(*chatComponent {
-                    append("${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} ")
-                    append(JsonMessages.lockLink())
-                })
+            player.sendJsonMessage {
+                append("${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} ")
+                append(JsonMessages.lockLink())
+            }
         } else {
             player.sendFWDMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
-            players.forEach { it?.sendFWDMessage(Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name)) }
+            players.forEach {
+                it?.sendFWDMessage(Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name))
+            }
         }
 
         players.add(player)
@@ -141,11 +148,9 @@ class DungeonFinalInstance(
     }
 
     private fun onPlayerRemoved(player: Player) {
-        player.run {
-            warpbackData.remove(uniqueId)
-            collidingTrigger?.onPlayerExit(player)
-            finalInstance = null
-        }
+        warpbackData.remove(player.uniqueId)
+        player.collidingTrigger?.onPlayerExit(player)
+        player.finalInstance = null
         players.remove(player)
         checkUpdateLeader(player)
     }
@@ -155,15 +160,9 @@ class DungeonFinalInstance(
             player.health = 0.0
             return
         }
-        players.forEach {
-            it?.sendFWDMessage(
-                Strings.PLAYER_LEFT_DUNGEON_PARTY.format(
-                    if (player.name == it.name)
-                        Strings.YOU
-                    else
-                        player.name
-                )
-            )
+        players.filterNotNull().forEach {
+            val token = if (player.name == it.name) Strings.YOU else player.name
+            it.sendFWDMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(token))
         }
         onPlayerRemoved(player)
     }
@@ -174,17 +173,17 @@ class DungeonFinalInstance(
         onPlayerRemoved(player)
     }
 
+    private fun preparePlayer(player: Player) {
+        warpbackData[player.uniqueId] = player.currentWarpbackData
+        player.gameMode = GameMode.ADVENTURE
+        val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
+        player.teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
+        player.sendFWDMessage(Strings.GOOD_LUCK_OUT_THERE)
+    }
+
     fun onStart() {
         inGame = true
-        players.forEach {
-            it?.run {
-                warpbackData[it.uniqueId] = WarpbackData(gameMode, location.world.uid, location.toVector())
-                gameMode = GameMode.ADVENTURE
-                val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
-                teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
-                sendFWDMessage(Strings.GOOD_LUCK_OUT_THERE)
-            }
-        }
+        players.filterNotNull().forEach { preparePlayer(it) }
         isTpSafe = false
         startCheckingTriggers()
     }
@@ -192,33 +191,16 @@ class DungeonFinalInstance(
     fun onInstanceFinish(givePoints: Boolean) {
 
         if (ConfigManager.useEasyRanking && givePoints && dungeon.points != 0) {
-            val er = ERBoardService.getInstance()
-            val board = er.getBoardById("dungeons").orElse(
-                er.createBoard(
-                    "dungeons",
-                    Strings.LEADERBOARD_TITLE,
-                    Strings.LEADERBOARD_DESCR,
-                    100,
-                    Strings.LEADERBOARD_POINTS,
-                    false
-                )
-            )
-
-            players
-                .mapNotNull { it?.uniqueId }
-                .forEach { er.addScoreToPlayer(board, it, dungeon.points.toFloat()) }
+            players.mapNotNull { it?.uniqueId }.forEach {
+                EasyRankingUtils.addScoreToPlayer(it, dungeon.points.toFloat())
+            }
         }
 
         isTpSafe = true
 
-        players.forEach { p ->
-            p?.run {
-                sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
-                warpbackData[uniqueId]?.let {
-                    teleport(it.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
-                    gameMode = it.gameMode
-                }
-            }
+        players.filterNotNull().forEach { p ->
+            p.sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
+            warpbackData[p.uniqueId]?.useWithPlayer(p)
         }
 
         resetInstance()
@@ -231,37 +213,39 @@ class DungeonFinalInstance(
 
     private fun checkTriggers(
         playerUuid: UUID,
-        posVector: Vector,
+        x: Int,
+        y: Int,
+        z: Int,
         oldTriggerId: Int?
-    ) = launchAsync {
-        val triggerId = unproccedTriggers.find {
-            it.containsVector(posVector)
-        }?.id
+    ) {
+        val triggerId = dungeon
+            .triggerGrid
+            .checkPositionAgainstTriggers(
+                x - origin.x,
+                y - origin.y,
+                z - origin.z,
+                triggers
+            )
 
         if (oldTriggerId != triggerId) {
-            launch {
-                Bukkit.getPluginManager().callEvent(
-                    Trigger.Event(
-                        playerUuid,
-                        triggerId ?: -1,
-                        oldTriggerId != null
-                    )
-                )
-            }
+            val event = Trigger.Event(playerUuid, triggerId ?: -1, oldTriggerId != null)
+            Bukkit.getPluginManager().callEvent(event)
         }
     }
 
     private fun startCheckingTriggers() = launch {
         while (inGame) {
             delay(500)
-            players.forEach { p ->
-                p?.run {
-                    checkTriggers(
-                        uniqueId,
-                        location.toVector(),
-                        collidingTrigger?.id
-                    )
-                }
+            players.forEach {
+                if (it == null) return@forEach
+                val loc = it.location
+                checkTriggers(
+                    it.uniqueId,
+                    loc.blockX,
+                    loc.blockY,
+                    loc.blockZ,
+                    it.collidingTrigger?.id
+                )
             }
         }
     }

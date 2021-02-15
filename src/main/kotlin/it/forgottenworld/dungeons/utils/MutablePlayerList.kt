@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.utils
 
 import org.bukkit.entity.Player
-import java.util.*
+import java.util.UUID
 
 class MutablePlayerList : MutableList<Player?> {
 
@@ -9,7 +9,7 @@ class MutablePlayerList : MutableList<Player?> {
 
     override val size get() = list.size
 
-    val uuids: List<UUID> = list
+    val uuids: List<UUID> get() = list
 
     override fun contains(element: Player?) = element
         ?.let { list.contains(it.uniqueId) } == true

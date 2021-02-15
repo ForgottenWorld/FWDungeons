@@ -10,6 +10,7 @@ import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance.Companion.f
 import it.forgottenworld.dungeons.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger.ActivationHandler.Companion.collidingTrigger
 import it.forgottenworld.dungeons.scripting.CodeParser
+import it.forgottenworld.dungeons.utils.Vector3i
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.toVector
 import org.bukkit.Bukkit
@@ -18,8 +19,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import org.bukkit.util.BlockVector
-import org.bukkit.util.Vector
 import java.util.*
 import kotlin.reflect.KProperty
 import org.bukkit.event.Event as BukkitEvent
@@ -37,7 +36,7 @@ class Trigger(
     private var procced = false
 
     private val playersCurrentlyInside = mutableSetOf<UUID>()
-    val origin: BlockVector
+    val origin: Vector3i
         get() = box.origin
 
     fun reset() {
@@ -46,7 +45,9 @@ class Trigger(
         playersCurrentlyInside.clear()
     }
 
-    fun containsVector(vector: Vector) = box.containsVector(vector)
+    fun containsVector(vector: Vector3i) = box.containsVector(vector)
+
+    fun containsXYZ(x: Int, y: Int, z: Int) = box.containsXYZ(x,y,z)
 
     fun onPlayerEnter(player: Player, instance: DungeonInstance) {
         if (ConfigManager.isDebugMode)
@@ -67,7 +68,7 @@ class Trigger(
         player.collidingTrigger = null
     }
 
-    override fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) =
+    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) =
         Trigger(id,
             box.withContainerOrigin(oldOrigin, newOrigin),
             effectCode,
@@ -77,7 +78,6 @@ class Trigger(
     private fun proc(instance: DungeonFinalInstance) {
         if (procced || requiresWholeParty && instance.playerCount != playersCurrentlyInside.size) return
         procced = true
-        instance.unproccedTriggers.remove(this)
         effect.invoke(instance)
     }
 
@@ -146,15 +146,15 @@ class Trigger(
 
     class FinalInstanceTriggerDelegate private constructor(
         dungeon: Dungeon,
-        newOrigin: BlockVector
+        newOrigin: Vector3i
     ) {
 
         private val triggers = dungeon
             .triggers
             .entries
-            .associate { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
+            .associate { (k, v) -> k to v.withContainerOrigin(Vector3i(0, 0, 0), newOrigin) }
 
-        operator fun getValue(thisRef: Any?, property: KProperty<*>) = triggers
+        operator fun getValue(thisRef: DungeonFinalInstance, property: KProperty<*>) = triggers
 
         companion object {
             fun DungeonFinalInstance.instanceTriggers() = FinalInstanceTriggerDelegate(dungeon, origin)

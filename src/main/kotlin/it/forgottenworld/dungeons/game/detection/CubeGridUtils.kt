@@ -1,67 +1,91 @@
 package it.forgottenworld.dungeons.game.detection
 
 import it.forgottenworld.dungeons.game.box.Box
+import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.utils.NestableGrid3iToNiPos
+import it.forgottenworld.dungeons.utils.Vector3i
+import it.forgottenworld.dungeons.utils.box
 import it.forgottenworld.dungeons.utils.euclideanMod
-import org.bukkit.util.BlockVector
+import kotlin.properties.ReadOnlyProperty
 
 object CubeGridUtils {
 
-    private fun alignVectorToGrid(blockVector: BlockVector): BlockVector {
-        val x = blockVector.blockX - (blockVector.blockX euclideanMod GRID_CUBE_SIZE_X)
-        val y = blockVector.blockY - (blockVector.blockY euclideanMod GRID_CUBE_SIZE_Y)
-        val z = blockVector.blockZ - (blockVector.blockZ euclideanMod GRID_CUBE_SIZE_Z)
-        return BlockVector(x,y,z)
+    private fun alignVectorToGrid(vector: Vector3i): Vector3i {
+        val x = vector.x - (vector.x euclideanMod this.GRID_INITIAL_CELL_SIZE)
+        val y = vector.y - (vector.y euclideanMod this.GRID_INITIAL_CELL_SIZE)
+        val z = vector.z - (vector.z euclideanMod this.GRID_INITIAL_CELL_SIZE)
+        return Vector3i(x, y, z)
     }
 
-    private fun tessellateAroundBox(box: Box): List<GridCubeIndex> {
-        val origin = box.origin
+    private fun tessellateAroundBox(box: Box): NestableGrid3iToNiPos {
         val opposite = box.originOpposite
-        val x1 = origin.blockX - (origin.blockX euclideanMod GRID_CUBE_SIZE_X)
-        val y1 = origin.blockY - (origin.blockY euclideanMod GRID_CUBE_SIZE_Y)
-        val z1 = origin.blockZ - (origin.blockZ euclideanMod GRID_CUBE_SIZE_Z)
-        val x2 = opposite.blockX - (opposite.blockX euclideanMod GRID_CUBE_SIZE_X)
-        val y2 = opposite.blockY - (opposite.blockY euclideanMod GRID_CUBE_SIZE_Y)
-        val z2 = opposite.blockZ - (opposite.blockZ euclideanMod GRID_CUBE_SIZE_Z)
-        val res = mutableListOf<GridCubeIndex>()
-        for (x in x1..x2 step GRID_CUBE_SIZE_X) {
-            for (y in y1..y2 step GRID_CUBE_SIZE_Y) {
-                for (z in z1..z2 step GRID_CUBE_SIZE_Z) {
-                    res.add(GridCubeIndex(x,y,z))
+        val x2 = opposite.x - (opposite.x euclideanMod GRID_INITIAL_CELL_SIZE)
+        val y2 = opposite.y - (opposite.y euclideanMod GRID_INITIAL_CELL_SIZE)
+        val z2 = opposite.z - (opposite.z euclideanMod GRID_INITIAL_CELL_SIZE)
+        return NestableGrid3iToNiPos(
+            x2 + GRID_INITIAL_CELL_SIZE,
+            y2 + GRID_INITIAL_CELL_SIZE,
+            z2 + GRID_INITIAL_CELL_SIZE,
+            GRID_INITIAL_CELL_SIZE
+        )
+    }
+
+    private fun mapTriggersOntoGrid(
+        grid: NestableGrid3iToNiPos,
+        triggers: Map<Int, Trigger>,
+        nestingLevel: Int = 0
+    ) {
+        val indices = grid.indices
+        val boxes = indices.associateWith { it.box }
+        val vectorMap = mutableMapOf<Vector3i, IntArray>()
+        for ((id, trig) in triggers) {
+            for (ind in indices) {
+                if (trig.box.intersects(boxes[ind]!!)) {
+                    vectorMap[ind] = vectorMap[ind]?.plus(id) ?: intArrayOf(id)
                 }
             }
         }
-        return res
-    }
-
-    fun mapTriggersOntoGrid(
-        indexes: List<GridCubeIndex>,
-        triggers: Map<Int, Trigger>
-    ): Map<GridCubeIndex, List<Int>> {
-        val boxes = indexes.associateWith { it.box }
-        val res = mutableMapOf<GridCubeIndex, List<Int>>()
-        for ((id,trig) in triggers) {
-            for (ind in indexes) {
-               if (trig.box.intersects(boxes[ind]!!)) {
-                   res[ind] = res[ind]?.plus(id) ?: listOf(id)
-               }
+        for ((k,v) in vectorMap) {
+            if (v.size > 1 && nestingLevel < 2) {
+                val nestedGrid = grid.nestAt(k.x,k.y,k.z)
+                val trigs = triggers.filterKeys { v.contains(it) }
+                mapTriggersOntoGrid(nestedGrid, trigs, nestingLevel + 1)
+            } else {
+                grid[k.x,k.y,k.z] = v
             }
         }
-        return res
     }
 
-    fun lookupPosition(
-        position: BlockVector,
-        grid: Map<GridCubeIndex, List<Int>>,
+    private fun lookupTriggersForPosition(
+        x: Int,
+        y: Int,
+        z: Int,
+        grid: NestableGrid3iToNiPos,
         triggers: Map<Int, Trigger>
-    ): Int? {
-        val aligned = alignVectorToGrid(position).toCubeGridIndex()
-        return grid[aligned]?.find {
-            triggers[it]?.containsVector(position) == true
-        }
+    ) = grid[x, y, z]?.find {
+        triggers[it]?.containsXYZ(x,y,z) == true
     }
 
-    const val GRID_CUBE_SIZE_X = 16
-    const val GRID_CUBE_SIZE_Y = 16
-    const val GRID_CUBE_SIZE_Z = 16
+    private fun createFinalDungeonGrid(
+        finalDungeon: FinalDungeon
+    ): NestableGrid3iToNiPos {
+        val grid = tessellateAroundBox(finalDungeon.box)
+        mapTriggersOntoGrid(grid, finalDungeon.triggers)
+        return grid
+    }
+
+    fun FinalDungeon.triggerGrid(): ReadOnlyProperty<FinalDungeon, NestableGrid3iToNiPos> {
+        val grid = createFinalDungeonGrid(this)
+        return ReadOnlyProperty { _, _ -> grid }
+    }
+
+    fun NestableGrid3iToNiPos.checkPositionAgainstTriggers(
+        x: Int,
+        y: Int,
+        z: Int,
+        triggers: Map<Int, Trigger>
+    ) = lookupTriggersForPosition(x, y, z, this, triggers)
+
+    const val GRID_INITIAL_CELL_SIZE = 16
 }

@@ -49,9 +49,12 @@ object ConfigManager {
             }
     }
 
-    fun saveDungeonConfig(dungeon: FinalDungeon, eraseEffects: Boolean = false) {
+    fun saveDungeonConfig(dungeon: FinalDungeon) {
         try {
-            val dir = File(plugin.dataFolder, "dungeons").apply { if (!exists() && !mkdir()) return }
+            val dir = File(
+                plugin.dataFolder,
+                "dungeons"
+            ).apply { if (!exists() && !mkdir()) return }
             val file = File(dir, "${dungeon.id}.yml")
 
             val existsAlready = file.exists()

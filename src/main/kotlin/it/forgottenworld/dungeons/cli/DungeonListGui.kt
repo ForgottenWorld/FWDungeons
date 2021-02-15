@@ -126,7 +126,11 @@ object DungeonListGui {
             append(inst.leader?.let { "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
         }
 
-        append("\n".repeat(13 - dng.instances.size - floor((dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0).toInt()))
+        append("\n".repeat(
+            13 - dng.instances.size - floor(
+                (dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0
+            ).toInt()
+        ))
         append(paginator(page))
     }
 }

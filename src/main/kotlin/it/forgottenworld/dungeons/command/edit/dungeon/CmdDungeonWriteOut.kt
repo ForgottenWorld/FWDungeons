@@ -22,7 +22,7 @@ class CmdDungeonWriteOut : CommandHandler<Player> {
         }
 
         val finalDungeon = dungeon.finalize()
-        ConfigManager.saveDungeonConfig(finalDungeon, true)
+        ConfigManager.saveDungeonConfig(finalDungeon)
         sender.sendFWDMessage(Strings.DUNGEON_EXPORTED)
 
         return true

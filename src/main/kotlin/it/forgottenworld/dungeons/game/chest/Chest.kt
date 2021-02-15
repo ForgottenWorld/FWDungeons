@@ -1,16 +1,19 @@
 package it.forgottenworld.dungeons.game.chest
 
+import it.forgottenworld.dungeons.utils.Vector3i
+import it.forgottenworld.dungeons.utils.getBlockAt
 import it.forgottenworld.dungeons.utils.toVector
+import it.forgottenworld.dungeons.utils.toVector3i
 import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
-import org.bukkit.util.BlockVector
 import kotlin.random.Random
 import org.bukkit.block.Chest as ChestBlock
 
 data class Chest(
     val id: Int,
-    val position: BlockVector,
+    val position: Vector3i,
     val itemAmountRange: IntRange,
     val itemChanceMap: Map<Material, Int>
 ) {
@@ -36,8 +39,16 @@ data class Chest(
         }.toTypedArray()
     }
 
-    fun fillChestBlock(chest: ChestBlock) {
+    fun fillActualChest(world: World) {
+        val block = world.getBlockAt(position)
+        val chest = block.state as? ChestBlock ?: return
         chest.inventory.contents = items
+    }
+
+    fun clearActualChest(world: World) {
+        val block = world.getBlockAt(position)
+        val chest = block.state as? ChestBlock ?: return
+        chest.inventory.clear()
     }
 
     fun toConfig(config: ConfigurationSection) {
@@ -56,7 +67,7 @@ data class Chest(
 
         fun fromConfig(config: ConfigurationSection): Chest {
             val id = config.getInt("id")
-            val position = config.getVector("position")!!.toBlockVector()
+            val position = config.getVector("position")!!.toVector3i()
             val minItems = config.getInt("minItems")
             val maxItems = config.getInt("maxItems")
             val itemAmountRange = minItems..maxItems

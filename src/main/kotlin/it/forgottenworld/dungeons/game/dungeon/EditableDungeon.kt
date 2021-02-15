@@ -8,16 +8,20 @@ import it.forgottenworld.dungeons.game.instance.DungeonTestInstance
 import it.forgottenworld.dungeons.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
-import it.forgottenworld.dungeons.utils.*
-import it.forgottenworld.dungeons.utils.PlayerDelegate.Companion.player
+import it.forgottenworld.dungeons.utils.Vector3i
+import it.forgottenworld.dungeons.utils.firstMissing
+import it.forgottenworld.dungeons.utils.launchAsync
+import it.forgottenworld.dungeons.utils.minecraft
+import it.forgottenworld.dungeons.utils.player
+import it.forgottenworld.dungeons.utils.plugin
+import it.forgottenworld.dungeons.utils.sendFWDMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.util.BlockVector
 import java.io.File
-import java.util.*
+import java.util.UUID
 import kotlin.properties.Delegates
 
 class EditableDungeon(editor: Player) : Dungeon {
@@ -28,7 +32,7 @@ class EditableDungeon(editor: Player) : Dungeon {
     override var difficulty = Dungeon.Difficulty.MEDIUM
     override var numberOfPlayers = 1..2
     override var box: Box? = null
-    override var startingLocation: BlockVector? = null
+    override var startingLocation: Vector3i? = null
     override var points = 0
 
     override var triggers by Delegates.observable(mapOf<Int, Trigger>()) { _, _, newValue ->
@@ -39,16 +43,14 @@ class EditableDungeon(editor: Player) : Dungeon {
         testInstance?.updateActiveAreas(newValue)
     }
 
-    override var chests by Delegates.observable(mapOf<Int, Chest>()) { _, _, newValue ->
-        //testInstance?.updateActiveAreas(newValue)
-    }
+    override var chests = mapOf<Int, Chest>()
 
     private val editor by player(editor)
     val dungeonBoxBuilder = Box.Builder()
     val triggerBoxBuilder = Box.Builder()
     val activeAreaBoxBuilder = Box.Builder()
     var testInstance: DungeonTestInstance? = null
-    var finalInstanceLocations = mutableListOf<BlockVector>()
+    var finalInstanceLocations = mutableListOf<Vector3i>()
 
     val hasTestInstance get() = testInstance != null
 
@@ -63,7 +65,7 @@ class EditableDungeon(editor: Player) : Dungeon {
             points,
             numberOfPlayers,
             box!!.clone(),
-            startingLocation!!.clone(),
+            startingLocation!!.copy(),
             triggers.toMap(),
             activeAreas.toMap(),
             chests,
@@ -79,12 +81,12 @@ class EditableDungeon(editor: Player) : Dungeon {
             val dgConf = config.createSection("$newId")
             finalDungeon.instances = finalInstanceLocations.withIndex().map { (k, v) ->
                 dgConf.createSection("$k").run {
-                    set("x", v.blockX)
-                    set("y", v.blockY)
-                    set("z", v.blockZ)
+                    set("x", v.x)
+                    set("y", v.y)
+                    set("z", v.z)
                 }
                 k to finalDungeon.createInstance(
-                    ConfigManager.dungeonWorld.getBlockAt(v.blockX, v.blockY, v.blockZ)
+                    ConfigManager.dungeonWorld.getBlockAt(v.x, v.y, v.z)
                 )
             }.toMap()
             @Suppress("BlockingMethodInNonBlockingContext")
@@ -113,7 +115,7 @@ class EditableDungeon(editor: Player) : Dungeon {
             id,
             box.withContainerOrigin(
                 testInstance!!.origin,
-                BlockVector(0, 0, 0)
+                Vector3i(0, 0, 0)
             )
         ).let {
             activeAreas = activeAreas.plus(id to it)
@@ -144,18 +146,16 @@ class EditableDungeon(editor: Player) : Dungeon {
         val id = triggers.keys.lastOrNull()?.plus(1) ?: 0
 
         return withContext(Dispatchers.minecraft) {
-            testInstance?.stopCheckingTriggers()
             Trigger(
                 id,
                 box.withContainerOrigin(
                     testInstance!!.origin,
-                    BlockVector(0, 0, 0)
+                    Vector3i(0, 0, 0)
                 )
             ).let {
                 testInstance?.highlightNewInteractiveRegion(it)
                 triggers = triggers.plus(id to it)
             }
-            testInstance?.startCheckingTriggers()
             id
         }
     }
@@ -178,8 +178,8 @@ class EditableDungeon(editor: Player) : Dungeon {
         }
     }
 
-    fun createTestInstance(creator: Player) {
-        testInstance = DungeonTestInstance(this, finalInstanceLocations.first(), creator.uniqueId)
+    fun createTestInstance() {
+        testInstance = DungeonTestInstance(this, finalInstanceLocations.first())
     }
 
     fun onDestroy(restoreFormer: Boolean = false) {

@@ -3,9 +3,8 @@ package it.forgottenworld.dungeons.listener
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance.Companion.finalInstance
-import it.forgottenworld.dungeons.utils.plugin
+import it.forgottenworld.dungeons.utils.NamespacedKeys
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -33,7 +32,6 @@ class PlayerListener : Listener {
         player.finalInstance?.onPlayerLeave(player)
     }
 
-
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.player.editableDungeon == null) return
@@ -41,14 +39,12 @@ class PlayerListener : Listener {
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
 
         val isTriggerWand = persistentDataContainer
-            .get(NamespacedKey(plugin, "FWD_TRIGGER_WAND"), PersistentDataType.SHORT)
-            ?.toShort()
-            ?.equals(1.toShort()) ?: false
+            .get(NamespacedKeys.TRIGGER_TOOL, PersistentDataType.SHORT)
+            ?.toShort() == 1.toShort()
 
         val isActiveAreaWand = !isTriggerWand && persistentDataContainer
-            .get(NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND"), PersistentDataType.SHORT)
-            ?.toShort()
-            ?.equals(1.toShort()) ?: false
+            .get(NamespacedKeys.ACTIVE_AREA_TOOL, PersistentDataType.SHORT)
+            ?.toShort() == 1.toShort()
 
         if (!isTriggerWand && !isActiveAreaWand) return
 

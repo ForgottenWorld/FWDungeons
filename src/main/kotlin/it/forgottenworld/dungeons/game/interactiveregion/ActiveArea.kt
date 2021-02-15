@@ -5,12 +5,12 @@ import it.forgottenworld.dungeons.game.box.Box
 import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.utils.ParticleSpammer.Companion.repeatedlySpawnParticles
+import it.forgottenworld.dungeons.utils.Vector3i
 import it.forgottenworld.dungeons.utils.toVector
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.util.BlockVector
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
@@ -30,12 +30,12 @@ data class ActiveArea(
 
     fun getRandomLocationOnFloor() = Location(
         ConfigManager.dungeonWorld,
-        Random.nextInt(box.origin.x.toInt(), box.origin.x.toInt() + box.width) + 0.5,
-        box.origin.y,
-        Random.nextInt(box.origin.z.toInt(), box.origin.z.toInt() + box.depth) + 0.5
+        Random.nextInt(box.origin.x, box.origin.x + box.width) + 0.5,
+        box.origin.y.toDouble(),
+        Random.nextInt(box.origin.z, box.origin.z + box.depth) + 0.5
     )
 
-    override fun withContainerOrigin(oldOrigin: BlockVector, newOrigin: BlockVector) = copy(
+    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = copy(
         box = box.withContainerOrigin(oldOrigin, newOrigin)
     )
 
@@ -51,15 +51,15 @@ data class ActiveArea(
 
     class FinalInstanceActiveAreaDelegate private constructor(
         dungeon: FinalDungeon,
-        newOrigin: BlockVector
+        newOrigin: Vector3i
     ) {
 
         private val activeAreas = dungeon
             .activeAreas
             .entries
-            .associate { (k, v) -> k to v.withContainerOrigin(BlockVector(0, 0, 0), newOrigin) }
+            .associate { (k, v) -> k to v.withContainerOrigin(Vector3i(0, 0, 0), newOrigin) }
 
-        operator fun getValue(thisRef: Any?, property: KProperty<*>) = activeAreas
+        operator fun getValue(thisRef: DungeonFinalInstance, property: KProperty<*>) = activeAreas
 
         companion object {
             fun DungeonFinalInstance.instanceActiveAreas() = FinalInstanceActiveAreaDelegate(dungeon, origin)

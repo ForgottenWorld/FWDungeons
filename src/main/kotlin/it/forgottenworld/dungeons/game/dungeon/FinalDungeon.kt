@@ -4,15 +4,21 @@ import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.box.Box
 import it.forgottenworld.dungeons.game.chest.Chest
+import it.forgottenworld.dungeons.game.detection.CubeGridUtils.triggerGrid
 import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance
 import it.forgottenworld.dungeons.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
-import it.forgottenworld.dungeons.utils.*
+import it.forgottenworld.dungeons.utils.Vector3i
+import it.forgottenworld.dungeons.utils.launchAsync
+import it.forgottenworld.dungeons.utils.plugin
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.toVector
+import it.forgottenworld.dungeons.utils.toVector3i
+import it.forgottenworld.dungeons.utils.vector3i
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.util.BlockVector
 import java.io.File
 import kotlin.reflect.KProperty
 
@@ -24,7 +30,7 @@ class FinalDungeon(
     override val points: Int,
     override val numberOfPlayers: IntRange,
     override val box: Box,
-    override val startingLocation: BlockVector,
+    override val startingLocation: Vector3i,
     override val triggers: Map<Int, Trigger>,
     override val activeAreas: Map<Int, ActiveArea>,
     override val chests: Map<Int, Chest>,
@@ -33,6 +39,7 @@ class FinalDungeon(
 
     var isActive = true
     var isBeingEdited = false
+    val triggerGrid by triggerGrid()
 
     fun putInEditMode(player: Player): EditableDungeon? {
         if (isActive) {
@@ -56,35 +63,35 @@ class FinalDungeon(
             it.points = points
             it.numberOfPlayers = numberOfPlayers
             it.box = box.clone()
-            it.startingLocation = startingLocation.clone()
-            it.finalInstanceLocations = instances.values.map { ins -> ins.origin.clone() }.toMutableList()
+            it.startingLocation = startingLocation.copy()
+            it.finalInstanceLocations = instances.values.map { ins -> ins.origin.copy() }.toMutableList()
             player.editableDungeon = it
-            it.createTestInstance(player)
+            it.createTestInstance()
             it.triggers = triggers
             it.activeAreas = activeAreas
         }
     }
 
-    fun import(at: BlockVector): Boolean {
+    fun import(at: Vector3i): Boolean {
         if (instances.isNotEmpty()) return false
         val config = YamlConfiguration()
         val file = File(plugin.dataFolder, "instances.yml")
         if (file.exists()) config.load(file)
         val dgconf = config.createSection("$id")
         dgconf.createSection("$0").run {
-            set("x", at.blockX)
-            set("y", at.blockY)
-            set("z", at.blockZ)
+            set("x", at.x)
+            set("y", at.y)
+            set("z", at.z)
         }
-        createInstance(ConfigManager.dungeonWorld.getBlockAt(at.blockX, at.blockY, at.blockZ))
+        createInstance(ConfigManager.dungeonWorld.getBlockAt(at.x, at.y, at.z))
         @Suppress("BlockingMethodInNonBlockingContext")
-        (launchAsync { config.save(file) })
+        launchAsync { config.save(file) }
         return true
     }
 
     fun createInstance(target: Block): DungeonFinalInstance {
         val id = instances.keys.lastOrNull()?.plus(1) ?: 0
-        val newOrigin = target.blockVector
+        val newOrigin = target.vector3i
         val newInstance = DungeonFinalInstance(id, this.id, newOrigin)
         newInstance.resetInstance()
         instances = instances + (id to newInstance)
@@ -158,8 +165,8 @@ class FinalDungeon(
                 Dungeon.Difficulty.fromString(getString("difficulty")!!)!!,
                 getInt("points", 0),
                 getIntegerList("numberOfPlayers").let { IntRange(it.first(), it.last()) },
-                Box(BlockVector(0, 0, 0), getInt("width"), getInt("height"), getInt("depth")),
-                getVector("startingLocation")!!.toBlockVector(),
+                Box(Vector3i(0, 0, 0), getInt("width"), getInt("height"), getInt("depth")),
+                getVector("startingLocation")!!.toVector3i(),
                 triggers,
                 activeAreas,
                 chests,

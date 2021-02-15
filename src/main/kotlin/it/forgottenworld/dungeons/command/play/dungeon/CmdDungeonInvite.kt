@@ -5,6 +5,7 @@ import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance.Companion.finalInstance
 import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendJsonMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
@@ -31,8 +32,8 @@ class CmdDungeonInvite : CommandHandler<Player> {
             return true
         }
 
-        toPlayer.spigot().sendMessage(
-            *JsonMessages.invitation(
+        toPlayer.sendJsonMessage(
+            JsonMessages.invitation(
                 sender.name,
                 instance.dungeon.id,
                 instance.id,

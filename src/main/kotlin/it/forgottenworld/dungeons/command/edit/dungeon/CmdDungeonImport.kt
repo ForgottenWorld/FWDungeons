@@ -3,9 +3,9 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.utils.blockVector
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
+import it.forgottenworld.dungeons.utils.vector3i
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -34,7 +34,7 @@ class CmdDungeonImport : CommandHandler<Player> {
             return true
         }
 
-        if (!dungeon.import(block.blockVector)) {
+        if (!dungeon.import(block.vector3i)) {
             sender.sendFWDMessage(Strings.THIS_DUNGEON_ALREADY_HAS_INSTANCES)
             return true
         }

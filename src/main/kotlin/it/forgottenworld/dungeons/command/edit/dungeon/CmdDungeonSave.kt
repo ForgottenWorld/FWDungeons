@@ -15,7 +15,7 @@ class CmdDungeonSave : CommandHandler<Player> {
             return true
         }
 
-        ConfigManager.saveDungeonConfig(dungeon.finalize(), false)
+        ConfigManager.saveDungeonConfig(dungeon.finalize())
 
         sender.sendFWDMessage(Strings.DUNGEON_SAVED)
 

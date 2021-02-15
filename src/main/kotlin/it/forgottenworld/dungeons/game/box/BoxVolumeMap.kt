@@ -18,7 +18,7 @@ class BoxVolumeMap private constructor(
         PASSABLE(0x03)
     }
 
-    var raw = serializeSize(box) + serializeVolume(world, box)
+    private var raw = serializeSize(box) + serializeVolume(world, box)
 
     private fun serializeVolume(world: World, box: Box): ByteArray {
         val res = mutableListOf<Byte>()
@@ -27,9 +27,9 @@ class BoxVolumeMap private constructor(
                 for (x in 0 until box.width) {
                     res.add(
                         world.getBlockAt(
-                        box.origin.blockX + x,
-                        box.origin.blockY + y,
-                        box.origin.blockZ + z
+                            box.origin.x + x,
+                            box.origin.y + y,
+                            box.origin.z + z
                         ).let {
                             when {
                                 it.isSolid -> BlockValue.SOLID

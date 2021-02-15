@@ -5,13 +5,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Location
 import org.bukkit.Particle
-import org.bukkit.util.BlockVector
 
 class ParticleSpammer(
     private val particle: Particle,
     private val count: Int,
     private val interval: Long,
-    private val locations: List<BlockVector>
+    private val locations: List<Vector3i>
 ) {
 
     private var job: Job? = null

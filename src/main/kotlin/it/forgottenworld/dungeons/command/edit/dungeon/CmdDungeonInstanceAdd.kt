@@ -3,9 +3,9 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
-import it.forgottenworld.dungeons.utils.blockVector
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import it.forgottenworld.dungeons.utils.targetBlock
+import it.forgottenworld.dungeons.utils.vector3i
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -24,7 +24,7 @@ class CmdDungeonInstanceAdd: CommandHandler<Player> {
             return true
         }
 
-        dungeon.finalInstanceLocations.add(block.blockVector)
+        dungeon.finalInstanceLocations.add(block.vector3i)
 
         sender.sendFWDMessage(Strings.INSTANCE_ADDED)
 

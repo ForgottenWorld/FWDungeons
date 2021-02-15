@@ -5,9 +5,12 @@ import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editabl
 import it.forgottenworld.dungeons.game.interactiveregion.InteractiveRegion.Type
 import it.forgottenworld.dungeons.game.interactiveregion.InteractiveRegion.Type.ACTIVE_AREA
 import it.forgottenworld.dungeons.game.interactiveregion.InteractiveRegion.Type.TRIGGER
-import it.forgottenworld.dungeons.utils.*
+import it.forgottenworld.dungeons.utils.NamespacedKeys
+import it.forgottenworld.dungeons.utils.launch
+import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.targetBlock
+import it.forgottenworld.dungeons.utils.vector3i
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -48,10 +51,11 @@ object InteractiveRegionCommandHelper {
         else
             dungeon.activeAreaBoxBuilder
 
-        if (posNo == 1)
-            builder.pos1(block.blockVector)
-        else
-            builder.pos2(block.blockVector)
+        if (posNo == 1) {
+            builder.pos1(block.vector3i)
+        } else {
+            builder.pos2(block.vector3i)
+        }
 
         val box = builder.build()
         if (box == null) {
@@ -174,10 +178,7 @@ object InteractiveRegionCommandHelper {
             itemMeta = itemMeta?.apply {
                 persistentDataContainer
                     .set(
-                        NamespacedKey(
-                            plugin,
-                            if (type == TRIGGER) "FWD_TRIGGER_WAND" else "FWD_ACTIVE_AREA_WAND"
-                        ),
+                        if (type == TRIGGER) NamespacedKeys.TRIGGER_TOOL else NamespacedKeys.ACTIVE_AREA_TOOL,
                         PersistentDataType.SHORT,
                         1
                     )

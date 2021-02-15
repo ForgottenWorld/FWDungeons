@@ -3,11 +3,11 @@ package it.forgottenworld.dungeons.command.edit.dungeon
 import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.utils.Vector3i
 import it.forgottenworld.dungeons.utils.sendFWDMessage
-import it.forgottenworld.dungeons.utils.toBlockVector
+import it.forgottenworld.dungeons.utils.toVector3i
 import it.forgottenworld.dungeons.utils.withRefSystemOrigin
 import org.bukkit.entity.Player
-import org.bukkit.util.BlockVector
 
 class CmdDungeonSetStart : CommandHandler<Player> {
 
@@ -28,9 +28,10 @@ class CmdDungeonSetStart : CommandHandler<Player> {
             return true
         }
 
-        dungeon.startingLocation = sender.location
-            .toBlockVector()
-            .withRefSystemOrigin(testInstance.origin, BlockVector(0, 0, 0))
+        dungeon.startingLocation = sender
+            .location
+            .toVector3i()
+            .withRefSystemOrigin(testInstance.origin, Vector3i(0, 0, 0))
 
         sender.sendFWDMessage(Strings.DUNGEON_STARTPOS_SET)
 

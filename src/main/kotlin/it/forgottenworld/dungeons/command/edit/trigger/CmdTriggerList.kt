@@ -5,6 +5,7 @@ import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendJsonMessage
 import org.bukkit.entity.Player
 
 class CmdTriggerList : CommandHandler<Player> {
@@ -15,8 +16,8 @@ class CmdTriggerList : CommandHandler<Player> {
             return true
         }
 
-        sender.spigot().sendMessage(
-            *InteractiveRegionListGui
+        sender.sendJsonMessage(
+            InteractiveRegionListGui
                 .showTriggers(
                     dungeon,
                     args.getOrNull(0)?.toIntOrNull() ?: 0

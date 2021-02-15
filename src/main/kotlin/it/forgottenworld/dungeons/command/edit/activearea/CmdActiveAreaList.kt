@@ -5,6 +5,7 @@ import it.forgottenworld.dungeons.command.api.CommandHandler
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.utils.sendFWDMessage
+import it.forgottenworld.dungeons.utils.sendJsonMessage
 import org.bukkit.entity.Player
 
 class CmdActiveAreaList : CommandHandler<Player> {
@@ -15,8 +16,15 @@ class CmdActiveAreaList : CommandHandler<Player> {
             return true
         }
 
-        sender.spigot()
-            .sendMessage(*InteractiveRegionListGui.showActiveAreas(dungeon, args.getOrNull(0)?.toIntOrNull() ?: 0))
+        sender.sendJsonMessage(
+            InteractiveRegionListGui.showActiveAreas(
+                dungeon,
+                args
+                    .getOrNull(0)
+                    ?.toIntOrNull()
+                    ?: 0
+            )
+        )
         return true
     }
 }

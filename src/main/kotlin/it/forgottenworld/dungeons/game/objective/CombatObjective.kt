@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.game.objectives
+package it.forgottenworld.dungeons.game.objective
 
 import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance
 import org.bukkit.Bukkit.getEntity
@@ -6,7 +6,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
-import java.util.*
+import java.util.UUID
 
 class CombatObjective(
     val instance: DungeonFinalInstance,
