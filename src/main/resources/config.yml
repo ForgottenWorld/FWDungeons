@@ -1,3 +1,4 @@
 dungeonWorld: "world"
 debugMode: true
 easyRankingIntegration: true
+fwEchelonIntegration: true

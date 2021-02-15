@@ -12,8 +12,9 @@ import it.forgottenworld.dungeons.game.interactiveregion.Trigger.ActivationHandl
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger.FinalInstanceTriggerDelegate.Companion.instanceTriggers
 import it.forgottenworld.dungeons.game.objective.CombatObjective
 import it.forgottenworld.dungeons.game.objective.CombatObjective.Companion.combatObjective
+import it.forgottenworld.dungeons.integrations.EasyRankingUtils
+import it.forgottenworld.dungeons.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.listener.RespawnHandler.Companion.respawnData
-import it.forgottenworld.dungeons.utils.EasyRankingUtils
 import it.forgottenworld.dungeons.utils.MobSpawnData
 import it.forgottenworld.dungeons.utils.MutablePlayerList
 import it.forgottenworld.dungeons.utils.RandomString
@@ -119,6 +120,11 @@ class DungeonFinalInstance(
     }
 
     fun onPlayerJoin(player: Player) {
+        if (!FWEchelonUtils.isPlayerFree(player)) {
+            player.sendFWDMessage(Strings.YOU_CANNOT_JOIN_A_DUNGEON_RIGHT_NOW)
+            return
+        }
+
         if (isFull) {
             player.sendFWDMessage(Strings.DUNGEON_PARTY_IS_FULL)
             return
@@ -128,6 +134,8 @@ class DungeonFinalInstance(
             player.sendFWDMessage(Strings.PARTY_HAS_ALREADY_ENTERED_DUNGEON)
             return
         }
+
+        FWEchelonUtils.playerIsNoLongerFree(player)
 
         if (players.isEmpty()) {
             leader = player
@@ -152,6 +160,7 @@ class DungeonFinalInstance(
         player.collidingTrigger?.onPlayerExit(player)
         player.finalInstance = null
         players.remove(player)
+        FWEchelonUtils.playerIsNowFree(player)
         checkUpdateLeader(player)
     }
 
@@ -206,6 +215,11 @@ class DungeonFinalInstance(
         resetInstance()
     }
 
+    fun rescuePlayer(player: Player) {
+        warpbackData[player.uniqueId]?.useWithPlayer(player)
+        onPlayerRemoved(player)
+    }
+
     fun evacuate(): Boolean {
         onInstanceFinish(false)
         return true
@@ -224,7 +238,7 @@ class DungeonFinalInstance(
                 x - origin.x,
                 y - origin.y,
                 z - origin.z,
-                triggers
+                dungeon.triggers
             )
 
         if (oldTriggerId != triggerId) {

@@ -1,8 +1,6 @@
 package it.forgottenworld.dungeons.utils
 
-import kotlin.math.ceil
-
-class NestableGrid3iToNiPos(
+class NestableGrid3iToNi(
     sizeX: Int,
     sizeY: Int,
     sizeZ: Int,
@@ -15,13 +13,13 @@ class NestableGrid3iToNiPos(
         }
     }
 
-    private val values = Array(ceil(sizeX.toDouble() / cellSize).toInt()) {
-        Array(ceil(sizeY.toDouble() / cellSize).toInt()) {
-            Array<IntArray?>(ceil(sizeZ.toDouble() / this.cellSize).toInt()) { null }
+    private val values = Array(sizeX / cellSize) {
+        Array(sizeY / cellSize) {
+            Array<IntArray?>(sizeZ / cellSize) { null }
         }
     }
 
-    private val nested = mutableListOf<NestableGrid3iToNiPos>()
+    private val nested = mutableListOf<NestableGrid3iToNi>()
 
     val indices: Set<Vector3i> get() {
         val res = mutableSetOf<Vector3i>()
@@ -35,8 +33,8 @@ class NestableGrid3iToNiPos(
         return res
     }
 
-    fun nestAt(index1: Int, index2: Int, index3: Int): NestableGrid3iToNiPos {
-        val nestedGrid = NestableGrid3iToNiPos(
+    fun nestAt(index1: Int, index2: Int, index3: Int): NestableGrid3iToNi {
+        val nestedGrid = NestableGrid3iToNi(
             cellSize,
             cellSize,
             cellSize,

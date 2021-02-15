@@ -1,15 +1,16 @@
 package it.forgottenworld.dungeons
 
-import it.forgottenworld.dungeons.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.command.edit.FWDungeonsEditCommand
+import it.forgottenworld.dungeons.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.game.objective.CombatObjective
+import it.forgottenworld.dungeons.integrations.EasyRankingUtils
+import it.forgottenworld.dungeons.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.listener.BypassAttemptListener
 import it.forgottenworld.dungeons.listener.PlayerListener
 import it.forgottenworld.dungeons.listener.RespawnHandler
-import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -40,7 +41,8 @@ class FWDungeonsPlugin : JavaPlugin() {
             BypassAttemptListener()
         ).forEach { server.pluginManager.registerEvents(it, this) }
 
-        checkEasyRankingIntegration()
+        EasyRankingUtils.checkEasyRankingIntegration()
+        FWEchelonUtils.checkFWEchelonIntegration()
     }
 
     private fun loadStrings() {
@@ -57,22 +59,6 @@ class FWDungeonsPlugin : JavaPlugin() {
         Strings.loadFromRes(conf)
     }
 
-    private fun checkEasyRankingIntegration() {
-        logger.info("Checking for EasyRanking integration...")
-        if (!ConfigManager.easyRankingIntegration) {
-            logger.info("EasyRanking integration is not enabled")
-            return
-        }
-
-        logger.info("EasyRanking integration is enabled")
-        if (Bukkit.getPluginManager().getPlugin("Easyranking") == null) {
-            logger.info("EasyRanking is not present")
-            return
-        }
-
-        logger.info("EasyRanking is present")
-        ConfigManager.useEasyRanking = true
-    }
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")

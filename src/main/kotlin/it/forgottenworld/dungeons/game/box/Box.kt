@@ -147,7 +147,7 @@ class Box(
 
     public override fun clone() = Box(origin.copy(), width, height, depth)
 
-    fun split8(): Array<Box> {
+    /*fun split8(): Array<Box> {
         if (width % 2 != 0 || height % 2 != 0 || depth % 2 != 0) return arrayOf()
         val or1 = Vector3i(origin.x + width / 2, origin.y, origin.z)
         val or2 = Vector3i(origin.x, origin.y + height / 2, origin.z)
@@ -166,7 +166,7 @@ class Box(
             Box(or6, width / 2, height / 2, depth / 2),
             Box(or7, width / 2, height / 2, depth / 2)
         )
-    }
+    }*/
 
     class Builder {
 

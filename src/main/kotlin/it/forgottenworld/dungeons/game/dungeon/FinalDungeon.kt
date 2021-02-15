@@ -150,13 +150,14 @@ class FinalDungeon(
                     )
                 }
 
-            val chests = getConfigurationSection("chests")!!
-                .getKeys(false)
-                .associate {
+            val chests = getConfigurationSection("chests")
+                ?.getKeys(false)
+                ?.associate {
                     it.toInt() to Chest.fromConfig(
                         getConfigurationSection("chests.$it")!!
                     )
                 }
+                ?: mapOf()
 
             val dungeon = FinalDungeon(
                 id,

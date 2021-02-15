@@ -6,6 +6,7 @@ author: Shivs (OhMeMuffin)
 main: it.forgottenworld.dungeons.FWDungeonsPlugin
 softdepend:
   - Easyranking
+  - FWEchelon
 depend:
   - FWKotlinDeps
   - MythicMobs

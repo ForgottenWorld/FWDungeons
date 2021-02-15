@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.game.detection
 import it.forgottenworld.dungeons.game.box.Box
 import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
-import it.forgottenworld.dungeons.utils.NestableGrid3iToNiPos
+import it.forgottenworld.dungeons.utils.NestableGrid3iToNi
 import it.forgottenworld.dungeons.utils.Vector3i
 import it.forgottenworld.dungeons.utils.box
 import it.forgottenworld.dungeons.utils.euclideanMod
@@ -18,12 +18,12 @@ object CubeGridUtils {
         return Vector3i(x, y, z)
     }
 
-    private fun tessellateAroundBox(box: Box): NestableGrid3iToNiPos {
+    private fun tessellateAroundBox(box: Box): NestableGrid3iToNi {
         val opposite = box.originOpposite
-        val x2 = opposite.x - (opposite.x euclideanMod GRID_INITIAL_CELL_SIZE)
-        val y2 = opposite.y - (opposite.y euclideanMod GRID_INITIAL_CELL_SIZE)
-        val z2 = opposite.z - (opposite.z euclideanMod GRID_INITIAL_CELL_SIZE)
-        return NestableGrid3iToNiPos(
+        val x2 = opposite.x - opposite.x % GRID_INITIAL_CELL_SIZE
+        val y2 = opposite.y - opposite.y % GRID_INITIAL_CELL_SIZE
+        val z2 = opposite.z - opposite.z % GRID_INITIAL_CELL_SIZE
+        return NestableGrid3iToNi(
             x2 + GRID_INITIAL_CELL_SIZE,
             y2 + GRID_INITIAL_CELL_SIZE,
             z2 + GRID_INITIAL_CELL_SIZE,
@@ -32,7 +32,7 @@ object CubeGridUtils {
     }
 
     private fun mapTriggersOntoGrid(
-        grid: NestableGrid3iToNiPos,
+        grid: NestableGrid3iToNi,
         triggers: Map<Int, Trigger>,
         nestingLevel: Int = 0
     ) {
@@ -61,7 +61,7 @@ object CubeGridUtils {
         x: Int,
         y: Int,
         z: Int,
-        grid: NestableGrid3iToNiPos,
+        grid: NestableGrid3iToNi,
         triggers: Map<Int, Trigger>
     ) = grid[x, y, z]?.find {
         triggers[it]?.containsXYZ(x,y,z) == true
@@ -69,18 +69,18 @@ object CubeGridUtils {
 
     private fun createFinalDungeonGrid(
         finalDungeon: FinalDungeon
-    ): NestableGrid3iToNiPos {
+    ): NestableGrid3iToNi {
         val grid = tessellateAroundBox(finalDungeon.box)
         mapTriggersOntoGrid(grid, finalDungeon.triggers)
         return grid
     }
 
-    fun FinalDungeon.triggerGrid(): ReadOnlyProperty<FinalDungeon, NestableGrid3iToNiPos> {
+    fun FinalDungeon.triggerGrid(): ReadOnlyProperty<FinalDungeon, NestableGrid3iToNi> {
         val grid = createFinalDungeonGrid(this)
         return ReadOnlyProperty { _, _ -> grid }
     }
 
-    fun NestableGrid3iToNiPos.checkPositionAgainstTriggers(
+    fun NestableGrid3iToNi.checkPositionAgainstTriggers(
         x: Int,
         y: Int,
         z: Int,

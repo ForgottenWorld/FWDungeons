@@ -22,6 +22,7 @@ dependencies {
     compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine.xikage:MythicMobs:4.10.0")
     compileOnly("com.github.ForgottenWorld:EasyRanking:7362fe6420")
+    compileOnly("com.github.ForgottenWorld.FWEchelon:fwechelon-api:v0.1.0")
 }
 
 group = "it.forgottenworld"
