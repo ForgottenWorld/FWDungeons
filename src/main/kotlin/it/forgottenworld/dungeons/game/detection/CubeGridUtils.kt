@@ -5,28 +5,17 @@ import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.utils.NestableGrid3iToNi
 import it.forgottenworld.dungeons.utils.Vector3i
-import it.forgottenworld.dungeons.utils.box
-import it.forgottenworld.dungeons.utils.euclideanMod
+import it.forgottenworld.dungeons.utils.cubeWithSide
 import kotlin.properties.ReadOnlyProperty
 
 object CubeGridUtils {
 
-    private fun alignVectorToGrid(vector: Vector3i): Vector3i {
-        val x = vector.x - (vector.x euclideanMod this.GRID_INITIAL_CELL_SIZE)
-        val y = vector.y - (vector.y euclideanMod this.GRID_INITIAL_CELL_SIZE)
-        val z = vector.z - (vector.z euclideanMod this.GRID_INITIAL_CELL_SIZE)
-        return Vector3i(x, y, z)
-    }
-
     private fun tessellateAroundBox(box: Box): NestableGrid3iToNi {
         val opposite = box.originOpposite
-        val x2 = opposite.x - opposite.x % GRID_INITIAL_CELL_SIZE
-        val y2 = opposite.y - opposite.y % GRID_INITIAL_CELL_SIZE
-        val z2 = opposite.z - opposite.z % GRID_INITIAL_CELL_SIZE
         return NestableGrid3iToNi(
-            x2 + GRID_INITIAL_CELL_SIZE,
-            y2 + GRID_INITIAL_CELL_SIZE,
-            z2 + GRID_INITIAL_CELL_SIZE,
+            opposite.x + GRID_INITIAL_CELL_SIZE,
+            opposite.y + GRID_INITIAL_CELL_SIZE,
+            opposite.z + GRID_INITIAL_CELL_SIZE,
             GRID_INITIAL_CELL_SIZE
         )
     }
@@ -37,7 +26,7 @@ object CubeGridUtils {
         nestingLevel: Int = 0
     ) {
         val indices = grid.indices
-        val boxes = indices.associateWith { it.box }
+        val boxes = indices.associateWith { it.cubeWithSide(grid.cellSize) }
         val vectorMap = mutableMapOf<Vector3i, IntArray>()
         for ((id, trig) in triggers) {
             for (ind in indices) {

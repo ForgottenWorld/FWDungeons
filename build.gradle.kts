@@ -8,7 +8,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://rayzr.dev/repo/")
     maven("https://papermc.io/repo/repository/maven-public/")
@@ -21,7 +20,7 @@ dependencies {
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
     compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine.xikage:MythicMobs:4.10.0")
-    compileOnly("com.github.ForgottenWorld:EasyRanking:7362fe6420")
+    compileOnly("com.github.ForgottenWorld:EasyRanking:0.2.0")
     compileOnly("com.github.ForgottenWorld.FWEchelon:fwechelon-api:v0.1.0")
 }
 

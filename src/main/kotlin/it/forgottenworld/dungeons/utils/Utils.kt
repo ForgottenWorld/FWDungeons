@@ -5,7 +5,6 @@ import it.forgottenworld.dungeons.FWDungeonsPlugin
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.box.Box
-import it.forgottenworld.dungeons.game.detection.CubeGridUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -63,13 +62,12 @@ fun Vector3i.withRefSystemOrigin(
     z - oldOrigin.z + newOrigin.z
 )
 
-val Vector3i.box
-    get() = Box(
-        this,
-        CubeGridUtils.GRID_INITIAL_CELL_SIZE,
-        CubeGridUtils.GRID_INITIAL_CELL_SIZE,
-        CubeGridUtils.GRID_INITIAL_CELL_SIZE
-    )
+fun Vector3i.cubeWithSide(side: Int) = Box(
+    this,
+    side,
+    side,
+    side
+)
 
 fun Int.toByteArray() = byteArrayOf(
     (this shr 24).toByte(),
