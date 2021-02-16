@@ -13,9 +13,9 @@ object CubeGridUtils {
     private fun tessellateAroundBox(box: Box): NestableGrid3iToNi {
         val opposite = box.originOpposite
         return NestableGrid3iToNi(
-            opposite.x + GRID_INITIAL_CELL_SIZE,
-            opposite.y + GRID_INITIAL_CELL_SIZE,
-            opposite.z + GRID_INITIAL_CELL_SIZE,
+            opposite.x,
+            opposite.y,
+            opposite.z,
             GRID_INITIAL_CELL_SIZE
         )
     }

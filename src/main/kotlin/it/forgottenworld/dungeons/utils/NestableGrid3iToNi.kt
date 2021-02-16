@@ -1,23 +1,26 @@
 package it.forgottenworld.dungeons.utils
 
 class NestableGrid3iToNi(
-    sizeX: Int,
-    sizeY: Int,
-    sizeZ: Int,
+    width: Int,
+    height: Int,
+    depth: Int,
     val cellSize: Int,
     private val origin: Vector3i = Vector3i(0,0,0)
 ) {
     init {
-        if (sizeX < cellSize || sizeY < cellSize || sizeZ < this.cellSize) {
+        if (width < cellSize || height < cellSize || depth < this.cellSize) {
             throw IllegalArgumentException("Cell size can't be greater than grid size")
         }
     }
 
-    private val values = Array(sizeX / cellSize) {
-        Array(sizeY / cellSize) {
-            Array<IntArray?>(sizeZ / cellSize) { null }
+    private val values =
+        Array(width / cellSize + if (width % cellSize == 0) 0 else 1) {
+            Array(height / cellSize + if (height % cellSize == 0) 0 else 1) {
+                Array<IntArray?>(depth / cellSize + if (depth % cellSize == 0) 0 else 1) {
+                    null
+                }
+            }
         }
-    }
 
     private val nested = mutableListOf<NestableGrid3iToNi>()
 
