@@ -17,4 +17,8 @@ data class Vector3i(private val components: IntArray) {
     }
 
     override fun hashCode() = 31 * (31 * x + y) + z
+
+    companion object {
+        val ZERO = Vector3i(0,0,0)
+    }
 }

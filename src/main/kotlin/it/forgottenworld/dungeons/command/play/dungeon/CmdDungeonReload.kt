@@ -5,7 +5,6 @@ import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
 import it.forgottenworld.dungeons.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.game.instance.DungeonFinalInstance
-import it.forgottenworld.dungeons.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -20,8 +19,6 @@ class CmdDungeonReload : CommandHandler<CommandSender> {
         FinalDungeon.dungeons.values.flatMap { it.instances.values }.forEach { it.evacuate() }
         FinalDungeon.dungeons.clear()
         DungeonFinalInstance.finalInstances.clear()
-        Trigger.ActivationHandler.clearAllCollisions()
-
 
         ConfigManager.loadData()
 

@@ -52,8 +52,12 @@ object CubeGridUtils {
         z: Int,
         grid: NestableGrid3iToNi,
         triggers: Map<Int, Trigger>
-    ) = grid[x, y, z]?.find {
-        triggers[it]?.containsXYZ(x,y,z) == true
+    ): Trigger? {
+        for (id in grid[x,y,z] ?: return null) {
+            val trig = triggers[id]!!
+            if (trig.containsXYZ(x,y,z)) return trig
+        }
+        return null
     }
 
     private fun createFinalDungeonGrid(
@@ -76,5 +80,5 @@ object CubeGridUtils {
         triggers: Map<Int, Trigger>
     ) = lookupTriggersForPosition(x, y, z, this, triggers)
 
-    const val GRID_INITIAL_CELL_SIZE = 16
+    private const val GRID_INITIAL_CELL_SIZE = 16
 }

@@ -19,29 +19,14 @@ class DungeonTestInstance(
 
     private var triggerDetectionJob: Job? = null
 
-    override var triggers = dungeon.triggers
-    override var activeAreas = dungeon.activeAreas
-
     private var hlFrames = false
 
-    fun updateTriggers(newTriggers: Map<Int, Trigger>) {
-        triggers = newTriggers.mapValues { (_, t) ->
-            t.withContainerOrigin(
-                Vector3i(0, 0, 0),
-                origin
-            )
-        }
-        updateTriggerParticleSpammers()
+    fun updateTriggers(newTriggers: Collection<Trigger>) {
+        updateTriggerParticleSpammers(newTriggers)
     }
 
-    fun updateActiveAreas(newActiveAreas: Map<Int, ActiveArea>) {
-        activeAreas = newActiveAreas.mapValues { (_, t) ->
-            t.withContainerOrigin(
-                Vector3i(0, 0, 0),
-                origin
-            )
-        }
-        updateActiveAreaParticleSpammers()
+    fun updateActiveAreas(newActiveAreas: Collection<ActiveArea>) {
+        updateActiveAreaParticleSpammers(newActiveAreas)
     }
 
     fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
@@ -51,22 +36,36 @@ class DungeonTestInstance(
     private var triggerParticleSpammer: ParticleSpammer? = null
     private var activeAreaParticleSpammer: ParticleSpammer? = null
 
-    private fun updateTriggerParticleSpammers() {
+    private fun updateTriggerParticleSpammers(newTriggers: Collection<Trigger>) {
         if (!hlFrames) return
         triggerParticleSpammer?.stop()
-        triggerParticleSpammer = ParticleSpammer(Particle.DRIP_LAVA, 1, 500, triggers.values.flatMap { it.box.getFrame() })
+        triggerParticleSpammer = ParticleSpammer(
+            Particle.DRIP_LAVA,
+            1,
+            500,
+            newTriggers.flatMap {
+                it.box.withContainerOrigin(Vector3i.ZERO, origin).getFrame()
+            }
+        )
     }
 
-    private fun updateActiveAreaParticleSpammers() {
+    private fun updateActiveAreaParticleSpammers(newActiveAreas: Collection<ActiveArea>) {
         if (!hlFrames) return
         activeAreaParticleSpammer?.stop()
-        activeAreaParticleSpammer = ParticleSpammer(Particle.DRIP_WATER, 1, 500, activeAreas.values.flatMap { it.box.getFrame() })
+        activeAreaParticleSpammer = ParticleSpammer(
+            Particle.DRIP_WATER,
+            1,
+            500,
+            newActiveAreas.flatMap {
+                it.box.withContainerOrigin(Vector3i.ZERO, origin).getFrame()
+            }
+        )
     }
 
     private fun updateParticleSpammers() {
         if (!hlFrames) return
-        updateTriggerParticleSpammers()
-        updateActiveAreaParticleSpammers()
+        updateTriggerParticleSpammers(dungeon.triggers.values)
+        updateActiveAreaParticleSpammers(dungeon.activeAreas.values)
     }
 
     private fun stopParticleSpammers() {
@@ -78,10 +77,11 @@ class DungeonTestInstance(
 
     fun toggleEditorHighlights() {
         hlFrames = !hlFrames
-        if (hlFrames)
+        if (hlFrames) {
             updateParticleSpammers()
-        else
+        } else {
             stopParticleSpammers()
+        }
     }
 
     fun onDestroy() {

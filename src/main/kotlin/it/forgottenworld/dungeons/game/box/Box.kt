@@ -78,7 +78,7 @@ class Box(
         width, height, depth
     )
 
-    fun getAllBlocks(): Set<Block> {
+    fun getAllBlocks(origin: Vector3i = this.origin): Set<Block> {
         val blocks = mutableSetOf<Block>()
         val world = ConfigManager.dungeonWorld
         for (x in 0 until width) {

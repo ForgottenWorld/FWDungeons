@@ -17,7 +17,7 @@ class CmdDungeonStart : CommandHandler<Player> {
         when {
             instance.leader != sender ->
                 sender.sendFWDMessage(Strings.ONLY_LEADER_MAY_START_INSTANCE)
-            instance.players.size < instance.minPlayers ->
+            instance.players.size < instance.dungeon.numberOfPlayers.first ->
                 sender.sendFWDMessage(Strings.NOT_ENOUGH_PLAYERS_FOR_DUNGEON)
             else -> {
                 sender.finalInstance?.onStart()

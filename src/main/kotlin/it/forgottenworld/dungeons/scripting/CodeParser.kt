@@ -71,8 +71,9 @@ object CodeParser {
                     val aaId = codeIterator.next().toInt()
                     val material = Material.getMaterial(codeIterator.next(), false)!!
                     parsed.add {
-                        (it.activeAreas[aaId] ?: error("Active area with id $aaId not found"))
-                            .fillWithMaterial(material)
+                        val aa = it.dungeon.activeAreas[aaId]
+                            ?: error("Active area with id $aaId not found")
+                        aa.fillWithMaterial(material, it)
                     }
                 }
                 Consts.CODE_FINISH -> parsed.add {

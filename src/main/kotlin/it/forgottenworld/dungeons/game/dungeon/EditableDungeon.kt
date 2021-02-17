@@ -21,8 +21,8 @@ import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
-import java.util.UUID
-import kotlin.properties.Delegates
+import java.util.*
+import kotlin.properties.Delegates.observable
 
 class EditableDungeon(editor: Player) : Dungeon {
 
@@ -35,12 +35,12 @@ class EditableDungeon(editor: Player) : Dungeon {
     override var startingLocation: Vector3i? = null
     override var points = 0
 
-    override var triggers by Delegates.observable(mapOf<Int, Trigger>()) { _, _, newValue ->
-        testInstance?.updateTriggers(newValue)
+    override var triggers by observable(mapOf<Int, Trigger>()) { _, _, newValue ->
+        testInstance?.updateTriggers(newValue.values)
     }
 
-    override var activeAreas by Delegates.observable(mapOf<Int, ActiveArea>()) { _, _, newValue ->
-        testInstance?.updateActiveAreas(newValue)
+    override var activeAreas by observable(mapOf<Int, ActiveArea>()) { _, _, newValue ->
+        testInstance?.updateActiveAreas(newValue.values)
     }
 
     override var chests = mapOf<Int, Chest>()
@@ -135,10 +135,8 @@ class EditableDungeon(editor: Player) : Dungeon {
     private fun labelActiveArea(label: String, id: Int = -1) {
         if (id == -1) {
             activeAreas.values.lastOrNull()?.label = label
-            testInstance?.activeAreas?.values?.lastOrNull()?.label = label
         } else {
             activeAreas[id]?.label = label
-            testInstance?.activeAreas?.get(id)?.label = label
         }
     }
 
@@ -171,10 +169,8 @@ class EditableDungeon(editor: Player) : Dungeon {
     private fun labelTrigger(label: String, id: Int = -1) {
         if (id == -1) {
             triggers.values.lastOrNull()?.label = label
-            testInstance?.triggers?.values?.lastOrNull()?.label = label
         } else {
             triggers[id]?.label = label
-            testInstance?.triggers?.get(id)?.label = label
         }
     }
 

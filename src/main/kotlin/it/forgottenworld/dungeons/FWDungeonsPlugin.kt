@@ -4,7 +4,6 @@ import it.forgottenworld.dungeons.command.edit.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.config.ConfigManager
 import it.forgottenworld.dungeons.config.Strings
-import it.forgottenworld.dungeons.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.game.objective.CombatObjective
 import it.forgottenworld.dungeons.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.integrations.FWEchelonUtils
@@ -36,7 +35,6 @@ class FWDungeonsPlugin : JavaPlugin() {
         listOf(
             CombatObjective.EntityDeathListener(),
             PlayerListener(),
-            Trigger.ActivationHandler(),
             RespawnHandler(),
             BypassAttemptListener()
         ).forEach { server.pluginManager.registerEvents(it, this) }

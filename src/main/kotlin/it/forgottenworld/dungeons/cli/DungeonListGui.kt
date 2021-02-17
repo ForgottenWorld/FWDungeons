@@ -123,7 +123,7 @@ object DungeonListGui {
                 ?.let { append(it, ChatColor.LIGHT_PURPLE) }
                 ?: append("none", ChatColor.DARK_GRAY)
             append(joinClickable(inst))
-            append(inst.leader?.let { "  [ ${inst.playerCount}/${inst.maxPlayers} ]" } ?: "")
+            append(inst.leader?.let { "  [ ${inst.playerCount}/${inst.dungeon.numberOfPlayers.last} ]" } ?: "")
         }
 
         append("\n".repeat(

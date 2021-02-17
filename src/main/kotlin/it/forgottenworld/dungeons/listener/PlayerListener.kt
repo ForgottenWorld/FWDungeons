@@ -10,6 +10,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.persistence.PersistentDataType
 
@@ -30,6 +31,14 @@ class PlayerListener : Listener {
         val player = event?.player ?: return
         player.editableDungeon?.onDestroy(true)
         player.finalInstance?.onPlayerLeave(player)
+    }
+
+    @EventHandler
+    fun onPlayerMove(event: PlayerMoveEvent) {
+        if (event.from.x == event.to.x &&
+            event.from.y == event.to.y &&
+            event.from.z == event.to.z) return
+        event.player.finalInstance?.onPlayerMove(event.player)
     }
 
     @EventHandler

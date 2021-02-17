@@ -156,8 +156,9 @@ object InteractiveRegionCommandHelper {
             return
         }
 
-        (if (type == TRIGGER) dungeon.testInstance?.triggers else dungeon.testInstance?.activeAreas)
-            ?.get(ieId)?.box?.highlightAll()
+        val irs = if (type == TRIGGER) dungeon.triggers else dungeon.activeAreas
+        val testInstance = dungeon.testInstance ?: return
+        (irs[ieId] ?: return).boxInInstance(testInstance).highlightAll()
         sender.sendFWDMessage(
             Strings.HIGHLIGHTED_IE_WITH_ID
                 .format(
