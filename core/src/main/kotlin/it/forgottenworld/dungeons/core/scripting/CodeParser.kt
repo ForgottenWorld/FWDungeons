@@ -40,11 +40,19 @@ object CodeParser {
             when {
                 code.startsWith(Consts.PREFIX_MYTHIC_MOB) -> {
                     if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
-                    mobs.add(MobSpawnData(currentActiveArea, code.removePrefix(Consts.PREFIX_MYTHIC_MOB), true))
+                    mobs.add(MobSpawnData(
+                        currentActiveArea,
+                        code.removePrefix(Consts.PREFIX_MYTHIC_MOB),
+                        true
+                    ))
                 }
                 code.startsWith(Consts.PREFIX_VANILLA_MOB) -> {
                     if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
-                    mobs.add(MobSpawnData(currentActiveArea, code.removePrefix(Consts.PREFIX_VANILLA_MOB), false))
+                    mobs.add(MobSpawnData(
+                        currentActiveArea,
+                        code.removePrefix(Consts.PREFIX_VANILLA_MOB),
+                        false
+                    ))
                 }
                 code.startsWith(Consts.PREFIX_ACTIVE_AREA) -> {
                     currentActiveArea = code.removePrefix(Consts.PREFIX_ACTIVE_AREA).toInt()
@@ -72,7 +80,7 @@ object CodeParser {
                     val material = Material.getMaterial(codeIterator.next(), false)!!
                     parsed.add {
                         val aa = it.dungeon.activeAreas[aaId]
-                            ?: error("Active area with id $aaId not found")
+                            ?: throw ScriptingException("Active area with id $aaId not found")
                         aa.fillWithMaterial(material, it)
                     }
                 }
@@ -92,14 +100,28 @@ object CodeParser {
     }
 
     fun beautify(raw: List<String>) = raw.joinToString(";\n") {
-        it.replace(Consts.CODE_FILL_ACTIVE_AREA, "${ChatColor.of("#bfff00")}${Consts.CODE_FILL_ACTIVE_AREA}${ChatColor.WHITE}")
-            .replace(Consts.CODE_COMBAT_OBJECTIVE, "${ChatColor.AQUA}${Consts.CODE_COMBAT_OBJECTIVE}${ChatColor.WHITE}")
-            .replace(Consts.CODE_WHEN_DONE, "${ChatColor.LIGHT_PURPLE}${Consts.CODE_WHEN_DONE}${ChatColor.WHITE}")
-            .replace(Consts.CODE_FINISH, "${ChatColor.RED}${Consts.CODE_FINISH}${ChatColor.WHITE}")
-            .replace(Consts.PREFIX_ACTIVE_AREA, "${ChatColor.GREEN}${Consts.PREFIX_ACTIVE_AREA}${ChatColor.WHITE}")
-            .replace(Consts.PREFIX_MYTHIC_MOB, "${ChatColor.of("#ffa500")}${Consts.PREFIX_MYTHIC_MOB}${ChatColor.WHITE}")
-            .replace(Consts.PREFIX_VANILLA_MOB, "${ChatColor.GRAY}${Consts.PREFIX_VANILLA_MOB}${ChatColor.WHITE}")
-            .trim()
+        it.replace(
+            Consts.CODE_FILL_ACTIVE_AREA,
+            "${ChatColor.of("#bfff00")}${Consts.CODE_FILL_ACTIVE_AREA}${ChatColor.WHITE}"
+        ).replace(
+            Consts.CODE_COMBAT_OBJECTIVE,
+            "${ChatColor.AQUA}${Consts.CODE_COMBAT_OBJECTIVE}${ChatColor.WHITE}"
+        ).replace(
+            Consts.CODE_WHEN_DONE,
+            "${ChatColor.LIGHT_PURPLE}${Consts.CODE_WHEN_DONE}${ChatColor.WHITE}"
+        ).replace(
+            Consts.CODE_FINISH,
+            "${ChatColor.RED}${Consts.CODE_FINISH}${ChatColor.WHITE}"
+        ).replace(
+            Consts.PREFIX_ACTIVE_AREA,
+            "${ChatColor.GREEN}${Consts.PREFIX_ACTIVE_AREA}${ChatColor.WHITE}"
+        ).replace(
+            Consts.PREFIX_MYTHIC_MOB,
+            "${ChatColor.of("#ffa500")}${Consts.PREFIX_MYTHIC_MOB}${ChatColor.WHITE}"
+        ).replace(
+            Consts.PREFIX_VANILLA_MOB,
+            "${ChatColor.GRAY}${Consts.PREFIX_VANILLA_MOB}${ChatColor.WHITE}"
+        ).trim()
     }
 
     fun parseScript(lines: List<String>) = parseTokens(lines.iterator())

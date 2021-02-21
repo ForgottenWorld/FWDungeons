@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.listener
+package it.forgottenworld.dungeons.core.game
 
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.WarpbackData
@@ -6,15 +6,12 @@ import it.forgottenworld.dungeons.core.utils.launch
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import kotlinx.coroutines.delay
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import java.util.*
 
-class RespawnHandler : Listener {
+object RespawnHandler {
 
-    @EventHandler
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
         val respawnData = event.player.respawnData ?: return
         event.player.sendFWDMessage(Strings.YOU_WILL_BE_TPED_SHORTLY)
@@ -26,16 +23,13 @@ class RespawnHandler : Listener {
         }
     }
 
-    companion object {
+    private val playerRespawnData = mutableMapOf<UUID, WarpbackData>()
 
-        private val playerRespawnData = mutableMapOf<UUID, WarpbackData>()
-
-        var Player.respawnData
-            get() = playerRespawnData[uniqueId]
-            set(value) {
-                value?.let {
-                    playerRespawnData[uniqueId] = it
-                } ?: playerRespawnData.remove(uniqueId)
-            }
-    }
+    var Player.respawnData
+        get() = playerRespawnData[uniqueId]
+        set(value) {
+            value?.let {
+                playerRespawnData[uniqueId] = it
+            } ?: playerRespawnData.remove(uniqueId)
+        }
 }

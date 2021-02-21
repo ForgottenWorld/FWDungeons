@@ -11,7 +11,7 @@ import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
-import it.forgottenworld.dungeons.core.utils.firstMissing
+import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.highlightAll
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.minecraft
@@ -29,43 +29,52 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import java.io.File
 import java.util.*
-import kotlin.properties.Delegates.observable
 
-class EditableDungeon(editor: Player) : Dungeon {
+class EditableDungeon(
+    editor: Player,
+    override var id: Int = -1000,
+    override var name: String = "NEW DUNGEON",
+    override var description: String = "",
+    override var difficulty: Dungeon.Difficulty = Dungeon.Difficulty.MEDIUM,
+    override var numberOfPlayers: IntRange = 1..2,
+    override var box: Box? = null,
+    override var startingLocation: Vector3i? = null,
+    override var points: Int = 0,
+    var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
+    triggers: Map<Int, TriggerImpl> = mutableMapOf(),
+    activeAreas: Map<Int, ActiveAreaImpl> = mutableMapOf()
+) : Dungeon {
 
     private val editor by player(editor)
 
-    override var id = -1000
-    override var name = "NEW DUNGEON"
-    override var description = ""
-    override var difficulty = Dungeon.Difficulty.MEDIUM
-    override var numberOfPlayers = 1..2
-    override var box: Box? = null
-    override var startingLocation: Vector3i? = null
-    override var points = 0
-
     lateinit var testOrigin: Vector3i
-    val testBox by lazy { box!!.withOrigin(testOrigin) }
 
-    override var triggers by observable(mapOf<Int, TriggerImpl>()) { _, _, newValue ->
-        updateTriggers(newValue.values)
+    init {
+        if (box != null) setupTestBox()
     }
 
-    override var activeAreas by observable(mapOf<Int, ActiveAreaImpl>()) { _, _, newValue ->
-        updateActiveAreas(newValue.values)
-    }
+    override var triggers = triggers
+        private set(value) {
+            field = value
+            updateTriggerParticleSpammers(value.values)
+        }
+
+    override var activeAreas = activeAreas
+        private set(value) {
+            field = value
+            updateActiveAreaParticleSpammers(value.values)
+        }
 
     override var chests = mapOf<Int, ChestImpl>()
 
     val dungeonBoxBuilder = Box.Builder()
     val triggerBoxBuilder = Box.Builder()
     val activeAreaBoxBuilder = Box.Builder()
-    var finalInstanceLocations = mutableListOf<Vector3i>()
 
-    val hasTestBox get() = this::testOrigin.isInitialized
+    val hasTestOrigin get() = this::testOrigin.isInitialized
 
     fun finalize(): FinalDungeon {
-        val newId = if (id == -1000) FinalDungeon.dungeons.keys.firstMissing() else id
+        val newId = if (id == -1000) FinalDungeon.dungeons.keys.firstGap() else id
 
         val finalDungeon = FinalDungeon(
             newId,
@@ -125,7 +134,7 @@ class EditableDungeon(editor: Player) : Dungeon {
             id,
             box.withContainerOrigin(
                 testOrigin,
-                Vector3i(0, 0, 0)
+                Vector3i.ZERO
             )
         ).let {
             activeAreas = activeAreas.plus(id to it)
@@ -158,7 +167,7 @@ class EditableDungeon(editor: Player) : Dungeon {
                 id,
                 box.withContainerOrigin(
                     testOrigin,
-                    Vector3i(0, 0, 0)
+                    Vector3i.ZERO
                 )
             ).let {
                 highlightNewInteractiveRegion(it)
@@ -200,7 +209,7 @@ class EditableDungeon(editor: Player) : Dungeon {
     }
 
     fun whatIsMissingForWriteout() = StringBuilder().apply {
-        if (!hasTestBox) append(Strings.WIM_BOX)
+        if (!hasTestOrigin) append(Strings.WIM_BOX)
         if (startingLocation == null) append(Strings.WIM_STARTING_LOCATION)
         if (triggers.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_TRIGGER)
         if (activeAreas.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_ACTIVE_AREA)
@@ -208,17 +217,9 @@ class EditableDungeon(editor: Player) : Dungeon {
 
     private var hlFrames = false
 
-    private fun updateTriggers(newTriggers: Collection<TriggerImpl>) {
-        updateTriggerParticleSpammers(newTriggers)
-    }
-
-    private fun updateActiveAreas(newActiveAreas: Collection<ActiveAreaImpl>) {
-        updateActiveAreaParticleSpammers(newActiveAreas)
-    }
-
     private fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
         interactiveRegion.withContainerOrigin(
-            Vector3i(0, 0, 0),
+            Vector3i.ZERO,
             testOrigin
         ).also { it.box.highlightAll() }
     }

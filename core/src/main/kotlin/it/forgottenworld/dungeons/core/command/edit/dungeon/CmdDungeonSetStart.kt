@@ -1,12 +1,12 @@
 package it.forgottenworld.dungeons.core.command.edit.dungeon
 
+import it.forgottenworld.dungeons.api.command.PlayerCommand
+import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.toVector3i
-import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import org.bukkit.entity.Player
 
 class CmdDungeonSetStart : PlayerCommand() {
@@ -17,12 +17,12 @@ class CmdDungeonSetStart : PlayerCommand() {
             return true
         }
 
-        if (dungeon.box == null || !dungeon.hasTestBox) {
+        if (dungeon.box == null || !dungeon.hasTestOrigin) {
             sender.sendFWDMessage(Strings.DUNGEON_BOX_SHOULD_BE_SET_BEFORE_ADDING_STARTPOS)
             return true
         }
 
-        if (!dungeon.testBox.containsPlayer(sender)) {
+        if (!dungeon.box!!.containsPlayer(sender, dungeon.testOrigin)) {
             sender.sendFWDMessage(Strings.OUTSIDE_OF_DUNGEON_BOX)
             return true
         }
@@ -30,7 +30,7 @@ class CmdDungeonSetStart : PlayerCommand() {
         dungeon.startingLocation = sender
             .location
             .toVector3i()
-            .withRefSystemOrigin(dungeon.testOrigin, Vector3i(0, 0, 0))
+            .withRefSystemOrigin(dungeon.testOrigin, Vector3i.ZERO)
 
         sender.sendFWDMessage(Strings.DUNGEON_STARTPOS_SET)
 

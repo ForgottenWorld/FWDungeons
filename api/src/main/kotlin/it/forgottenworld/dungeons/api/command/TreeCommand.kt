@@ -6,7 +6,10 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 
-abstract class TreeCommand(val name: String, private val cmdTree: BranchingCommand) : CommandExecutor, TabCompleter {
+abstract class TreeCommand(
+    private val name: String,
+    private val cmdTree: BranchingCommand
+) : CommandExecutor, TabCompleter {
 
     override fun onCommand(
         sender: CommandSender,

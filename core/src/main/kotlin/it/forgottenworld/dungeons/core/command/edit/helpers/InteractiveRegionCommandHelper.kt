@@ -33,17 +33,16 @@ object InteractiveRegionCommandHelper {
             return
         }
 
-        if (!dungeon.hasTestBox) {
+        if (!dungeon.hasTestOrigin) {
             sender.sendFWDMessage(
-                Strings.DUNGEON_BOX_AND_STARTPOS_SHOULD_BE_SET_BEFORE_ADDING_IE
-                    .format(
-                        if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
-                    )
+                Strings.DUNGEON_BOX_AND_STARTPOS_SHOULD_BE_SET_BEFORE_ADDING_IE.format(
+                    if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
+                )
             )
             return
         }
 
-        if (!dungeon.testBox.containsBlock(block)) {
+        if (!dungeon.box!!.containsBlock(block, dungeon.testOrigin)) {
             sender.sendFWDMessage(Strings.TARGET_NOT_INSIDE_DUNGEON_BOX)
             return
         }
@@ -75,11 +74,10 @@ object InteractiveRegionCommandHelper {
         launch {
             val id = dungeon.newInteractiveRegion(type, box)
             sender.sendFWDMessage(
-                Strings.CREATED_IE_WITH_ID
-                    .format(
-                        if (type == TRIGGER) "trigger" else "active area",
-                        id
-                    )
+                Strings.CREATED_IE_WITH_ID.format(
+                    if (type == TRIGGER) "trigger" else "active area",
+                    id
+                )
             )
         }
 
@@ -101,10 +99,9 @@ object InteractiveRegionCommandHelper {
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
             sender.sendFWDMessage(
-                Strings.THIS_DUNGEON_HAS_NO_IE_YET
-                    .format(
-                        if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
-                    )
+                Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(
+                    if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
+                )
             )
             return
         }
@@ -123,21 +120,19 @@ object InteractiveRegionCommandHelper {
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
             sender.sendFWDMessage(
-                Strings.THIS_DUNGEON_HAS_NO_IE_YET
-                    .format(
-                        if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
-                    )
+                Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(
+                    if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
+                )
             )
             return
         }
 
         val id = dungeon.unmakeInteractiveRegion(type, ieId)
         sender.sendFWDMessage(
-            Strings.DELETED_IE_WITH_ID
-                .format(
-                    if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS,
-                    id
-                )
+            Strings.DELETED_IE_WITH_ID.format(
+                if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS,
+                id
+            )
         )
     }
 
@@ -151,16 +146,15 @@ object InteractiveRegionCommandHelper {
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
             sender.sendFWDMessage(
-                Strings.THIS_DUNGEON_HAS_NO_IE_YET
-                    .format(
-                        if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
-                    )
+                Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(
+                    if (type == TRIGGER) Strings.TRIGGERS else Strings.ACTIVE_AREAS
+                )
             )
             return
         }
 
         val irs = if (type == TRIGGER) dungeon.triggers else dungeon.activeAreas
-        if (!dungeon.hasTestBox) return
+        if (!dungeon.hasTestOrigin) return
         (irs[ieId] ?: return).box
             .withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin)
             .highlightAll()

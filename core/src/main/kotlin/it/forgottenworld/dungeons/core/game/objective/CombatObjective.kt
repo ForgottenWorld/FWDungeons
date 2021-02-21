@@ -3,9 +3,6 @@ package it.forgottenworld.dungeons.core.game.objective
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import org.bukkit.Bukkit.getEntity
 import org.bukkit.entity.LivingEntity
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDeathEvent
 import java.util.*
 
 class CombatObjective(
@@ -17,7 +14,6 @@ class CombatObjective(
     private var aborting = false
     private val shouldBeRemoved
         get() = mobsToKill.isEmpty()
-
 
     fun onMobKilled(uuid: UUID) {
         mobsToKill.remove(uuid)
@@ -37,14 +33,6 @@ class CombatObjective(
             .map { getEntity(it) }
             .filterIsInstance<LivingEntity>()
             .forEach { it.health = 0.0 }
-    }
-
-    class EntityDeathListener : Listener {
-
-        @EventHandler
-        fun onEntityDeath(event: EntityDeathEvent) {
-            event.entity.uniqueId.combatObjective?.onMobKilled(event.entity.uniqueId)
-        }
     }
 
     companion object {

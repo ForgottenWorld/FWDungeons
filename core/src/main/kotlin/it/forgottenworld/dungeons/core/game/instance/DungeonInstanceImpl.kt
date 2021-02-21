@@ -7,15 +7,14 @@ import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.cli.JsonMessages
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.RespawnHandler.respawnData
 import it.forgottenworld.dungeons.core.game.detection.CubeGridUtils.checkPositionAgainstTriggers
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon.FinalDungeonsDelegate.Companion.finalDungeons
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.game.objective.CombatObjective
 import it.forgottenworld.dungeons.core.game.objective.CombatObjective.Companion.combatObjective
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
-import it.forgottenworld.dungeons.core.listener.RespawnHandler.Companion.respawnData
 import it.forgottenworld.dungeons.core.utils.MobSpawnData
 import it.forgottenworld.dungeons.core.utils.MutablePlayerList
 import it.forgottenworld.dungeons.core.utils.RandomString
@@ -41,11 +40,9 @@ import java.util.*
 
 class DungeonInstanceImpl(
     override val id: Int,
-    dungeonId: Int,
+    override val dungeon: FinalDungeon,
     override val origin: Vector3i
 ) : DungeonInstance {
-
-    override val dungeon by finalDungeons(dungeonId)
 
     var isTpSafe = true
     val players = MutablePlayerList.of()
@@ -62,7 +59,7 @@ class DungeonInstanceImpl(
 
     private val startingPostion = dungeon
         .startingLocation
-        .withRefSystemOrigin(Vector3i(0, 0, 0), origin)
+        .withRefSystemOrigin(Vector3i.ZERO, origin)
 
     val playerCount
         get() = players.size
@@ -209,7 +206,6 @@ class DungeonInstanceImpl(
     }
 
     fun onInstanceFinish(givePoints: Boolean) {
-
         if (ConfigManager.useEasyRanking && givePoints && dungeon.points != 0) {
             players.uuids.forEach {
                 EasyRankingUtils.addScoreToPlayer(it, dungeon.points.toFloat())

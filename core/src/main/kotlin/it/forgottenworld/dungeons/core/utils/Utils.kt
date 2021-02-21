@@ -6,7 +6,6 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.utils.ParticleSpammer.Companion.repeatedlySpawnParticles
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -32,7 +31,7 @@ fun Vector3i.cubeWithSide(side: Int) = Box(
 
 fun CommandSender.sendFWDMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
 
-fun Iterable<Int>.firstMissing() = find { !contains(it + 1) }?.plus(1) ?: 0
+fun Iterable<Int>.firstGap() = sorted().find { !contains(it + 1) }?.plus(1) ?: 0
 
 val plugin get() = JavaPlugin.getPlugin(FWDungeonsPlugin::class.java)
 
@@ -41,7 +40,7 @@ val mythicMobsHelper by lazy { BukkitAPIHelper() }
 val dungeonWorld get() = ConfigManager.dungeonWorld
 
 fun Box.highlightAll() {
-    repeatedlySpawnParticles(
+    ParticleSpammer.repeatedlySpawnParticles(
         Particle.COMPOSTER,
         getAllBlocks(dungeonWorld).map { it.location },
         1,

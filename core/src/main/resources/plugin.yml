@@ -101,6 +101,15 @@ permissions:
   fwdungeonsedit.activearea.label:
     description: Allows the player to use /fwdungeonsedit activearea label
     default: op
+  fwdungeonsedit.chest.add:
+    description: Allows the player to use /fwdungeonsedit chest add
+    default: op
+  fwdungeonsedit.chest.remove:
+    description: Allows the player to use /fwdungeonsedit chest remove
+    default: op
+  fwdungeonsedit.chest.label:
+    description: Allows the player to use /fwdungeonsedit chest label
+    default: op
   fwdungeonsedit.activearea.unmake:
     description: Allows the player to use /fwdungeonsedit activearea unmake
     default: op

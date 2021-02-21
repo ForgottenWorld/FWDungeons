@@ -1,16 +1,23 @@
-package it.forgottenworld.dungeons.core.listener
+package it.forgottenworld.dungeons.core
 
+import it.forgottenworld.dungeons.core.game.BypassAttemptHandler
+import it.forgottenworld.dungeons.core.game.RespawnHandler
 import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl.Companion.finalInstance
+import it.forgottenworld.dungeons.core.game.objective.CombatObjective.Companion.combatObjective
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerRespawnEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 
 
-class PlayerListener : Listener {
+class SpigotListenerDelegates : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
@@ -35,6 +42,28 @@ class PlayerListener : Listener {
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         event.player.editableDungeon?.handlePlayerInteract(event)
+        BypassAttemptHandler.onPlayerInteract(event)
+    }
+
+    @EventHandler
+    fun onEntityDeath(event: EntityDeathEvent) {
+        event.entity.uniqueId.combatObjective?.onMobKilled(event.entity.uniqueId)
+    }
+
+    @EventHandler
+    fun onPlayerTeleport(event: PlayerTeleportEvent) {
+        if (event.player.finalInstance?.isTpSafe != false) return
+        BypassAttemptHandler.onPlayerTeleport(event)
+    }
+
+    @EventHandler
+    fun onEntityPotionEffect(event: EntityPotionEffectEvent) {
+        BypassAttemptHandler.onEntityPotionEffect(event)
+    }
+
+    @EventHandler
+    fun onPlayerRespawn(event: PlayerRespawnEvent) {
+        RespawnHandler.onPlayerRespawn(event)
     }
 
 }

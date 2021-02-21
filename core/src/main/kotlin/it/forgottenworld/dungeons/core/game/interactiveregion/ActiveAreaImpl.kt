@@ -7,7 +7,7 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.math.toVector
 import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.config.ConfigManager
-import it.forgottenworld.dungeons.core.utils.ParticleSpammer.Companion.repeatedlySpawnParticles
+import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import it.forgottenworld.dungeons.core.utils.dungeonWorld
 import org.bukkit.Location
 import org.bukkit.Material
@@ -25,7 +25,7 @@ data class ActiveAreaImpl(
     override fun fillWithMaterial(material: Material, instance: DungeonInstance) {
         val blocks = box.getAllBlocks(dungeonWorld, instance.origin)
         blocks.forEach { it.setType(material, true) }
-        repeatedlySpawnParticles(
+        ParticleSpammer.repeatedlySpawnParticles(
             Particle.PORTAL,
             blocks.map { it.location },
             1,

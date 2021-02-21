@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.utils
 
-import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.core.config.ConfigManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Location
@@ -29,7 +29,12 @@ class ParticleSpammer(
                 locations.forEach {
                     world.spawnParticle(
                         particle,
-                        Location(ConfigManager.dungeonWorld, it.x + 0.5, it.y + 0.5, it.z + 0.5),
+                        Location(
+                            ConfigManager.dungeonWorld,
+                            it.x + 0.5,
+                            it.y + 0.5,
+                            it.z + 0.5
+                        ),
                         count
                     )
                 }

@@ -5,7 +5,7 @@ class NestableGrid3iToNi(
     height: Int,
     depth: Int,
     val cellSize: Int,
-    private val origin: Vector3i = Vector3i(0,0,0)
+    private val origin: Vector3i = Vector3i.ZERO
 ) {
 
     private val values =

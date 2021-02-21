@@ -1,23 +1,19 @@
-package it.forgottenworld.dungeons.core.listener
+package it.forgottenworld.dungeons.core.game
 
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl.Companion.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.potion.PotionEffectType
 
-class BypassAttemptListener : Listener {
+object BypassAttemptHandler {
 
-    @EventHandler
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
-        if (event.player.finalInstance?.isTpSafe != false) return
 
         fun preventTp(because: String, damage: Double = 0.0) {
             event.player.sendFWDMessage(because)
@@ -38,7 +34,6 @@ class BypassAttemptListener : Listener {
         }
     }
 
-    @EventHandler
     fun onEntityPotionEffect(event: EntityPotionEffectEvent) {
         val player = event.entity as? Player ?: return
         if (player.finalInstance != null &&
@@ -50,7 +45,6 @@ class BypassAttemptListener : Listener {
         }
     }
 
-    @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.player.finalInstance == null ||
             event.item?.type != Material.ENDER_PEARL ||
@@ -60,17 +54,16 @@ class BypassAttemptListener : Listener {
         event.isCancelled = true
     }
 
-    companion object {
-        private val bannedPotionEffects = setOf(
-            PotionEffectType.JUMP,
-            PotionEffectType.SPEED,
-            PotionEffectType.LEVITATION
-        )
-        private val checkedCauses = setOf(
-            EntityPotionEffectEvent.Cause.POTION_DRINK,
-            EntityPotionEffectEvent.Cause.POTION_SPLASH,
-            EntityPotionEffectEvent.Cause.ARROW,
-            EntityPotionEffectEvent.Cause.AREA_EFFECT_CLOUD
-        )
-    }
+    private val bannedPotionEffects = setOf(
+        PotionEffectType.JUMP,
+        PotionEffectType.SPEED,
+        PotionEffectType.LEVITATION
+    )
+
+    private val checkedCauses = setOf(
+        EntityPotionEffectEvent.Cause.POTION_DRINK,
+        EntityPotionEffectEvent.Cause.POTION_SPLASH,
+        EntityPotionEffectEvent.Cause.ARROW,
+        EntityPotionEffectEvent.Cause.AREA_EFFECT_CLOUD
+    )
 }

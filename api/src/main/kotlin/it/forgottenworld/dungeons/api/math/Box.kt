@@ -25,11 +25,20 @@ class Box(
         origin.z + depth
     )
 
-    fun containsPlayer(player: Player) = containsLocation(player.location)
+    fun containsPlayer(
+        player: Player,
+        origin: Vector3i = this.origin
+    ) = containsLocation(player.location, origin)
 
-    fun containsBlock(block: Block) = containsLocation(block.location)
+    fun containsBlock(
+        block: Block,
+        origin: Vector3i = this.origin
+    ) = containsLocation(block.location, origin)
 
-    private fun containsLocation(location: Location) = location.let {
+    private fun containsLocation(
+        location: Location,
+        origin: Vector3i = this.origin
+    ) = location.let {
         it.x >= origin.x && it.x < origin.x + width &&
             it.y >= origin.y && it.y < origin.y + height &&
             it.z >= origin.z && it.z < origin.z + depth
@@ -51,7 +60,7 @@ class Box(
             origin.z <= otherOpposite.z
     }
 
-    fun withOriginZero() = Box(Vector3i(0, 0, 0), width, height, depth)
+    fun withOriginZero() = Box(Vector3i.ZERO, width, height, depth)
 
     fun withOrigin(origin: Vector3i) = Box(origin, width, height, depth)
 

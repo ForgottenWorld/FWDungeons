@@ -1,5 +1,10 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
+import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.math.Box
+import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.math.toVector
+import it.forgottenworld.dungeons.api.math.toVector3i
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.chest.ChestImpl
@@ -8,20 +13,15 @@ import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.ed
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
+import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.plugin
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.vector3i
-import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
-import it.forgottenworld.dungeons.api.math.Box
-import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.toVector
-import it.forgottenworld.dungeons.api.math.toVector3i
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
-import kotlin.reflect.KProperty
 
 class FinalDungeon(
     override val id: Int,
@@ -56,21 +56,20 @@ class FinalDungeon(
 
         player.sendFWDMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
 
-        return EditableDungeon(player).also {
-            it.id = id
-            it.name = name
-            it.description = description
-            it.difficulty = difficulty
-            it.points = points
-            it.numberOfPlayers = numberOfPlayers
-            it.box = box.clone()
-            it.startingLocation = startingLocation.copy()
-            it.finalInstanceLocations = instances.values.map { ins -> ins.origin.copy() }.toMutableList()
-            player.editableDungeon = it
-            it.setupTestBox()
-            it.triggers = triggers
-            it.activeAreas = activeAreas
-        }
+        return EditableDungeon(
+            player,
+            id,
+            name,
+            description,
+            difficulty,
+            numberOfPlayers,
+            box.clone(),
+            startingLocation.copy(),
+            points,
+            instances.values.map { ins -> ins.origin.copy() }.toMutableList(),
+            triggers,
+            activeAreas
+        ).also { player.editableDungeon = it }
     }
 
     fun import(at: Vector3i): Boolean {
@@ -91,9 +90,8 @@ class FinalDungeon(
     }
 
     fun createInstance(target: Block): DungeonInstanceImpl {
-        val id = instances.keys.lastOrNull()?.plus(1) ?: 0
-        val newOrigin = target.vector3i
-        val newInstance = DungeonInstanceImpl(id, this.id, newOrigin)
+        val id = instances.keys.firstGap()
+        val newInstance = DungeonInstanceImpl(id, this, target.vector3i)
         newInstance.resetInstance()
         instances = instances + (id to newInstance)
         return newInstance
@@ -123,33 +121,31 @@ class FinalDungeon(
         }
     }
 
-    class FinalDungeonsDelegate private constructor(val id: Int) {
-
-        operator fun getValue(thisRef: Any?, property: KProperty<*>) =
-            dungeons[id] ?: error("Dungeon $id was not found")
-
-        companion object {
-            fun finalDungeons(id: Int) = FinalDungeonsDelegate(id)
-        }
-    }
-
     companion object {
 
         val dungeons = mutableMapOf<Int, FinalDungeon>()
 
-        fun fromConfig(id: Int, conf: YamlConfiguration): FinalDungeon = conf.run {
-            val triggers = getConfigurationSection("triggers")!!
-                .getKeys(false)
-                .associate { it.toInt() to TriggerImpl.fromConfig(it.toInt(), getConfigurationSection("triggers.$it")!!) }
+        fun fromConfig(id: Int, conf: YamlConfiguration) = conf.run {
 
-            val activeAreas = getConfigurationSection("activeAreas")!!
-                .getKeys(false)
-                .associate {
+            val triggers = getConfigurationSection("triggers")
+                ?.getKeys(false)
+                ?.associate {
+                    it.toInt() to TriggerImpl.fromConfig(
+                        it.toInt(),
+                        getConfigurationSection("triggers.$it")!!
+                    )
+                }
+                ?: mapOf()
+
+            val activeAreas = getConfigurationSection("activeAreas")
+                ?.getKeys(false)
+                ?.associate {
                     it.toInt() to ActiveAreaImpl.fromConfig(
                         it.toInt(),
                         getConfigurationSection("activeAreas.$it")!!
                     )
                 }
+                ?: mapOf()
 
             val chests = getConfigurationSection("chests")
                 ?.getKeys(false)
@@ -166,8 +162,13 @@ class FinalDungeon(
                 getString("description")!!,
                 Dungeon.Difficulty.fromString(getString("difficulty")!!)!!,
                 getInt("points", 0),
-                getIntegerList("numberOfPlayers").let { IntRange(it.first(), it.last()) },
-                Box(Vector3i(0, 0, 0), getInt("width"), getInt("height"), getInt("depth")),
+                getIntegerList("numberOfPlayers").let { it.first()..it.last() },
+                Box(
+                    Vector3i.ZERO,
+                    getInt("width"),
+                    getInt("height"),
+                    getInt("depth")
+                ),
                 getVector("startingLocation")!!.toVector3i(),
                 triggers,
                 activeAreas,

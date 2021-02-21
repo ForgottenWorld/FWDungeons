@@ -14,7 +14,7 @@ class CmdDungeonHlFrames : PlayerCommand() {
             return true
         }
 
-        if (!dungeon.hasTestBox) {
+        if (!dungeon.hasTestOrigin) {
             sender.sendFWDMessage(Strings.COULDNT_FIND_DUNGEON_TEST_INSTANCE)
             return true
         }

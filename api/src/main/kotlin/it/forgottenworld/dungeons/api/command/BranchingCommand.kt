@@ -8,7 +8,7 @@ class BranchingCommand(val bindings: Map<String, CommandHandler>) : CommandHandl
         bindings[args[0]]
             ?.walkExecute(
                 sender,
-                args.drop(1).toTypedArray()
+                args.copyOfRange(1,args.size)
             )
         ?: false
 }

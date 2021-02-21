@@ -1,11 +1,11 @@
 package it.forgottenworld.dungeons.core.game.detection
 
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
-import it.forgottenworld.dungeons.core.utils.cubeWithSide
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.NestableGrid3iToNi
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
+import it.forgottenworld.dungeons.core.utils.cubeWithSide
 import kotlin.properties.ReadOnlyProperty
 
 object CubeGridUtils {
@@ -36,7 +36,7 @@ object CubeGridUtils {
             }
         }
         for ((k,v) in vectorMap) {
-            if (v.size > 1 && nestingLevel < 2) {
+            if (v.size > 2 && nestingLevel < 2) {
                 val nestedGrid = grid.nestAt(k.x,k.y,k.z)
                 val trigs = triggers.filterKeys { v.contains(it) }
                 mapTriggersOntoGrid(nestedGrid, trigs, nestingLevel + 1)
