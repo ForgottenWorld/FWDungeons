@@ -1,0 +1,181 @@
+package it.forgottenworld.dungeons.core.game.dungeon
+
+import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.chest.ChestImpl
+import it.forgottenworld.dungeons.core.game.detection.CubeGridUtils.triggerGrid
+import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
+import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
+import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
+import it.forgottenworld.dungeons.core.utils.launchAsync
+import it.forgottenworld.dungeons.core.utils.plugin
+import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.vector3i
+import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.math.Box
+import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.math.toVector
+import it.forgottenworld.dungeons.api.math.toVector3i
+import org.bukkit.block.Block
+import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.entity.Player
+import java.io.File
+import kotlin.reflect.KProperty
+
+class FinalDungeon(
+    override val id: Int,
+    override val name: String,
+    override val description: String,
+    override val difficulty: Dungeon.Difficulty,
+    override val points: Int,
+    override val numberOfPlayers: IntRange,
+    override val box: Box,
+    override val startingLocation: Vector3i,
+    override val triggers: Map<Int, TriggerImpl>,
+    override val activeAreas: Map<Int, ActiveAreaImpl>,
+    override val chests: Map<Int, ChestImpl>,
+    var instances: Map<Int, DungeonInstanceImpl>
+) : Dungeon {
+
+    var isActive = true
+    var isBeingEdited = false
+    val triggerGrid by triggerGrid()
+
+    fun putInEditMode(player: Player): EditableDungeon? {
+        if (isActive) {
+            player.sendFWDMessage(Strings.DUNGEON_WITH_ID_NOT_DISABLED.format(id))
+            return null
+        }
+
+        if (isBeingEdited) {
+            player.sendFWDMessage(Strings.DUNGEON_ALREADY_BEING_EDITED)
+            return null
+        }
+        isBeingEdited = true
+
+        player.sendFWDMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
+
+        return EditableDungeon(player).also {
+            it.id = id
+            it.name = name
+            it.description = description
+            it.difficulty = difficulty
+            it.points = points
+            it.numberOfPlayers = numberOfPlayers
+            it.box = box.clone()
+            it.startingLocation = startingLocation.copy()
+            it.finalInstanceLocations = instances.values.map { ins -> ins.origin.copy() }.toMutableList()
+            player.editableDungeon = it
+            it.setupTestBox()
+            it.triggers = triggers
+            it.activeAreas = activeAreas
+        }
+    }
+
+    fun import(at: Vector3i): Boolean {
+        if (instances.isNotEmpty()) return false
+        val config = YamlConfiguration()
+        val file = File(plugin.dataFolder, "instances.yml")
+        if (file.exists()) config.load(file)
+        val dgconf = config.createSection("$id")
+        dgconf.createSection("$0").run {
+            set("x", at.x)
+            set("y", at.y)
+            set("z", at.z)
+        }
+        createInstance(ConfigManager.dungeonWorld.getBlockAt(at.x, at.y, at.z))
+        @Suppress("BlockingMethodInNonBlockingContext")
+        (launchAsync { config.save(file) })
+        return true
+    }
+
+    fun createInstance(target: Block): DungeonInstanceImpl {
+        val id = instances.keys.lastOrNull()?.plus(1) ?: 0
+        val newOrigin = target.vector3i
+        val newInstance = DungeonInstanceImpl(id, this.id, newOrigin)
+        newInstance.resetInstance()
+        instances = instances + (id to newInstance)
+        return newInstance
+    }
+
+    fun toConfig(conf: YamlConfiguration) {
+        val dungeon = this
+        conf.run {
+            set("name", dungeon.name)
+            set("description", dungeon.description)
+            set("difficulty", dungeon.difficulty.toString())
+            set("points", dungeon.points)
+            set("numberOfPlayers", dungeon.numberOfPlayers.toList())
+            set("width", dungeon.box.width)
+            set("height", dungeon.box.height)
+            set("depth", dungeon.box.depth)
+            set("startingLocation", dungeon.startingLocation.toVector())
+            dungeon.triggers.values.forEach {
+                it.toConfig(createSection("triggers.${it.id}"))
+            }
+            dungeon.activeAreas.values.forEach {
+                it.toConfig(createSection("activeAreas.${it.id}"))
+            }
+            dungeon.chests.values.forEach {
+                it.toConfig(createSection("chests.${it.id}"))
+            }
+        }
+    }
+
+    class FinalDungeonsDelegate private constructor(val id: Int) {
+
+        operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+            dungeons[id] ?: error("Dungeon $id was not found")
+
+        companion object {
+            fun finalDungeons(id: Int) = FinalDungeonsDelegate(id)
+        }
+    }
+
+    companion object {
+
+        val dungeons = mutableMapOf<Int, FinalDungeon>()
+
+        fun fromConfig(id: Int, conf: YamlConfiguration): FinalDungeon = conf.run {
+            val triggers = getConfigurationSection("triggers")!!
+                .getKeys(false)
+                .associate { it.toInt() to TriggerImpl.fromConfig(it.toInt(), getConfigurationSection("triggers.$it")!!) }
+
+            val activeAreas = getConfigurationSection("activeAreas")!!
+                .getKeys(false)
+                .associate {
+                    it.toInt() to ActiveAreaImpl.fromConfig(
+                        it.toInt(),
+                        getConfigurationSection("activeAreas.$it")!!
+                    )
+                }
+
+            val chests = getConfigurationSection("chests")
+                ?.getKeys(false)
+                ?.associate {
+                    it.toInt() to ChestImpl.fromConfig(
+                        getConfigurationSection("chests.$it")!!
+                    )
+                }
+                ?: mapOf()
+
+            val dungeon = FinalDungeon(
+                id,
+                getString("name")!!,
+                getString("description")!!,
+                Dungeon.Difficulty.fromString(getString("difficulty")!!)!!,
+                getInt("points", 0),
+                getIntegerList("numberOfPlayers").let { IntRange(it.first(), it.last()) },
+                Box(Vector3i(0, 0, 0), getInt("width"), getInt("height"), getInt("depth")),
+                getVector("startingLocation")!!.toVector3i(),
+                triggers,
+                activeAreas,
+                chests,
+                mapOf()
+            )
+
+            dungeon
+        }
+    }
+}
