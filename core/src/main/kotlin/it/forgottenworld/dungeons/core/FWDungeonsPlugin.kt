@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
+import it.forgottenworld.dungeons.core.integrations.VaultUtils
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -32,6 +33,7 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         EasyRankingUtils.checkEasyRankingIntegration()
         FWEchelonUtils.checkFWEchelonIntegration()
+        VaultUtils.checkVaultIntegration()
     }
 
     fun loadStrings() {
