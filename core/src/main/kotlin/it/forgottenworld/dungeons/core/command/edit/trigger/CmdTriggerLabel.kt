@@ -10,6 +10,10 @@ import org.bukkit.entity.Player
 class CmdTriggerLabel : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
+        if (args.isEmpty()) {
+            sender.sendFWDMessage(Strings.LABEL_CANNOT_BE_EMPTY)
+            return true
+        }
         val firstArg = args[0]
         if (firstArg.startsWith("id:")) {
             val id = firstArg.drop(3).toIntOrNull() ?: run {
@@ -22,10 +26,6 @@ class CmdTriggerLabel : PlayerCommand() {
             }
             val label = args.drop(1).joinToString(" ").trim()
             InteractiveRegionCommandHelper.labelInteractiveRegion(sender, label, InteractiveRegion.Type.TRIGGER, id)
-            return true
-        }
-        if (args.isEmpty()) {
-            sender.sendFWDMessage(Strings.LABEL_CANNOT_BE_EMPTY)
             return true
         }
         val label = args.joinToString(" ").trim()

@@ -10,6 +10,10 @@ import org.bukkit.entity.Player
 class CmdActiveAreaLabel : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
+        if (args.isEmpty()) {
+            sender.sendFWDMessage(Strings.LABEL_CANNOT_BE_EMPTY)
+            return true
+        }
         val firstArg = args[0]
         if (firstArg.startsWith("id:")) {
             val id = firstArg.drop(3).toIntOrNull() ?: run {
@@ -27,10 +31,6 @@ class CmdActiveAreaLabel : PlayerCommand() {
                 InteractiveRegion.Type.ACTIVE_AREA,
                 id
             )
-            return true
-        }
-        if (args.isEmpty()) {
-            sender.sendFWDMessage(Strings.LABEL_CANNOT_BE_EMPTY)
             return true
         }
         val label = args.joinToString(" ").trim()

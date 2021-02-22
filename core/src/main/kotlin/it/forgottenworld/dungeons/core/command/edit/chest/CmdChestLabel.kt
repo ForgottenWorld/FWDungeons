@@ -14,6 +14,11 @@ class CmdChestLabel : PlayerCommand() {
             return true
         }
 
+        if (args.isEmpty()) {
+            sender.sendFWDMessage(Strings.LABEL_CANNOT_BE_EMPTY)
+            return true
+        }
+
         val firstArg = args[0]
         val chest = if (firstArg.startsWith("id:")) {
             if (args.size == 1) {
@@ -28,11 +33,6 @@ class CmdChestLabel : PlayerCommand() {
             return true
         } else dungeon.chests.values.lastOrNull() ?: run {
             sender.sendFWDMessage(Strings.NO_CHESTS_YET)
-            return true
-        }
-
-        if (args.isEmpty()) {
-            sender.sendFWDMessage(Strings.LABEL_CANNOT_BE_EMPTY)
             return true
         }
 

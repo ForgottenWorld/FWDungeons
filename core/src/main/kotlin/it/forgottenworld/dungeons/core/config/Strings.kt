@@ -36,6 +36,7 @@ object Strings {
     val ALREADY_IN_PARTY by ResourceString()
     val ANOTHER_DUNGEON_WITH_SAME_NAME_EXISTS by ResourceString()
     val CANT_WRITEOUT_YET_MISSING by ResourceString()
+    val CHEST_REMOVED_SUCCESFULLY by ResourceString()
     val CONGRATS_YOU_MADE_IT_OUT by ResourceString()
     val COULDNT_FIND_DUNGEON_TEST_INSTANCE by ResourceString()
     val CREATE by ResourceString()
