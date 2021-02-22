@@ -2,7 +2,8 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -23,7 +24,7 @@ class CmdDungeonEvacuate : SenderCommand() {
         }
 
         sender.sendFWDMessage(
-            if (FinalDungeon.dungeons[dungeonId]?.instances?.get(instanceId)?.evacuate() != null)
+            if (DungeonManager.finalDungeons[dungeonId]?.instances?.get(instanceId)?.evacuate() != null)
                 Strings.ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET
             else
                 Strings.DUNGEON_INSTANCE_NOT_FOUND

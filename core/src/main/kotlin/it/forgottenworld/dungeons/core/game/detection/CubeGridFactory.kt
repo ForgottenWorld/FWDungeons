@@ -8,7 +8,7 @@ import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.utils.cubeWithSide
 import kotlin.properties.ReadOnlyProperty
 
-object CubeGridUtils {
+object CubeGridFactory {
 
     private fun tessellateAroundBox(box: Box): NestableGrid3iToNi {
         val opposite = box.getOriginOpposite()

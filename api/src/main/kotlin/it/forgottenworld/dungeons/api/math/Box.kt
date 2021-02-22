@@ -91,7 +91,7 @@ class Box(
         return blocks
     }
 
-    fun getFrame(): List<Vector3i> {
+    fun getFrame(origin: Vector3i = this.origin): List<Vector3i> {
         val minX = origin.x
         val maxX = origin.x + width - 1
         val minY = origin.y

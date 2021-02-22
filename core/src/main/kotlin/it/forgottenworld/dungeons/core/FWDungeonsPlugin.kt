@@ -28,13 +28,13 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         logger.info("Registering events...")
 
-        server.pluginManager.registerEvents(SpigotListenerDelegates(), this)
+        server.pluginManager.registerEvents(SpigotEventDispatcher(), this)
 
         EasyRankingUtils.checkEasyRankingIntegration()
         FWEchelonUtils.checkFWEchelonIntegration()
     }
 
-    private fun loadStrings() {
+    fun loadStrings() {
         val stringsFile = File(dataFolder, "strings.yml")
         val conf = YamlConfiguration()
         if (!stringsFile.exists()) {

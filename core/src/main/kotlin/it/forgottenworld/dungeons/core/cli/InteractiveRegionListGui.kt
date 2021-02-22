@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.core.cli
 
+import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
@@ -68,7 +68,7 @@ object InteractiveRegionListGui {
     fun showActiveAreas(dungeon: EditableDungeon, page: Int) = chatComponent {
 
         append("====================[ ", ChatColor.DARK_GRAY)
-        append(Strings.CHAT_PREFIX.dropLast(1))
+        append(Strings.CHAT_PREFIX_NO_SPACE)
         append("ungeons ", ChatColor.GRAY)
         append("]====================\n", ChatColor.DARK_GRAY)
 
@@ -97,7 +97,7 @@ object InteractiveRegionListGui {
     fun showTriggers(dungeon: EditableDungeon, page: Int) = chatComponent {
 
         append("====================[ ", ChatColor.DARK_GRAY)
-        append(Strings.CHAT_PREFIX.dropLast(1))
+        append(Strings.CHAT_PREFIX_NO_SPACE)
         append("ungeons ", ChatColor.GRAY)
         append("]====================\n", ChatColor.DARK_GRAY)
 
@@ -109,8 +109,11 @@ object InteractiveRegionListGui {
             .triggers
             .entries
             .toList()
-            .slice(page * ITEMS_PER_PAGE..((page + 1) * ITEMS_PER_PAGE - 1)
-                .coerceAtMost(dungeon.triggers.size - 1))) {
+            .slice(
+                page * ITEMS_PER_PAGE..((page + 1) * ITEMS_PER_PAGE - 1)
+                    .coerceAtMost(dungeon.triggers.size - 1)
+            )
+        ) {
             append(">>> ", ChatColor.GRAY)
             append("#$k: ", ChatColor.DARK_AQUA)
             append(v.label ?: "NO LABEL", ChatColor.WHITE)

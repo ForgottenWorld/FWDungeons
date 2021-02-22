@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.targetBlock
 import it.forgottenworld.dungeons.core.utils.vector3i
@@ -29,7 +29,7 @@ class CmdDungeonImport : PlayerCommand() {
             return true
         }
 
-        val dungeon = FinalDungeon.dungeons[id] ?: run {
+        val dungeon = DungeonManager.finalDungeons[id] ?: run {
             sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
             return true
         }

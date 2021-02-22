@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 interface Chest {
     val id: Int
     val position: Vector3i
+    val label: String?
     val itemAmountRange: IntRange
     val itemChanceMap: Map<Material, Int>
     val items: Array<ItemStack>

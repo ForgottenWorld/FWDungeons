@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.targetBlock
 import it.forgottenworld.dungeons.core.utils.vector3i

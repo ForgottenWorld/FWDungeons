@@ -8,8 +8,9 @@ import it.forgottenworld.dungeons.api.math.toVector3i
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.chest.ChestImpl
-import it.forgottenworld.dungeons.core.game.detection.CubeGridUtils.triggerGrid
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.detection.CubeGridFactory.triggerGrid
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
@@ -34,8 +35,7 @@ class FinalDungeon(
     override val startingLocation: Vector3i,
     override val triggers: Map<Int, TriggerImpl>,
     override val activeAreas: Map<Int, ActiveAreaImpl>,
-    override val chests: Map<Int, ChestImpl>,
-    var instances: Map<Int, DungeonInstanceImpl>
+    override val chests: Map<Int, ChestImpl>
 ) : Dungeon {
 
     var isActive = true
@@ -123,8 +123,6 @@ class FinalDungeon(
 
     companion object {
 
-        val dungeons = mutableMapOf<Int, FinalDungeon>()
-
         fun fromConfig(id: Int, conf: YamlConfiguration) = conf.run {
 
             val triggers = getConfigurationSection("triggers")
@@ -172,8 +170,7 @@ class FinalDungeon(
                 getVector("startingLocation")!!.toVector3i(),
                 triggers,
                 activeAreas,
-                chests,
-                mapOf()
+                chests
             )
 
             dungeon

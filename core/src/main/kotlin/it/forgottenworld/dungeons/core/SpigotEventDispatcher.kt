@@ -2,9 +2,9 @@ package it.forgottenworld.dungeons.core
 
 import it.forgottenworld.dungeons.core.game.BypassAttemptHandler
 import it.forgottenworld.dungeons.core.game.RespawnHandler
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl.Companion.finalInstance
-import it.forgottenworld.dungeons.core.game.objective.CombatObjective.Companion.combatObjective
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 
 
-class SpigotListenerDelegates : Listener {
+class SpigotEventDispatcher : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
@@ -41,7 +41,7 @@ class SpigotListenerDelegates : Listener {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        event.player.editableDungeon?.handlePlayerInteract(event)
+        event.player.editableDungeon?.onPlayerInteract(event)
         BypassAttemptHandler.onPlayerInteract(event)
     }
 

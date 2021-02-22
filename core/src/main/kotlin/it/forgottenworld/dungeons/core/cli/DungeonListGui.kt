@@ -1,8 +1,9 @@
 package it.forgottenworld.dungeons.core.cli
 
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
@@ -36,8 +37,12 @@ object DungeonListGui {
                 else -> ChatColor.GREEN
             }
         )
-        if (!full && !locked && !inGame)
-            clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons join ${instance.dungeon.id} ${instance.id}")
+        if (!full && !locked && !inGame) {
+            clickEvent(
+                ClickEvent.Action.RUN_COMMAND,
+                "/fwdungeons join ${instance.dungeon.id} ${instance.id}"
+            )
+        }
         append(" ]", ChatColor.WHITE)
     }
 
@@ -57,7 +62,7 @@ object DungeonListGui {
 
         append("=====================================", ChatColor.DARK_GRAY)
 
-        if (page < FinalDungeon.dungeons.count() - 1) {
+        if (page < DungeonManager.finalDungeons.count() - 1) {
             append("=[ ")
             color(ChatColor.DARK_GRAY)
             append(pageClickable(">>>>", page + 1))
@@ -84,13 +89,15 @@ object DungeonListGui {
 
     fun showPage(page: Int) = chatComponent {
 
-        if (page < 0 || page > FinalDungeon.dungeons.count() - 1) return@chatComponent
-        val dng = FinalDungeon.dungeons.values
+        if (page < 0 || page > DungeonManager.finalDungeons.count() - 1) return@chatComponent
+        val dng = DungeonManager
+            .finalDungeons
+            .values
             .filter { it.isActive }
             .getOrNull(page) ?: return@chatComponent
 
         append("====================[ ", ChatColor.DARK_GRAY)
-        append(Strings.CHAT_PREFIX.dropLast(1))
+        append(Strings.CHAT_PREFIX_NO_SPACE)
         append("ungeons ", ChatColor.GRAY)
         append("]====================\n\n", ChatColor.DARK_GRAY)
 
@@ -119,7 +126,8 @@ object DungeonListGui {
             append("${Strings.ROOM} ${ii + 1} ")
             append("| ", ChatColor.DARK_GRAY)
             append("Leader: ", ChatColor.GRAY)
-            inst.leader?.name
+            inst.leader
+                ?.name
                 ?.let { append(it, ChatColor.LIGHT_PURPLE) }
                 ?: append("none", ChatColor.DARK_GRAY)
             append(joinClickable(inst))

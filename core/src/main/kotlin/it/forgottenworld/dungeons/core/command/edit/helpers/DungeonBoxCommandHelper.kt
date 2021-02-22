@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.command.edit.helpers
 
 
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.targetBlock
 import it.forgottenworld.dungeons.core.utils.vector3i
@@ -25,10 +25,11 @@ object DungeonBoxCommandHelper {
         }
 
         val builder = dungeon.dungeonBoxBuilder
-        if (posNo == 1)
+        if (posNo == 1) {
             builder.pos1(block.vector3i)
-        else
+        } else {
             builder.pos2(block.vector3i)
+        }
 
         val box = builder.build()
         if (box == null) {

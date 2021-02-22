@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.game
 
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl.Companion.finalInstance
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -15,9 +15,8 @@ object BypassAttemptHandler {
 
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
 
-        fun preventTp(because: String, damage: Double = 0.0) {
+        fun preventTp(because: String) {
             event.player.sendFWDMessage(because)
-            if (damage != 0.0) event.player.damage(damage)
             event.isCancelled = true
         }
 
@@ -28,7 +27,7 @@ object BypassAttemptHandler {
             }
             PlayerTeleportEvent.TeleportCause.COMMAND,
             PlayerTeleportEvent.TeleportCause.PLUGIN -> {
-                preventTp(Strings.YOU_WISH_YOU_COULD, 2.0)
+                preventTp(Strings.YOU_WISH_YOU_COULD)
             }
             else -> return
         }

@@ -4,7 +4,7 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.toVector3i
 import org.bukkit.entity.Player

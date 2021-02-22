@@ -4,9 +4,12 @@ import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.chest.ChestImpl
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
@@ -14,12 +17,9 @@ import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.highlightAll
 import it.forgottenworld.dungeons.core.utils.launchAsync
-import it.forgottenworld.dungeons.core.utils.minecraft
 import it.forgottenworld.dungeons.core.utils.player
 import it.forgottenworld.dungeons.core.utils.plugin
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.configuration.file.YamlConfiguration
@@ -28,7 +28,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import java.io.File
-import java.util.*
 
 class EditableDungeon(
     editor: Player,
@@ -50,7 +49,7 @@ class EditableDungeon(
     lateinit var testOrigin: Vector3i
 
     init {
-        if (box != null) setupTestBox()
+        if (finalInstanceLocations.isNotEmpty()) setupTestBox()
     }
 
     override var triggers = triggers
@@ -65,7 +64,7 @@ class EditableDungeon(
             updateActiveAreaParticleSpammers(value.values)
         }
 
-    override var chests = mapOf<Int, ChestImpl>()
+    override var chests = mutableMapOf<Int, ChestImpl>()
 
     val dungeonBoxBuilder = Box.Builder()
     val triggerBoxBuilder = Box.Builder()
@@ -74,7 +73,7 @@ class EditableDungeon(
     val hasTestOrigin get() = this::testOrigin.isInitialized
 
     fun finalize(): FinalDungeon {
-        val newId = if (id == -1000) FinalDungeon.dungeons.keys.firstGap() else id
+        val newId = if (id == -1000) DungeonManager.finalDungeons.keys.firstGap() else id
 
         val finalDungeon = FinalDungeon(
             newId,
@@ -87,11 +86,10 @@ class EditableDungeon(
             startingLocation!!.copy(),
             triggers.toMap(),
             activeAreas.toMap(),
-            chests,
-            mapOf()
+            chests
         )
 
-        FinalDungeon.dungeons[newId] = finalDungeon
+        DungeonManager.finalDungeons[newId] = finalDungeon
 
         try {
             val config = YamlConfiguration()
@@ -125,7 +123,7 @@ class EditableDungeon(
     fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) =
         if (type == InteractiveRegion.Type.TRIGGER) unmakeTrigger(ieId) else unmakeActiveArea(ieId)
 
-    suspend fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) =
+    fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) =
         if (type == InteractiveRegion.Type.TRIGGER) newTrigger(box) else newActiveArea(box)
 
     private fun newActiveArea(box: Box): Int {
@@ -159,22 +157,20 @@ class EditableDungeon(
         }
     }
 
-    private suspend fun newTrigger(box: Box): Int {
+    private fun newTrigger(box: Box): Int {
         val id = triggers.keys.lastOrNull()?.plus(1) ?: 0
 
-        return withContext(Dispatchers.minecraft) {
-            TriggerImpl(
-                id,
-                box.withContainerOrigin(
-                    testOrigin,
-                    Vector3i.ZERO
-                )
-            ).let {
-                highlightNewInteractiveRegion(it)
-                triggers = triggers.plus(id to it)
-            }
-            id
+        TriggerImpl(
+            id,
+            box.withContainerOrigin(
+                testOrigin,
+                Vector3i.ZERO
+            )
+        ).let {
+            highlightNewInteractiveRegion(it)
+            triggers = triggers.plus(id to it)
         }
+        return id
     }
 
     private fun unmakeTrigger(tId: Int?) =
@@ -204,7 +200,7 @@ class EditableDungeon(
         triggerBoxBuilder.clear()
         activeAreaBoxBuilder.clear()
         player.editableDungeon = null
-        if (restoreFormer) FinalDungeon.dungeons[id]?.isBeingEdited = false
+        if (restoreFormer) DungeonManager.finalDungeons[id]?.isBeingEdited = false
         player.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }
 
@@ -235,7 +231,7 @@ class EditableDungeon(
             1,
             500,
             newTriggers.flatMap {
-                it.box.withContainerOrigin(Vector3i.ZERO, testOrigin).getFrame()
+                it.box.getFrame(it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin))
             }
         )
     }
@@ -248,7 +244,7 @@ class EditableDungeon(
             1,
             500,
             newActiveAreas.flatMap {
-                it.box.withContainerOrigin(Vector3i.ZERO, testOrigin).getFrame()
+                it.box.getFrame(it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin))
             }
         )
     }
@@ -275,7 +271,7 @@ class EditableDungeon(
         }
     }
 
-    fun handlePlayerInteract(event: PlayerInteractEvent) {
+    fun onPlayerInteract(event: PlayerInteractEvent) {
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
 
         val isTriggerWand = persistentDataContainer
@@ -298,17 +294,5 @@ class EditableDungeon(
 
         event.player.performCommand(cmd)
         event.isCancelled = true
-    }
-
-    companion object {
-
-        private val editableDungeons = mutableMapOf<UUID, EditableDungeon>()
-
-        var Player.editableDungeon: EditableDungeon?
-            get() = editableDungeons[uniqueId]
-            set(value) {
-                value?.let { editableDungeons[uniqueId] = it }
-                    ?: editableDungeons.remove(uniqueId)
-            }
     }
 }

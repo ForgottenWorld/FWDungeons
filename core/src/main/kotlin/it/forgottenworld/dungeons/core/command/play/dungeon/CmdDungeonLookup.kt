@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl.Companion.finalInstance
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender

@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.core.game.objective
 
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import org.bukkit.Bukkit.getEntity
 import org.bukkit.entity.LivingEntity
 import java.util.*
@@ -33,18 +34,5 @@ class CombatObjective(
             .map { getEntity(it) }
             .filterIsInstance<LivingEntity>()
             .forEach { it.health = 0.0 }
-    }
-
-    companion object {
-
-        private val entityCombatObjectives = mutableMapOf<UUID, CombatObjective>()
-
-        var UUID.combatObjective
-            get() = entityCombatObjectives[this]
-            set(value) {
-                value?.let {
-                    entityCombatObjectives[this] = it
-                } ?: entityCombatObjectives.remove(this)
-            }
     }
 }

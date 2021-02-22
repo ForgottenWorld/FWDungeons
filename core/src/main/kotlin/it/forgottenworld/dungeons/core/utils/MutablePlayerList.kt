@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.utils
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
 
 class MutablePlayerList : MutableList<Player?> {
 
@@ -64,7 +64,7 @@ class MutablePlayerList : MutableList<Player?> {
     override fun removeAll(elements: Collection<Player?>) = list
         .removeAll(elements.mapNotNull { it?.uniqueId })
 
-    override fun removeAt(index: Int): Player? = Bukkit.getPlayer(list.removeAt(index))
+    override fun removeAt(index: Int) = Bukkit.getPlayer(list.removeAt(index))
 
     override fun retainAll(elements: Collection<Player?>) = list
         .retainAll(elements.mapNotNull { it?.uniqueId })

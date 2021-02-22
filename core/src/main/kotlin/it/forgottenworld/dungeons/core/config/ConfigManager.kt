@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.core.config
 
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.utils.launchAsync
@@ -32,10 +33,6 @@ object ConfigManager {
     val dungeonWorld
         get() = Bukkit.getWorld(dungeonWorldId) ?: error("Dungeon world not found!")
 
-    private fun loadConfig(config: FileConfiguration) {
-        ConfigManager.config = config
-    }
-
     private val dungeonNameRegex = Regex("""[0-9]+\.yml""")
     private fun loadDungeonConfigs(dataFolder: File) {
         val dir = File(dataFolder, "dungeons").apply { if (isFile || (!exists() && mkdir())) return }
@@ -45,7 +42,7 @@ object ConfigManager {
                 try {
                     val dId = it.removeSuffix(".yml").toInt()
                     val conf = YamlConfiguration().apply { load(File(dir, it)) }
-                    FinalDungeon.dungeons[dId] = FinalDungeon.fromConfig(dId, conf)
+                    DungeonManager.finalDungeons[dId] = FinalDungeon.fromConfig(dId, conf)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -74,18 +71,18 @@ object ConfigManager {
         }
     }
 
-    private fun getInstancesFromConfig() {
+    private fun loadInstancesFromConfig() {
         val file = File(plugin.dataFolder, "instances.yml")
         val conf = YamlConfiguration()
         if (file.exists()) conf.load(file) else file.createNewFile()
 
-        for (dId in FinalDungeon.dungeons.keys) {
+        for (dId in DungeonManager.finalDungeons.keys) {
             val sec = conf.getConfigurationSection("$dId")
             if (sec?.getKeys(false)?.isEmpty() != false) {
                 Bukkit.getLogger().warning(
                     "Dungeon $dId loaded from config has no instances, create one with /fwde d import $dId"
                 )
-                FinalDungeon.dungeons[dId]?.isActive = false
+                DungeonManager.finalDungeons[dId]?.isActive = false
                 continue
             }
             for (iId in sec.getKeys(false)) {
@@ -96,8 +93,9 @@ object ConfigManager {
 
     fun loadData() {
         plugin.reloadConfig()
-        loadConfig(plugin.config)
+        plugin.loadStrings()
+        config = plugin.config
         loadDungeonConfigs(plugin.dataFolder)
-        getInstancesFromConfig()
+        loadInstancesFromConfig()
     }
 }

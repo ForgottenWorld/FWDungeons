@@ -8,11 +8,13 @@ import it.forgottenworld.dungeons.core.cli.JsonMessages
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.RespawnHandler.respawnData
-import it.forgottenworld.dungeons.core.game.detection.CubeGridUtils.checkPositionAgainstTriggers
+import it.forgottenworld.dungeons.core.game.detection.CubeGridFactory.checkPositionAgainstTriggers
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.game.objective.CombatObjective
-import it.forgottenworld.dungeons.core.game.objective.CombatObjective.Companion.combatObjective
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.utils.MobSpawnData
@@ -82,7 +84,9 @@ class DungeonInstanceImpl(
         for (aa in dungeon.activeAreas.values) {
             aa.fillWithMaterial(aa.startingMaterial, this)
         }
-        instanceObjectives.forEach { it.abort() }
+        for (io in instanceObjectives) {
+            io.abort()
+        }
         instanceObjectives.clear()
         val boundingBox = dungeon.box.getBoundingBox(origin)
         dungeonWorld
@@ -306,26 +310,8 @@ class DungeonInstanceImpl(
 
     companion object {
 
-        val finalInstances = mutableMapOf<UUID, DungeonInstanceImpl>()
-
-        var Player.finalInstance
-            get() = finalInstances[uniqueId]
-            set(value) {
-                value?.let {
-                    finalInstances[uniqueId] = value
-                } ?: finalInstances.remove(uniqueId)
-            }
-
-        var UUID.finalInstance
-            get() = finalInstances[this]
-            set(value) {
-                value?.let {
-                    finalInstances[this] = value
-                } ?: finalInstances.remove(this)
-            }
-
         fun fromConfig(dungeonId: Int, config: ConfigurationSection): DungeonInstanceImpl? {
-            val dungeon = FinalDungeon.dungeons[dungeonId] ?: return null
+            val dungeon = DungeonManager.finalDungeons[dungeonId] ?: return null
             val instOriginBlock = ConfigManager.dungeonWorld.getBlockAt(
                 config.getInt("x"),
                 config.getInt("y"),

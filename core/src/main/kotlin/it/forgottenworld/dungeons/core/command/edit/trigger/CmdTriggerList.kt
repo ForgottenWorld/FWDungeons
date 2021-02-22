@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.core.command.edit.trigger
 
-import it.forgottenworld.dungeons.core.cli.InteractiveRegionListGui
 import it.forgottenworld.dungeons.api.command.PlayerCommand
+import it.forgottenworld.dungeons.core.cli.InteractiveRegionListGui
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import org.bukkit.entity.Player

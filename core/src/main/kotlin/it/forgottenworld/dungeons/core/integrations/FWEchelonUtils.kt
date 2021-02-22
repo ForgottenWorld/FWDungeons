@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.integrations
 
 import it.forgottenworld.dungeons.core.config.ConfigManager
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl.Companion.finalInstance
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.echelonapi.FWEchelon
 import it.forgottenworld.echelonapi.mutexactivity.MutexActivity
@@ -16,6 +16,7 @@ object FWEchelonUtils {
 
     fun checkFWEchelonIntegration() {
         val logger = Bukkit.getLogger()
+
         logger.info("Checking for FWEchelon integration...")
         if (!ConfigManager.fwEchelonIntegration) {
             logger.info("FWEchelon integration is not enabled")
@@ -29,12 +30,12 @@ object FWEchelonUtils {
         }
 
         logger.info("FWEchelon is present")
-        registerMutexActivity()
-        ConfigManager.useFWEchelon = true
-    }
 
-    private fun registerMutexActivity() {
-        FWEchelon.api.mutexActivityService.registerMutexActivity(FWDungeonsMutexActivity())
+        FWEchelon.api
+            .mutexActivityService
+            .registerMutexActivity(FWDungeonsMutexActivity())
+
+        ConfigManager.useFWEchelon = true
     }
 
     fun isPlayerFree(player: Player) = !ConfigManager.useFWEchelon ||
@@ -68,7 +69,7 @@ object FWEchelonUtils {
         override val id = MUTEX_ACTIVITY_NAME
 
         override fun onAllPlayersForceRemoved(reason: String?) {
-            val insts = DungeonInstanceImpl.finalInstances.values
+            val insts = DungeonManager.playerFinalInstances.values
             if (reason != null) {
                 insts.flatMap { it.players }.forEach {
                     it?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))

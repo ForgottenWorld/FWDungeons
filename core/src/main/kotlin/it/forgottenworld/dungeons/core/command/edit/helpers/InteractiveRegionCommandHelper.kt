@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.T
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.TRIGGER
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon.Companion.editableDungeon
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
 import it.forgottenworld.dungeons.core.utils.highlightAll
 import it.forgottenworld.dungeons.core.utils.launch

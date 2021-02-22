@@ -15,8 +15,9 @@ import org.bukkit.block.Chest as ChestBlock
 data class ChestImpl(
     override val id: Int,
     override val position: Vector3i,
-    override val itemAmountRange: IntRange,
-    override val itemChanceMap: Map<Material, Int>
+    override var label: String? = null,
+    override val itemAmountRange: IntRange = 1..4,
+    override val itemChanceMap: Map<Material, Int> = mapOf()
 ) : Chest {
 
     override val items: Array<ItemStack>
@@ -69,6 +70,7 @@ data class ChestImpl(
         fun fromConfig(config: ConfigurationSection): ChestImpl {
             val id = config.getInt("id")
             val position = config.getVector("position")!!.toVector3i()
+            val label = config.getString("label")
             val minItems = config.getInt("minItems")
             val maxItems = config.getInt("maxItems")
             val itemAmountRange = minItems..maxItems
@@ -76,7 +78,7 @@ data class ChestImpl(
             val chancesMap = chancesConfig
                 .getKeys(false)
                 .associate { Material.valueOf(it) to chancesConfig.getInt(it) }
-            return ChestImpl(id,position,itemAmountRange,chancesMap)
+            return ChestImpl(id,position,label,itemAmountRange,chancesMap)
         }
     }
 }
