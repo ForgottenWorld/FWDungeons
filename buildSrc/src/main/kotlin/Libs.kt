@@ -5,4 +5,5 @@ object Libs {
     const val mythicMobs = "io.lumine.xikage:MythicMobs:4.10.0"
     const val easyRanking = "com.github.ForgottenWorld:EasyRanking:0.2.0"
     const val fwEchelonApi = "com.github.ForgottenWorld.FWEchelon:fwechelon-api:v0.1.0"
+    const val vault = "com.github.MilkBowl:VaultAPI:1.7"
 }

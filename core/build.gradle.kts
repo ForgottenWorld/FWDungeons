@@ -15,6 +15,7 @@ dependencies {
     compileOnly(Libs.mythicMobs)
     compileOnly(Libs.easyRanking)
     compileOnly(Libs.fwEchelonApi)
+    compileOnly(Libs.vault)
 }
 
 description = "fwdungeons"

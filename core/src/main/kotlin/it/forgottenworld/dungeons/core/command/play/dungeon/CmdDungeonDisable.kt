@@ -28,10 +28,11 @@ class CmdDungeonDisable : SenderCommand() {
         } != null
 
         sender.sendFWDMessage(
-            if (res)
+            if (res) {
                 Strings.DUNGEON_WITH_ID_WAS_DISABLED.format(dungeonId)
-            else
+            } else {
                 Strings.NO_DUNGEON_FOUND_WITH_ID.format(dungeonId)
+            }
         )
 
         return true

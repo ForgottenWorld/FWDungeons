@@ -21,7 +21,12 @@ class CmdActiveAreaLabel : PlayerCommand() {
                 return true
             }
             val label = args.drop(1).joinToString(" ").trim()
-            InteractiveRegionCommandHelper.labelInteractiveRegion(sender, label, InteractiveRegion.Type.ACTIVE_AREA, id)
+            InteractiveRegionCommandHelper.labelInteractiveRegion(
+                sender,
+                label,
+                InteractiveRegion.Type.ACTIVE_AREA,
+                id
+            )
             return true
         }
         if (args.isEmpty()) {

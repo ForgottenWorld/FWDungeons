@@ -30,6 +30,9 @@ object ConfigManager {
     val fwEchelonIntegration by lazy { config.getBoolean("fwEchelonIntegration") }
     var useFWEchelon = false
 
+    val vaultIntegration by lazy { config.getBoolean("vaultIntegration") }
+    var useVault = false
+
     val dungeonWorld
         get() = Bukkit.getWorld(dungeonWorldId) ?: error("Dungeon world not found!")
 

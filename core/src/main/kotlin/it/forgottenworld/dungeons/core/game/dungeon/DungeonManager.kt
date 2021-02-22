@@ -24,8 +24,9 @@ object DungeonManager {
     var Player.editableDungeon: EditableDungeon?
         get() = playerEditableDungeons[uniqueId]
         set(value) {
-            value?.let { playerEditableDungeons[uniqueId] = it }
-                ?: playerEditableDungeons.remove(uniqueId)
+            value?.let {
+                playerEditableDungeons[uniqueId] = it
+            } ?: playerEditableDungeons.remove(uniqueId)
         }
 
     var Player.finalInstance
