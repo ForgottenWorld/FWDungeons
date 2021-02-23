@@ -8,7 +8,11 @@ import org.bukkit.entity.Player
 
 object VaultUtils {
 
-    private val economy get() = plugin.server.servicesManager.getRegistration(Economy::class.java)?.provider
+    private val economy get() = plugin
+        .server
+        .servicesManager
+        .getRegistration(Economy::class.java)
+        ?.provider
 
     fun checkVaultIntegration() {
         val logger = Bukkit.getLogger()

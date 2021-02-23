@@ -2,12 +2,14 @@
 
 package it.forgottenworld.dungeons.core.utils
 
+import it.forgottenworld.dungeons.core.config.Strings
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.hover.content.Content
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 inline fun chatComponent(build: ComponentBuilder.() -> Unit): Array<BaseComponent> = ComponentBuilder()
@@ -37,3 +39,5 @@ fun ComponentBuilder.append(
     text: String,
     color: ChatColor
 ): ComponentBuilder = append(text).color(color)
+
+fun CommandSender.sendFWDMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
