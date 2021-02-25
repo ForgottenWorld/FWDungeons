@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.game.unlocks
+package it.forgottenworld.dungeons.core.game.unlockables
 
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player

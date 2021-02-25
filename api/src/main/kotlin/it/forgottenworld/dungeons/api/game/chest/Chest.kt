@@ -12,6 +12,6 @@ interface Chest {
     val itemAmountRange: IntRange
     val itemChanceMap: Map<Material, Int>
     val items: Array<ItemStack>
-    fun fillActualChest(world: World)
-    fun clearActualChest(world: World)
+    fun fillActualChest(world: World, position: Vector3i = this.position)
+    fun clearActualChest(world: World, position: Vector3i = this.position)
 }

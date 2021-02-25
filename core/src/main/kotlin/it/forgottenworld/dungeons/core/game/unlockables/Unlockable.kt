@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.game.unlocks
+package it.forgottenworld.dungeons.core.game.unlockables
 
 import it.forgottenworld.dungeons.core.integrations.VaultUtils
 import org.bukkit.Material
@@ -39,6 +39,25 @@ data class Unlockable(
             }
         }
         return true
+    }
+
+    fun toConfig(config: ConfigurationSection) {
+        config.set("seriesId", seriesId)
+        config.set("order", order)
+        config.set("message", message)
+        config.set("unlockedMessage", unlockedMessage)
+        config.createSection("requirements").run {
+            for (req in requirements) {
+                when (req) {
+                    is EconomyRequirement -> {
+                        set("CURRENCY", req.amount)
+                    }
+                    is ItemRequirement -> {
+                        set(req.material.toString(), req.amount)
+                    }
+                }
+            }
+        }
     }
 
     companion object {

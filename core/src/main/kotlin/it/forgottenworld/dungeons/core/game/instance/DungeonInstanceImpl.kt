@@ -17,17 +17,8 @@ import it.forgottenworld.dungeons.core.game.objective.CombatObjective
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
-import it.forgottenworld.dungeons.core.utils.MobSpawnData
-import it.forgottenworld.dungeons.core.utils.MutablePlayerList
-import it.forgottenworld.dungeons.core.utils.RandomString
-import it.forgottenworld.dungeons.core.utils.WarpbackData
+import it.forgottenworld.dungeons.core.utils.*
 import it.forgottenworld.dungeons.core.utils.WarpbackData.Companion.currentWarpbackData
-import it.forgottenworld.dungeons.core.utils.dungeonWorld
-import it.forgottenworld.dungeons.core.utils.launch
-import it.forgottenworld.dungeons.core.utils.mythicMobsHelper
-import it.forgottenworld.dungeons.core.utils.player
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
-import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -86,6 +77,12 @@ class DungeonInstanceImpl(
         }
         for (io in instanceObjectives) {
             io.abort()
+        }
+        for (c in dungeon.chests.values) {
+            c.clearActualChest(
+                dungeonWorld,
+                c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
+            )
         }
         instanceObjectives.clear()
         val boundingBox = dungeon.box.getBoundingBox(origin)
@@ -152,6 +149,12 @@ class DungeonInstanceImpl(
     fun onStart() {
         inGame = true
         players.filterNotNull().forEach { preparePlayer(it) }
+        for (c in dungeon.chests.values) {
+            c.fillActualChest(
+                dungeonWorld,
+                c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
+            )
+        }
         isTpSafe = false
     }
 
@@ -174,9 +177,9 @@ class DungeonInstanceImpl(
 
     private fun onPlayerRemoved(player: Player) {
         warpbackData.remove(player.uniqueId)
-        val trigId = playerTriggers[player.uniqueId]
-        val trig = trigId?.let { dungeon.triggers[it] }
-        trig?.let { onPlayerExitTrigger(player, it) }
+        playerTriggers[player.uniqueId]
+            ?.let { dungeon.triggers[it] }
+            ?.let { onPlayerExitTrigger(player, it) }
         playerTriggers.remove(player.uniqueId)
         player.finalInstance = null
         players.remove(player)

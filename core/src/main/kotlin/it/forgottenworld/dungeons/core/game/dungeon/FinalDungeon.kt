@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
+import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -14,11 +15,7 @@ import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
-import it.forgottenworld.dungeons.core.utils.firstGap
-import it.forgottenworld.dungeons.core.utils.launchAsync
-import it.forgottenworld.dungeons.core.utils.plugin
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
-import it.forgottenworld.dungeons.core.utils.vector3i
+import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -35,7 +32,7 @@ class FinalDungeon(
     override val startingLocation: Vector3i,
     override val triggers: Map<Int, TriggerImpl>,
     override val activeAreas: Map<Int, ActiveAreaImpl>,
-    override val chests: Map<Int, ChestImpl>
+    override val chests: Map<Int, Chest>
 ) : Dungeon {
 
     var isActive = true
@@ -116,7 +113,7 @@ class FinalDungeon(
                 it.toConfig(createSection("activeAreas.${it.id}"))
             }
             dungeon.chests.values.forEach {
-                it.toConfig(createSection("chests.${it.id}"))
+                (it as ChestImpl).toConfig(createSection("chests.${it.id}"))
             }
         }
     }

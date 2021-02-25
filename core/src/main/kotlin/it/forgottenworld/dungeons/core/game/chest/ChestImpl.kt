@@ -41,13 +41,13 @@ data class ChestImpl(
         }.toTypedArray()
     }
 
-    override fun fillActualChest(world: World) {
+    override fun fillActualChest(world: World, position: Vector3i) {
         val block = world.getBlockAt(position)
         val chest = block.state as? ChestBlock ?: return
         chest.inventory.contents = items
     }
 
-    override fun clearActualChest(world: World) {
+    override fun clearActualChest(world: World, position: Vector3i) {
         val block = world.getBlockAt(position)
         val chest = block.state as? ChestBlock ?: return
         chest.inventory.clear()
