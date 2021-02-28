@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.core.config
 
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
+import it.forgottenworld.dungeons.core.config.Storage.toConfig
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
@@ -43,9 +44,9 @@ object Configuration {
         }
         for (file in dir.list()?.filter { it.matches(dungeonNameRegex) } ?: return) {
             try {
-                val dId = file.removeSuffix(".yml").toInt()
-                val conf = YamlConfiguration().apply { load(File(dir, file)) }
-                DungeonManager.finalDungeons[dId] = FinalDungeon.fromConfig(dId, conf)
+                val config = YamlConfiguration().apply { load(File(dir, file)) }
+                val dungeon = Storage.load<FinalDungeon>(config)
+                DungeonManager.finalDungeons[dungeon.id] = dungeon
             } catch (e: Exception) {
                 e.printStackTrace()
             }

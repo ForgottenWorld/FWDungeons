@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.core.game.unlockables
 
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
+import it.forgottenworld.dungeons.core.config.Storage
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.util.*
@@ -13,7 +14,7 @@ object UnlockableManager {
 
     fun loadUnlockablesFromConfig(config: ConfigurationSection) {
         for (key in config.getKeys(false)) {
-            val series = UnlockableSeriesImpl.fromConfig(config.getConfigurationSection(key)!!)
+            val series = Storage.load<UnlockableSeriesImpl>(config.getConfigurationSection(key)!!)
             unlockableSeries[series.id] = series
         }
     }

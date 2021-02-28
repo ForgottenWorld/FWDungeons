@@ -8,14 +8,12 @@ import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.core.config.Storage
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.chest.ChestImpl
 import it.forgottenworld.dungeons.core.game.detection.CubeGridFactory.triggerGrid
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
@@ -37,7 +35,7 @@ class FinalDungeon(
     override val triggers: Map<Int, Trigger>,
     override val activeAreas: Map<Int, ActiveArea>,
     override val chests: Map<Int, Chest>
-) : Dungeon {
+) : Dungeon, Storage.Storable {
 
     var isActive = true
     var isBeingEdited = false
@@ -99,88 +97,5 @@ class FinalDungeon(
         newInstance.resetInstance()
         instances = instances + (id to newInstance)
         return newInstance
-    }
-
-    fun toConfig(conf: YamlConfiguration) {
-        val dungeon = this
-        conf.run {
-            set("name", dungeon.name)
-            set("description", dungeon.description)
-            set("difficulty", dungeon.difficulty.toString())
-            set("points", dungeon.points)
-            set("numberOfPlayers", listOf(minPlayers, maxPlayers))
-            set("width", dungeon.box.width)
-            set("height", dungeon.box.height)
-            set("depth", dungeon.box.depth)
-            set("startingLocation", dungeon.startingLocation.toVector())
-            dungeon.triggers.values.forEach {
-                (it as TriggerImpl).toConfig(createSection("triggers.${it.id}"))
-            }
-            dungeon.activeAreas.values.forEach {
-                (it as ActiveAreaImpl).toConfig(createSection("activeAreas.${it.id}"))
-            }
-            dungeon.chests.values.forEach {
-                (it as ChestImpl).toConfig(createSection("chests.${it.id}"))
-            }
-        }
-    }
-
-    companion object {
-
-        fun fromConfig(id: Int, conf: YamlConfiguration) = conf.run {
-
-            val triggers = getConfigurationSection("triggers")
-                ?.getKeys(false)
-                ?.associate {
-                    it.toInt() to TriggerImpl.fromConfig(
-                        it.toInt(),
-                        getConfigurationSection("triggers.$it")!!
-                    )
-                }
-                ?: mapOf()
-
-            val activeAreas = getConfigurationSection("activeAreas")
-                ?.getKeys(false)
-                ?.associate {
-                    it.toInt() to ActiveAreaImpl.fromConfig(
-                        it.toInt(),
-                        getConfigurationSection("activeAreas.$it")!!
-                    )
-                }
-                ?: mapOf()
-
-            val chests = getConfigurationSection("chests")
-                ?.getKeys(false)
-                ?.associate {
-                    it.toInt() to ChestImpl.fromConfig(
-                        getConfigurationSection("chests.$it")!!
-                    )
-                }
-                ?: mapOf()
-
-            val noOfPlayers = getIntegerList("numberOfPlayers")
-
-            val dungeon = FinalDungeon(
-                id,
-                getString("name")!!,
-                getString("description")!!,
-                Dungeon.Difficulty.fromString(getString("difficulty")!!)!!,
-                getInt("points", 0),
-                noOfPlayers[0],
-                noOfPlayers[1],
-                Box(
-                    Vector3i.ZERO,
-                    getInt("width"),
-                    getInt("height"),
-                    getInt("depth")
-                ),
-                Vector3i.ofBukkitVector(getVector("startingLocation")!!),
-                triggers,
-                activeAreas,
-                chests
-            )
-
-            dungeon
-        }
     }
 }

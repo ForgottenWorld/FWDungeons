@@ -1,7 +1,6 @@
 package it.forgottenworld.dungeons.api.serialization.box
 
 import it.forgottenworld.dungeons.api.math.Box
-import it.forgottenworld.dungeons.api.serialization.toByteArray
 import org.bukkit.World
 import java.io.File
 import java.io.IOException
@@ -60,5 +59,12 @@ class BoxVolumeMap private constructor(
 
     companion object {
         fun Box.getVolumeMap(world: World) = BoxVolumeMap(world, this)
+
+        private fun Int.toByteArray() = byteArrayOf(
+            (this shr 24).toByte(),
+            (this shr 16).toByte(),
+            (this shr 8).toByte(),
+            this.toByte()
+        )
     }
 }

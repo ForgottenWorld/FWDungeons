@@ -4,11 +4,11 @@ import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.core.config.Storage
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.scripting.CodeParser
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 
 data class TriggerImpl(
@@ -17,7 +17,7 @@ data class TriggerImpl(
     override val effectCode: List<String> = listOf(),
     override val requiresWholeParty: Boolean = false,
     override var label: String? = null
-) : Trigger {
+) : Trigger, Storage.Storable {
 
     private val effect = CodeParser.parseScript(effectCode)
 
@@ -56,27 +56,5 @@ data class TriggerImpl(
         ) return
         instance.proccedTriggers.add(id)
         effect.invoke(instance)
-    }
-
-    fun toConfig(config: ConfigurationSection) = config.run {
-        set("id", id)
-        label?.let { set("label", it) }
-        set("origin", origin.toVector())
-        set("width", box.width)
-        set("height", box.height)
-        set("depth", box.depth)
-        set("effect", effectCode.joinToString("; "))
-        set("requiresWholeParty", requiresWholeParty)
-    }
-
-    companion object {
-
-        fun fromConfig(id: Int, config: ConfigurationSection) = TriggerImpl(
-            id,
-            Box.fromConfig(config),
-            CodeParser.cleanupCode(config.getString("effect")!!),
-            config.getBoolean("requiresWholeParty"),
-            config.getString("label")
-        )
     }
 }
