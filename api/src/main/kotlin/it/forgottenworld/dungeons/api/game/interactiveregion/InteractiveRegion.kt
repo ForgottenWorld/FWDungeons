@@ -8,6 +8,7 @@ interface InteractiveRegion {
     val box: Box
 
     fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i): InteractiveRegion
+    fun withContainerOriginZero(oldOrigin: Vector3i): InteractiveRegion
 
     enum class Type { TRIGGER, ACTIVE_AREA }
 }

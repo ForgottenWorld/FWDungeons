@@ -1,13 +1,15 @@
 package it.forgottenworld.dungeons.core.game.unlockables
 
+import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
+import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
 import org.bukkit.configuration.ConfigurationSection
 
-data class UnlockableSeries(
-    val id: Int,
-    val name: String,
-    val description: String,
-    val unlockables: List<Unlockable>
-) {
+data class UnlockableSeriesImpl(
+    override val id: Int,
+    override val name: String,
+    override val description: String,
+    override val unlockables: List<Unlockable>
+) : UnlockableSeries {
 
     fun toConfig(config: ConfigurationSection) {
         config.set("id", id)
@@ -15,19 +17,19 @@ data class UnlockableSeries(
         config.set("description", description)
         config.createSection("unlockables").run {
             for ((i,unl) in unlockables.withIndex()) {
-                unl.toConfig(createSection("$i"))
+                (unl as UnlockableImpl).toConfig(createSection("$i"))
             }
         }
     }
 
     companion object {
-        fun fromConfig(config: ConfigurationSection) = UnlockableSeries(
+        fun fromConfig(config: ConfigurationSection) = UnlockableSeriesImpl(
             config.getInt("id"),
             config.getString("name")!!,
             config.getString("description")!!,
             config.getConfigurationSection("unlockables")!!.run {
-                getKeys(false).map { uk ->
-                    Unlockable.fromConfig(getConfigurationSection(uk)!!)
+                getKeys(false).map {
+                    UnlockableImpl.fromConfig(getConfigurationSection(it)!!)
                 }
             }
         )

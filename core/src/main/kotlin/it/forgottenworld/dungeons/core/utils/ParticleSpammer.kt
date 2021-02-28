@@ -1,7 +1,8 @@
 package it.forgottenworld.dungeons.core.utils
 
+import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.bukkit.Location
@@ -25,12 +26,12 @@ class ParticleSpammer(
         job = launch {
             while (true) {
                 delay(interval)
-                val world = ConfigManager.dungeonWorld
+                val world = Configuration.dungeonWorld
                 locations.forEach {
                     world.spawnParticle(
                         particle,
                         Location(
-                            ConfigManager.dungeonWorld,
+                            Configuration.dungeonWorld,
                             it.x + 0.5,
                             it.y + 0.5,
                             it.z + 0.5
@@ -44,13 +45,24 @@ class ParticleSpammer(
 
     companion object {
 
+        fun highlightBox(box: Box) {
+            repeatedlySpawnParticles(
+                Particle.COMPOSTER,
+                box.getAllBlocks(Configuration.dungeonWorld).map { it.location },
+                1,
+                500,
+                20
+            )
+        }
+
         fun repeatedlySpawnParticles(
             particle: Particle,
             locations: Iterable<Location>,
             count: Int,
             interval: Long,
-            iterations: Int) {
-            val world = ConfigManager.dungeonWorld
+            iterations: Int
+        ) {
+            val world = Configuration.dungeonWorld
             launch {
                 for (i in 0 until iterations) {
                     delay(interval)
@@ -58,7 +70,8 @@ class ParticleSpammer(
                         world.spawnParticle(
                             particle,
                             it.clone().add(0.5, 0.5, 0.5),
-                            count)
+                            count
+                        )
                     }
                 }
             }

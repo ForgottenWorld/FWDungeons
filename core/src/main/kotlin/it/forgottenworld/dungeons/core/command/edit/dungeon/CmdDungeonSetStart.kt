@@ -2,17 +2,15 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
-import it.forgottenworld.dungeons.core.utils.toVector3i
 import org.bukkit.entity.Player
 
 class CmdDungeonSetStart : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val dungeon = sender.editableDungeon ?: run {
+        val dungeon = sender.uniqueId.editableDungeon ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
@@ -27,9 +25,8 @@ class CmdDungeonSetStart : PlayerCommand() {
             return true
         }
 
-        dungeon.startingLocation = sender
-            .location
-            .toVector3i()
+        dungeon.startingLocation = Vector3i
+            .ofLocation(sender.location)
             .withRefSystemOrigin(dungeon.testOrigin, Vector3i.ZERO)
 
         sender.sendFWDMessage(Strings.DUNGEON_STARTPOS_SET)

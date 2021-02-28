@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 class CmdActiveAreaList : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val dungeon = sender.editableDungeon ?: run {
+        val dungeon = sender.uniqueId.editableDungeon ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }

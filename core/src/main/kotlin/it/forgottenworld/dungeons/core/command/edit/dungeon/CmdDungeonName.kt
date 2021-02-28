@@ -17,7 +17,7 @@ class CmdDungeonName : PlayerCommand() {
 
         val name = args.joinToString(" ")
 
-        val dungeon = sender.editableDungeon ?: run {
+        val dungeon = sender.uniqueId.editableDungeon ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }

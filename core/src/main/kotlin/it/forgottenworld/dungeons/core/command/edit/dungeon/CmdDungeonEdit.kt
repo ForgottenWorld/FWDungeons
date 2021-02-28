@@ -22,7 +22,7 @@ class CmdDungeonEdit : PlayerCommand() {
             return true
         }
 
-        if (sender.editableDungeon != null) {
+        if (sender.uniqueId.editableDungeon != null) {
             sender.sendFWDMessage(Strings.ALREADY_EDITING_DUNGEON)
             return true
         }

@@ -4,11 +4,8 @@ import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.toVector
-import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
-import it.forgottenworld.dungeons.core.utils.dungeonWorld
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -23,8 +20,8 @@ data class ActiveAreaImpl(
 ) : ActiveArea {
 
     override fun fillWithMaterial(material: Material, instance: DungeonInstance) {
-        val blocks = box.getAllBlocks(dungeonWorld, instance.origin)
-        blocks.forEach { it.setType(material, true) }
+        val blocks = box.getAllBlocks(Configuration.dungeonWorld, instance.origin)
+        for (it in blocks) it.setType(material, true)
         ParticleSpammer.repeatedlySpawnParticles(
             Particle.PORTAL,
             blocks.map { it.location },
@@ -37,7 +34,7 @@ data class ActiveAreaImpl(
     override fun getRandomLocationOnFloor(dungeonInstance: DungeonInstance): Location {
         val origin = box.origin.withRefSystemOrigin(Vector3i.ZERO, dungeonInstance.origin)
         return Location(
-            ConfigManager.dungeonWorld,
+            Configuration.dungeonWorld,
             Random.nextInt(origin.x, origin.x + box.width) + 0.5,
             origin.y.toDouble(),
             Random.nextInt(origin.z, origin.z + box.depth) + 0.5
@@ -46,6 +43,10 @@ data class ActiveAreaImpl(
 
     override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = copy(
         box = box.withContainerOrigin(oldOrigin, newOrigin)
+    )
+
+    override fun withContainerOriginZero(oldOrigin: Vector3i) = copy(
+        box = box.withContainerOriginZero(oldOrigin)
     )
 
     fun toConfig(config: ConfigurationSection) = config.run {

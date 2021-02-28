@@ -1,18 +1,17 @@
 package it.forgottenworld.dungeons.core.game.interactiveregion
 
-import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import it.forgottenworld.dungeons.core.scripting.CodeParser
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.toVector
+import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
+import it.forgottenworld.dungeons.core.scripting.CodeParser
+import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 
-class TriggerImpl(
+data class TriggerImpl(
     override val id: Int,
     override val box: Box,
     override val effectCode: List<String> = listOf(),
@@ -41,21 +40,16 @@ class TriggerImpl(
         )
     }
 
-    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = TriggerImpl(
-        id,
-        box.withContainerOrigin(oldOrigin, newOrigin),
-        effectCode,
-        requiresWholeParty,
-        label
+    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = copy(
+        box = box.withContainerOrigin(oldOrigin, newOrigin)
+    )
+
+    override fun withContainerOriginZero(oldOrigin: Vector3i) = copy(
+        box = box.withContainerOriginZero(oldOrigin)
     )
 
     override fun proc(instance: DungeonInstance) {
-        if (instance is DungeonInstanceImpl) {
-            proc(instance)
-        }
-    }
-
-    fun proc(instance: DungeonInstanceImpl) {
+        if (instance !is DungeonInstanceImpl) return
         if (instance.proccedTriggers.contains(id) ||
             requiresWholeParty &&
             instance.playerTriggers.values.count { it == id } != instance.playerCount

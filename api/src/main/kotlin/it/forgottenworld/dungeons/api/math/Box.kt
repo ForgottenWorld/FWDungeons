@@ -6,6 +6,7 @@ import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BoundingBox
+import kotlin.math.abs
 
 class Box(
     val origin: Vector3i,
@@ -64,13 +65,23 @@ class Box(
 
     fun withOrigin(origin: Vector3i) = Box(origin, width, height, depth)
 
-    fun withContainerOrigin(oldContainerOrigin: Vector3i, newOrigin: Vector3i) = Box(
+    fun withContainerOrigin(
+        oldContainerOrigin: Vector3i,
+        newOrigin: Vector3i
+    ) = Box(
         Vector3i(
             origin.x - oldContainerOrigin.x + newOrigin.x,
             origin.y - oldContainerOrigin.y + newOrigin.y,
             origin.z - oldContainerOrigin.z + newOrigin.z
         ),
         width, height, depth
+    )
+
+    fun withContainerOriginZero(
+        oldContainerOrigin: Vector3i
+    ) = withContainerOrigin(
+        oldContainerOrigin,
+        Vector3i.ZERO
     )
 
     fun getAllBlocks(world: World, containerOrigin: Vector3i = Vector3i.ZERO): Set<Block> {
@@ -163,7 +174,7 @@ class Box(
     companion object {
 
         fun fromConfig(config: ConfigurationSection) = Box(
-            config.getVector("origin")!!.toVector3i(),
+            Vector3i.ofBukkitVector(config.getVector("origin")!!),
             config.getInt("width"),
             config.getInt("height"),
             config.getInt("depth")
@@ -174,9 +185,9 @@ class Box(
             val opposite = pos1 max pos2
             return Box(
                 origin,
-                opposite.x - origin.x + 1,
-                opposite.y - origin.y + 1,
-                opposite.z - origin.z + 1
+                abs(opposite.x - origin.x) + 1,
+                abs(opposite.y - origin.y) + 1,
+                abs(opposite.z - origin.z) + 1
             )
         }
     }

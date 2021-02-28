@@ -8,8 +8,9 @@ import org.bukkit.inventory.ItemStack
 interface Chest {
     val id: Int
     val position: Vector3i
-    val label: String?
-    val itemAmountRange: IntRange
+    var label: String?
+    val minItems: Int
+    val maxItems: Int
     val itemChanceMap: Map<Material, Int>
     val items: Array<ItemStack>
     fun fillActualChest(world: World, position: Vector3i = this.position)

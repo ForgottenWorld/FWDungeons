@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.core.integrations
 
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import me.kaotich00.easyranking.api.board.Board
 import me.kaotich00.easyranking.service.ERBoardService
@@ -14,7 +14,7 @@ object EasyRankingUtils {
     fun checkEasyRankingIntegration() {
         val logger = Bukkit.getLogger()
         logger.info("Checking for EasyRanking integration...")
-        if (!ConfigManager.easyRankingIntegration) {
+        if (!Configuration.easyRankingIntegration) {
             logger.info("EasyRanking integration is not enabled")
             return
         }
@@ -26,7 +26,7 @@ object EasyRankingUtils {
         }
 
         logger.info("EasyRanking is present")
-        ConfigManager.useEasyRanking = true
+        Configuration.useEasyRanking = true
     }
 
     private fun getBoard(): Board = erBoardService

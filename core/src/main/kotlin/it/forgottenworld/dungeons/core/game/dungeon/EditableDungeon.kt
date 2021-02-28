@@ -1,25 +1,20 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
+import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
+import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.FWDungeonsPlugin
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.chest.ChestImpl
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
-import it.forgottenworld.dungeons.core.utils.NamespacedKeys
-import it.forgottenworld.dungeons.core.utils.ParticleSpammer
-import it.forgottenworld.dungeons.core.utils.firstGap
-import it.forgottenworld.dungeons.core.utils.highlightAll
-import it.forgottenworld.dungeons.core.utils.launchAsync
-import it.forgottenworld.dungeons.core.utils.player
-import it.forgottenworld.dungeons.core.utils.plugin
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.configuration.file.YamlConfiguration
@@ -31,20 +26,22 @@ import java.io.File
 
 class EditableDungeon(
     editor: Player,
-    override var id: Int = -1000,
+    override var id: Int = NEW_DUNGEON_TEMP_ID,
     override var name: String = "NEW DUNGEON",
     override var description: String = "",
     override var difficulty: Dungeon.Difficulty = Dungeon.Difficulty.MEDIUM,
-    override var numberOfPlayers: IntRange = 1..2,
+    override var minPlayers: Int = 1,
+    override var maxPlayers: Int = 2,
     override var box: Box? = null,
     override var startingLocation: Vector3i? = null,
     override var points: Int = 0,
     var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
-    triggers: Map<Int, TriggerImpl> = mutableMapOf(),
-    activeAreas: Map<Int, ActiveAreaImpl> = mutableMapOf()
+    triggers: Map<Int, Trigger> = mutableMapOf(),
+    activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
+    override var chests: MutableMap<Int, Chest> = mutableMapOf()
 ) : Dungeon {
 
-    private val editor by player(editor)
+    private val editor = editor.uniqueId
 
     lateinit var testOrigin: Vector3i
 
@@ -64,16 +61,24 @@ class EditableDungeon(
             updateActiveAreaParticleSpammers(value.values)
         }
 
-    override var chests = mutableMapOf<Int, ChestImpl>()
-
     val dungeonBoxBuilder = Box.Builder()
     val triggerBoxBuilder = Box.Builder()
     val activeAreaBoxBuilder = Box.Builder()
 
     val hasTestOrigin get() = this::testOrigin.isInitialized
 
+    private var hlFrames = false
+    private var triggerParticleSpammer: ParticleSpammer? = null
+    private var activeAreaParticleSpammer: ParticleSpammer? = null
+
     fun finalize(): FinalDungeon {
-        val newId = if (id == -1000) DungeonManager.finalDungeons.keys.firstGap() else id
+        val newId = if (id == NEW_DUNGEON_TEMP_ID ||
+            DungeonManager.finalDungeons.containsKey(id)
+        ) {
+            DungeonManager.finalDungeons.keys.firstGap()
+        } else {
+            id
+        }
 
         val finalDungeon = FinalDungeon(
             newId,
@@ -81,19 +86,26 @@ class EditableDungeon(
             description,
             difficulty,
             points,
-            numberOfPlayers,
+            minPlayers,
+            maxPlayers,
             box!!.clone(),
             startingLocation!!.copy(),
-            triggers.toMap(),
-            activeAreas.toMap(),
+            triggers,
+            activeAreas,
             chests
         )
 
         DungeonManager.finalDungeons[newId] = finalDungeon
+        saveToConfigAndCreateInstances(newId, finalDungeon)
+        onDestroy()
+        return finalDungeon
+    }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private fun saveToConfigAndCreateInstances(newId: Int, finalDungeon: FinalDungeon) {
         try {
             val config = YamlConfiguration()
-            val file = File(plugin.dataFolder, "instances.yml")
+            val file = File(FWDungeonsPlugin.getInstance().dataFolder, "instances.yml")
             if (file.exists()) config.load(file)
             val dgConf = config.createSection("$newId")
             finalDungeon.instances = finalInstanceLocations.withIndex().map { (k, v) ->
@@ -103,41 +115,37 @@ class EditableDungeon(
                     set("z", v.z)
                 }
                 k to finalDungeon.createInstance(
-                    ConfigManager.dungeonWorld.getBlockAt(v.x, v.y, v.z)
+                    Configuration.dungeonWorld.getBlockAt(v.x, v.y, v.z)
                 )
             }.toMap()
-            @Suppress("BlockingMethodInNonBlockingContext")
             launchAsync { config.save(file) }
         } catch (e: Exception) {
             Bukkit.getLogger().warning(e.message)
         }
-
-        onDestroy()
-        return finalDungeon
     }
 
     fun labelInteractiveRegion(type: InteractiveRegion.Type, label: String, id: Int = -1) {
-        if (type == InteractiveRegion.Type.TRIGGER) labelTrigger(label, id) else labelActiveArea(label, id)
+        when (type) {
+            InteractiveRegion.Type.TRIGGER -> labelTrigger(label, id)
+            InteractiveRegion.Type.ACTIVE_AREA -> labelActiveArea(label, id)
+        }
     }
 
-    fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) =
-        if (type == InteractiveRegion.Type.TRIGGER) unmakeTrigger(ieId) else unmakeActiveArea(ieId)
+    fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) = when (type) {
+        InteractiveRegion.Type.TRIGGER -> unmakeTrigger(ieId)
+        InteractiveRegion.Type.ACTIVE_AREA -> unmakeActiveArea(ieId)
+    }
 
-    fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) =
-        if (type == InteractiveRegion.Type.TRIGGER) newTrigger(box) else newActiveArea(box)
+    fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) = when (type) {
+        InteractiveRegion.Type.TRIGGER -> newTrigger(box)
+        InteractiveRegion.Type.ACTIVE_AREA -> newActiveArea(box)
+    }
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
-        ActiveAreaImpl(
-            id,
-            box.withContainerOrigin(
-                testOrigin,
-                Vector3i.ZERO
-            )
-        ).let {
-            activeAreas = activeAreas.plus(id to it)
-            highlightNewInteractiveRegion(it)
-        }
+        val activeArea = ActiveAreaImpl(id, box.withContainerOriginZero(testOrigin))
+        activeAreas = activeAreas.plus(id to activeArea)
+        highlightNewInteractiveRegion(activeArea)
         return id
     }
 
@@ -158,18 +166,10 @@ class EditableDungeon(
     }
 
     private fun newTrigger(box: Box): Int {
-        val id = triggers.keys.lastOrNull()?.plus(1) ?: 0
-
-        TriggerImpl(
-            id,
-            box.withContainerOrigin(
-                testOrigin,
-                Vector3i.ZERO
-            )
-        ).let {
-            highlightNewInteractiveRegion(it)
-            triggers = triggers.plus(id to it)
-        }
+        val id = triggers.keys.firstGap()
+        val trigger = TriggerImpl(id, box.withContainerOriginZero(testOrigin))
+        highlightNewInteractiveRegion(trigger)
+        triggers = triggers.plus(id to trigger)
         return id
     }
 
@@ -194,14 +194,15 @@ class EditableDungeon(
     }
 
     fun onDestroy(restoreFormer: Boolean = false) {
-        val player = editor ?: return
         stopParticleSpammers()
         dungeonBoxBuilder.clear()
         triggerBoxBuilder.clear()
         activeAreaBoxBuilder.clear()
-        player.editableDungeon = null
-        if (restoreFormer) DungeonManager.finalDungeons[id]?.isBeingEdited = false
-        player.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
+        editor.editableDungeon = null
+        if (restoreFormer) {
+            DungeonManager.finalDungeons[id]?.isBeingEdited = false
+        }
+        Bukkit.getPlayer(editor)?.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }
 
     fun whatIsMissingForWriteout() = StringBuilder().apply {
@@ -211,42 +212,31 @@ class EditableDungeon(
         if (activeAreas.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_ACTIVE_AREA)
     }.toString().dropLast(2)
 
-    private var hlFrames = false
-
     private fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
-        interactiveRegion.withContainerOrigin(
-            Vector3i.ZERO,
-            testOrigin
-        ).also { it.box.highlightAll() }
+        ParticleSpammer.highlightBox(interactiveRegion.withContainerOrigin(Vector3i.ZERO, testOrigin).box)
     }
 
-    private var triggerParticleSpammer: ParticleSpammer? = null
-    private var activeAreaParticleSpammer: ParticleSpammer? = null
-
-    private fun updateTriggerParticleSpammers(newTriggers: Collection<TriggerImpl>) {
-        if (!hlFrames) return
+    private fun updateTriggerParticleSpammers(newTriggers: Collection<Trigger>) {
         triggerParticleSpammer?.stop()
-        triggerParticleSpammer = ParticleSpammer(
-            Particle.DRIP_LAVA,
-            1,
-            500,
-            newTriggers.flatMap {
-                it.box.getFrame(it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin))
-            }
-        )
+        if (!hlFrames) return
+        triggerParticleSpammer = getFrameParticleSpammer(Particle.DRIP_LAVA, newTriggers)
     }
 
-    private fun updateActiveAreaParticleSpammers(newActiveAreas: Collection<ActiveAreaImpl>) {
-        if (!hlFrames) return
+    private fun updateActiveAreaParticleSpammers(newActiveAreas: Collection<ActiveArea>) {
         activeAreaParticleSpammer?.stop()
-        activeAreaParticleSpammer = ParticleSpammer(
-            Particle.DRIP_WATER,
-            1,
-            500,
-            newActiveAreas.flatMap {
-                it.box.getFrame(it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin))
-            }
-        )
+        if (!hlFrames) return
+        activeAreaParticleSpammer = getFrameParticleSpammer(Particle.DRIP_WATER, newActiveAreas)
+    }
+
+    private fun getFrameParticleSpammer(
+        particle: Particle,
+        regions: Collection<InteractiveRegion>
+    ): ParticleSpammer {
+        val frameBlocks = regions.flatMap {
+            val box = it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin)
+            it.box.getFrame(box)
+        }
+        return ParticleSpammer(particle, 1, 500, frameBlocks)
     }
 
     private fun updateParticleSpammers() {
@@ -283,6 +273,7 @@ class EditableDungeon(
             ?.toShort() == 1.toShort()
 
         if (!isTriggerWand && !isActiveAreaWand) return
+        event.isCancelled = true
 
         val posNo = when (event.action) {
             Action.LEFT_CLICK_BLOCK -> 1
@@ -293,6 +284,9 @@ class EditableDungeon(
         val cmd = "fwde ${if (isTriggerWand) "trigger" else "activearea"} pos$posNo"
 
         event.player.performCommand(cmd)
-        event.isCancelled = true
+    }
+
+    companion object {
+        private const val NEW_DUNGEON_TEMP_ID = -69420
     }
 }

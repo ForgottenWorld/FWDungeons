@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core
 
 import it.forgottenworld.dungeons.core.game.BypassAttemptHandler
-import it.forgottenworld.dungeons.core.game.RespawnHandler
+import it.forgottenworld.dungeons.core.game.RespawnManager
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
@@ -21,27 +21,28 @@ class SpigotEventDispatcher : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
-        event.entity.editableDungeon?.onDestroy(true)
-        event.entity.finalInstance?.onPlayerDeath(event.entity)
+        event.entity.uniqueId.editableDungeon?.onDestroy(true)
+        event.entity.uniqueId.finalInstance?.onPlayerDeath(event.entity)
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        event.player.editableDungeon?.onDestroy(true)
-        event.player.finalInstance?.onPlayerLeave(event.player)
+        event.player.uniqueId.editableDungeon?.onDestroy(true)
+        event.player.uniqueId.finalInstance?.onPlayerLeave(event.player)
     }
 
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
         if (event.from.x == event.to.x &&
             event.from.y == event.to.y &&
-            event.from.z == event.to.z) return
-        event.player.finalInstance?.onPlayerMove(event.player)
+            event.from.z == event.to.z
+        ) return
+        event.player.uniqueId.finalInstance?.onPlayerMove(event.player)
     }
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        event.player.editableDungeon?.onPlayerInteract(event)
+        event.player.uniqueId.editableDungeon?.onPlayerInteract(event)
         BypassAttemptHandler.onPlayerInteract(event)
     }
 
@@ -52,7 +53,7 @@ class SpigotEventDispatcher : Listener {
 
     @EventHandler
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
-        if (event.player.finalInstance?.isTpSafe != false) return
+        if (event.player.uniqueId.finalInstance?.isTpSafe != false) return
         BypassAttemptHandler.onPlayerTeleport(event)
     }
 
@@ -63,7 +64,7 @@ class SpigotEventDispatcher : Listener {
 
     @EventHandler
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
-        RespawnHandler.onPlayerRespawn(event)
+        RespawnManager.onPlayerRespawn(event)
     }
 
 }

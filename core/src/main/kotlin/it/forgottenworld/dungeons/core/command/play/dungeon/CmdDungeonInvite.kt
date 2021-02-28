@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
-import it.forgottenworld.dungeons.core.cli.JsonMessages
 import it.forgottenworld.dungeons.api.command.PlayerCommand
+import it.forgottenworld.dungeons.core.cli.JsonMessages
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
@@ -17,12 +17,12 @@ class CmdDungeonInvite : PlayerCommand() {
             return true
         }
 
-        val instance = sender.finalInstance ?: run {
+        val instance = sender.uniqueId.finalInstance ?: run {
             sender.sendFWDMessage(Strings.CURRENTLY_NOT_IN_DUNGEON_PARTY)
             return true
         }
 
-        if (instance.leader != sender) {
+        if (instance.leader != sender.uniqueId) {
             sender.sendFWDMessage(Strings.ONLY_LEADER_MAY_INVITE)
             return true
         }

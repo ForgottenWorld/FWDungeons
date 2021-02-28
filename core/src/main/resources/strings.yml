@@ -82,7 +82,7 @@ NEA_PROVIDE_MIN_MAX_PLAYERS: "Not enough arguments: please provide minimum and m
 NEA_PROVIDE_NAME: "Not enough arguments: please provide a name"
 NOT_EDITING_ANY_DUNGEONS: "You're not editing any dungeons"
 NOT_ENOUGH_PLAYERS_FOR_DUNGEON: "Not enough players for this dungeon"
-NOT_PARTY_LEADER: "You're now the party leader"
+NOW_PARTY_LEADER: "You're now the party leader"
 NOW_EDITING_DUNGEON_WITH_ID: "Now editing dungeon with id %d"
 NOW_HOLDING_WAND_FOR_MAKING_IE: "You're now holding a wand for making %s"
 NO_ACTIVE_AREA_WITH_SUCH_ID: "No active area with such id"

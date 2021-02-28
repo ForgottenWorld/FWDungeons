@@ -114,7 +114,7 @@ object Strings {
     val NEA_PROVIDE_NAME by ResourceString()
     val NOT_EDITING_ANY_DUNGEONS by ResourceString()
     val NOT_ENOUGH_PLAYERS_FOR_DUNGEON by ResourceString()
-    val NOT_PARTY_LEADER by ResourceString()
+    val NOW_PARTY_LEADER by ResourceString()
     val NOW_EDITING_DUNGEON_WITH_ID by ResourceString()
     val NOW_HOLDING_WAND_FOR_MAKING_IE by ResourceString()
     val NO_ACTIVE_AREA_WITH_SUCH_ID by ResourceString()

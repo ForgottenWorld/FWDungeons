@@ -10,6 +10,7 @@ import it.forgottenworld.dungeons.core.utils.chatComponent
 import it.forgottenworld.dungeons.core.utils.clickEvent
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
+import org.bukkit.Bukkit
 import kotlin.math.floor
 
 object DungeonListGui {
@@ -117,28 +118,27 @@ object DungeonListGui {
         append(chevrons(3))
         append("${Strings.PLAYERS}: ", ChatColor.DARK_AQUA)
 
-        val minPl = dng.numberOfPlayers.first
-        val maxPl = dng.numberOfPlayers.last
+        val minPl = dng.minPlayers
+        val maxPl = dng.maxPlayers
         append("$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n", ChatColor.WHITE)
 
-        dng.instances.values.forEachIndexed { ii, inst ->
+        for((i, inst) in dng.instances.values.withIndex()) {
             append(chevrons(1))
-            append("${Strings.ROOM} ${ii + 1} ")
+            append("${Strings.ROOM} ${i + 1} ")
             append("| ", ChatColor.DARK_GRAY)
             append("Leader: ", ChatColor.GRAY)
-            inst.leader
-                ?.name
-                ?.let { append(it, ChatColor.LIGHT_PURPLE) }
-                ?: append("none", ChatColor.DARK_GRAY)
+            inst.leader?.let {
+                val pl = Bukkit.getPlayer(it) ?: return@let
+                append(pl.name, ChatColor.LIGHT_PURPLE)
+            } ?: append("none", ChatColor.DARK_GRAY)
             append(joinClickable(inst))
-            append(inst.leader?.let { "  [ ${inst.playerCount}/${inst.dungeon.numberOfPlayers.last} ]" } ?: "")
+            append(inst.leader?.let { "  [ ${inst.playerCount}/$maxPl ]" } ?: "")
         }
 
-        append("\n".repeat(
-            13 - dng.instances.size - floor(
-                (dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0
-            ).toInt()
-        ))
+        val paddingLines = 13 - dng.instances.size - floor(
+            (dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0
+        ).toInt()
+        append("\n".repeat(paddingLines))
         append(paginator(page))
     }
 }

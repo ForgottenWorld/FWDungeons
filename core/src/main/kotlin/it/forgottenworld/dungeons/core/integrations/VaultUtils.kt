@@ -1,14 +1,14 @@
 package it.forgottenworld.dungeons.core.integrations
 
-import it.forgottenworld.dungeons.core.config.ConfigManager
-import it.forgottenworld.dungeons.core.utils.plugin
+import it.forgottenworld.dungeons.core.FWDungeonsPlugin
+import it.forgottenworld.dungeons.core.config.Configuration
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 object VaultUtils {
 
-    private val economy get() = plugin
+    private val economy get() = FWDungeonsPlugin.getInstance()
         .server
         .servicesManager
         .getRegistration(Economy::class.java)
@@ -17,7 +17,7 @@ object VaultUtils {
     fun checkVaultIntegration() {
         val logger = Bukkit.getLogger()
         logger.info("Checking for Vault integration...")
-        if (!ConfigManager.vaultIntegration) {
+        if (!Configuration.vaultIntegration) {
             logger.info("Vault integration is not enabled")
             return
         }
@@ -29,11 +29,11 @@ object VaultUtils {
         }
 
         logger.info("Vault is present")
-        ConfigManager.useEasyRanking = true
+        Configuration.useEasyRanking = true
     }
 
     fun canPlayerPay(player: Player, amount: Double): Boolean {
-        if (!ConfigManager.useVault) return true
+        if (!Configuration.useVault) return true
         return economy?.has(
             Bukkit.getOfflinePlayer(player.uniqueId),
             amount
@@ -41,7 +41,7 @@ object VaultUtils {
     }
 
     fun playerPay(player: Player, amount: Double) {
-        if (!ConfigManager.useVault) return
+        if (!Configuration.useVault) return
         economy?.withdrawPlayer(Bukkit.getOfflinePlayer(player.uniqueId), amount)
     }
 }

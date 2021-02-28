@@ -1,13 +1,13 @@
 package it.forgottenworld.dungeons.core.game.instance
 
+import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.locationInWorld
-import it.forgottenworld.dungeons.api.math.withRefSystemOrigin
 import it.forgottenworld.dungeons.core.cli.JsonMessages
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.RespawnHandler.respawnData
+import it.forgottenworld.dungeons.core.game.RespawnManager.respawnData
 import it.forgottenworld.dungeons.core.game.detection.CubeGridFactory.checkPositionAgainstTriggers
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
@@ -15,6 +15,7 @@ import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.game.objective.CombatObjective
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
+import it.forgottenworld.dungeons.core.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.utils.*
@@ -38,14 +39,14 @@ class DungeonInstanceImpl(
 ) : DungeonInstance {
 
     var isTpSafe = true
-    val players = MutablePlayerList.of()
-    var leader by player()
+    val players = mutableListOf<UUID>()
+    var leader: UUID? = null
     var isLocked = false
     var inGame = false
     var partyKey = ""
     val instanceObjectives = mutableListOf<CombatObjective>()
 
-    val playerTriggers = mutableMapOf<UUID,Int>()
+    val playerTriggers = mutableMapOf<UUID, Int>()
     val proccedTriggers = mutableSetOf<Int>()
 
     private val warpbackData = mutableMapOf<UUID, WarpbackData>()
@@ -58,10 +59,10 @@ class DungeonInstanceImpl(
         get() = players.size
 
     val isFull
-        get() = playerCount == dungeon.numberOfPlayers.last
+        get() = playerCount == dungeon.maxPlayers
 
     fun resetInstance() {
-        players.uuids.forEach { uuid ->
+        players.forEach { uuid ->
             warpbackData.remove(uuid)
             Bukkit.getPlayer(uuid)?.let { FWEchelonUtils.playerIsNowFree(it) }
             uuid.finalInstance = null
@@ -80,19 +81,19 @@ class DungeonInstanceImpl(
         }
         for (c in dungeon.chests.values) {
             c.clearActualChest(
-                dungeonWorld,
+                Configuration.dungeonWorld,
                 c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
             )
         }
         instanceObjectives.clear()
         val boundingBox = dungeon.box.getBoundingBox(origin)
-        dungeonWorld
+        Configuration.dungeonWorld
             .getNearbyEntities(boundingBox)
             .filter { it is LivingEntity && it !is Player }
             .forEach { (it as LivingEntity).health = 0.0 }
         launch {
             delay(500)
-            dungeonWorld
+            Configuration.dungeonWorld
                 .getNearbyEntities(boundingBox)
                 .filterIsInstance<Item>()
                 .forEach { it.remove() }
@@ -129,7 +130,7 @@ class DungeonInstanceImpl(
         FWEchelonUtils.playerIsNoLongerFree(player)
 
         if (players.isEmpty()) {
-            leader = player
+            leader = player.uniqueId
             player.sendJsonMessage {
                 append("${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} ")
                 append(JsonMessages.lockLink())
@@ -137,21 +138,23 @@ class DungeonInstanceImpl(
         } else {
             player.sendFWDMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
             players.forEach {
-                it?.sendFWDMessage(Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name))
+                Bukkit.getPlayer(it)?.sendFWDMessage(
+                    Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name)
+                )
             }
         }
 
-        players.add(player)
-        player.finalInstance = this
+        players.add(player.uniqueId)
+        player.uniqueId.finalInstance = this
         return
     }
 
     fun onStart() {
         inGame = true
-        players.filterNotNull().forEach { preparePlayer(it) }
+        players.forEach { Bukkit.getPlayer(it)?.let(::preparePlayer) }
         for (c in dungeon.chests.values) {
             c.fillActualChest(
-                dungeonWorld,
+                Configuration.dungeonWorld,
                 c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
             )
         }
@@ -161,18 +164,22 @@ class DungeonInstanceImpl(
     private fun preparePlayer(player: Player) {
         warpbackData[player.uniqueId] = player.currentWarpbackData
         player.gameMode = GameMode.ADVENTURE
-        val startingLocation = startingPostion.locationInWorld(ConfigManager.dungeonWorld)
+        val startingLocation = startingPostion.locationInWorld(Configuration.dungeonWorld)
         player.teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
         player.sendFWDMessage(Strings.GOOD_LUCK_OUT_THERE)
     }
 
-    private fun onPlayerEnterTrigger(player: Player, trigger: TriggerImpl) {
-        if (ConfigManager.isDebugMode) trigger.debugLogEnter(player)
+    private fun onPlayerEnterTrigger(player: Player, trigger: Trigger) {
+        if (Configuration.isDebugMode) {
+            (trigger as TriggerImpl).debugLogEnter(player)
+        }
         trigger.proc(this)
     }
 
-    private fun onPlayerExitTrigger(player: Player, trigger: TriggerImpl) {
-        if (ConfigManager.isDebugMode) trigger.debugLogExit(player)
+    private fun onPlayerExitTrigger(player: Player, trigger: Trigger) {
+        if (Configuration.isDebugMode) {
+            (trigger as TriggerImpl).debugLogExit(player)
+        }
     }
 
     private fun onPlayerRemoved(player: Player) {
@@ -181,16 +188,20 @@ class DungeonInstanceImpl(
             ?.let { dungeon.triggers[it] }
             ?.let { onPlayerExitTrigger(player, it) }
         playerTriggers.remove(player.uniqueId)
-        player.finalInstance = null
-        players.remove(player)
+        player.uniqueId.finalInstance = null
+        players.remove(player.uniqueId)
         FWEchelonUtils.playerIsNowFree(player)
         updatePartyLeader(player)
     }
 
     private fun updatePartyLeader(player: Player) {
-        if (leader != player) return
-        if (players.isEmpty()) resetInstance()
-        else leader = players.first()?.apply { sendFWDMessage(Strings.NOT_PARTY_LEADER) }
+        if (leader != player.uniqueId) return
+        if (players.isEmpty()) {
+            resetInstance()
+        } else {
+            leader = players.first()
+            Bukkit.getPlayer(leader!!)?.sendFWDMessage(Strings.NOW_PARTY_LEADER)
+        }
     }
 
     fun onPlayerLeave(player: Player) {
@@ -198,32 +209,38 @@ class DungeonInstanceImpl(
             player.health = 0.0
             return
         }
-        players.filterNotNull().forEach {
-            val token = if (player.name == it.name) Strings.YOU else player.name
-            it.sendFWDMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(token))
+        for (uuid in players) {
+            val pl = Bukkit.getPlayer(uuid) ?: continue
+            val token = if (player.name == pl.name) Strings.YOU else player.name
+            pl.sendFWDMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(token))
         }
         onPlayerRemoved(player)
     }
 
     fun onPlayerDeath(player: Player) {
         player.sendFWDMessage(Strings.YOU_DIED_IN_THE_DUNGEON)
-        player.respawnData = warpbackData[player.uniqueId]
+        player.uniqueId.respawnData = warpbackData[player.uniqueId]
         onPlayerRemoved(player)
-        players.forEach { it?.sendFWDMessage(Strings.PLAYER_DIED_IN_DUNGEON.format(player.name)) }
+        for (uuid in players) {
+            Bukkit.getPlayer(uuid)?.sendFWDMessage(
+                Strings.PLAYER_DIED_IN_DUNGEON.format(player.name)
+            )
+        }
     }
 
     fun onInstanceFinish(givePoints: Boolean) {
-        if (ConfigManager.useEasyRanking && givePoints && dungeon.points != 0) {
-            players.uuids.forEach {
-                EasyRankingUtils.addScoreToPlayer(it, dungeon.points.toFloat())
+        if (Configuration.useEasyRanking && givePoints && dungeon.points != 0) {
+            for (uuid in players) {
+                EasyRankingUtils.addScoreToPlayer(uuid, dungeon.points.toFloat())
             }
         }
 
         isTpSafe = true
 
-        players.filterNotNull().forEach { p ->
-            p.sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
-            warpbackData[p.uniqueId]?.useWithPlayer(p)
+        for (uuid in players) {
+            val pl = Bukkit.getPlayer(uuid) ?: continue
+            pl.sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
+            warpbackData[uuid]?.useWithPlayer(pl)
         }
 
         resetInstance()
@@ -244,7 +261,7 @@ class DungeonInstanceImpl(
         x: Int,
         y: Int,
         z: Int,
-        oldTrigger: TriggerImpl?
+        oldTrigger: Trigger?
     ) {
         val newTrigger = dungeon
             .triggerGrid
@@ -313,9 +330,11 @@ class DungeonInstanceImpl(
 
     companion object {
 
+        private val mythicMobsHelper by lazy { BukkitAPIHelper() }
+
         fun fromConfig(dungeonId: Int, config: ConfigurationSection): DungeonInstanceImpl? {
             val dungeon = DungeonManager.finalDungeons[dungeonId] ?: return null
-            val instOriginBlock = ConfigManager.dungeonWorld.getBlockAt(
+            val instOriginBlock = Configuration.dungeonWorld.getBlockAt(
                 config.getInt("x"),
                 config.getInt("y"),
                 config.getInt("z")

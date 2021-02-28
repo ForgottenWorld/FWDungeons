@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core
 
 import it.forgottenworld.dungeons.core.command.edit.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.core.command.play.FWDungeonsPlayCommand
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
@@ -20,7 +20,7 @@ class FWDungeonsPlugin : JavaPlugin() {
         logger.info("Loading data...")
 
         loadStrings()
-        ConfigManager.loadData()
+        Configuration.loadData()
 
         logger.info("Registering commands...")
 
@@ -53,6 +53,11 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")
+    }
+
+    companion object {
+
+        fun getInstance() = getPlugin(FWDungeonsPlugin::class.java)
     }
 
 }

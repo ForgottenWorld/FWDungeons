@@ -36,7 +36,7 @@ class CmdDungeonJoinInstance : PlayerCommand() {
             return true
         }
 
-        if (sender.finalInstance != null) {
+        if (sender.uniqueId.finalInstance != null) {
             sender.sendFWDMessage(Strings.ALREADY_IN_PARTY)
             return true
         }

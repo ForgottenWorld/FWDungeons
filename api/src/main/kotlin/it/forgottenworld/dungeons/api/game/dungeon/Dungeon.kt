@@ -12,7 +12,8 @@ interface Dungeon {
     val description: String
     val difficulty: Difficulty
     val points: Int
-    val numberOfPlayers: IntRange
+    val minPlayers: Int
+    val maxPlayers: Int
     val box: Box?
     val startingLocation: Vector3i?
     val triggers: Map<Int, Trigger>

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 class CmdDungeonInstanceRemove : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val dungeon = sender.editableDungeon
+        val dungeon = sender.uniqueId.editableDungeon
             ?: run {
                 sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
                 return true

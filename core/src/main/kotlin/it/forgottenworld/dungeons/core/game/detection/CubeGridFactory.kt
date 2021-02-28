@@ -1,11 +1,10 @@
 package it.forgottenworld.dungeons.core.game.detection
 
+import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.NestableGrid3iToNi
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
-import it.forgottenworld.dungeons.core.utils.cubeWithSide
 import kotlin.properties.ReadOnlyProperty
 
 object CubeGridFactory {
@@ -22,7 +21,7 @@ object CubeGridFactory {
 
     private fun mapTriggersOntoGrid(
         grid: NestableGrid3iToNi,
-        triggers: Map<Int, TriggerImpl>,
+        triggers: Map<Int, Trigger>,
         nestingLevel: Int = 0
     ) {
         val indices = grid.indices
@@ -51,8 +50,8 @@ object CubeGridFactory {
         y: Int,
         z: Int,
         grid: NestableGrid3iToNi,
-        triggers: Map<Int, TriggerImpl>
-    ): TriggerImpl? {
+        triggers: Map<Int, Trigger>
+    ): Trigger? {
         for (id in grid[x,y,z] ?: return null) {
             val trig = triggers[id]!!
             if (trig.containsXYZ(x,y,z)) return trig
@@ -77,7 +76,7 @@ object CubeGridFactory {
         x: Int,
         y: Int,
         z: Int,
-        triggers: Map<Int, TriggerImpl>
+        triggers: Map<Int, Trigger>
     ) = lookupTriggersForPosition(x, y, z, this, triggers)
 
     private const val GRID_INITIAL_CELL_SIZE = 16

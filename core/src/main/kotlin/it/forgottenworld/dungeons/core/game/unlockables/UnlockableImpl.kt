@@ -1,37 +1,29 @@
 package it.forgottenworld.dungeons.core.game.unlockables
 
+import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.core.integrations.VaultUtils
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 
-data class Unlockable(
-    val seriesId: Int,
-    val order: Int,
-    val message: String,
-    val unlockedMessage: String,
-    val requirements: List<UnlockableRequirement>
-) {
-    interface UnlockableRequirement
+data class UnlockableImpl(
+    override val seriesId: Int,
+    override val order: Int,
+    override val message: String,
+    override val unlockedMessage: String,
+    override val requirements: List<Unlockable.UnlockableRequirement>
+) : Unlockable {
 
-    class ItemRequirement(
-        val material: Material,
-        val amount: Int
-    ): UnlockableRequirement
-
-    class EconomyRequirement(
-        val amount: Double
-    ): UnlockableRequirement
 
     fun verifyPlayerRequirements(player: Player): Boolean {
         for(req in requirements) {
             when (req) {
-                is ItemRequirement -> {
+                is Unlockable.ItemRequirement -> {
                     if (!player.inventory.contains(req.material, req.amount)) {
                         return false
                     }
                 }
-                is EconomyRequirement -> {
+                is Unlockable.EconomyRequirement -> {
                     if (!VaultUtils.canPlayerPay(player, req.amount)) {
                         return false
                     }
@@ -49,10 +41,10 @@ data class Unlockable(
         config.createSection("requirements").run {
             for (req in requirements) {
                 when (req) {
-                    is EconomyRequirement -> {
+                    is Unlockable.EconomyRequirement -> {
                         set("CURRENCY", req.amount)
                     }
-                    is ItemRequirement -> {
+                    is Unlockable.ItemRequirement -> {
                         set(req.material.toString(), req.amount)
                     }
                 }
@@ -62,7 +54,7 @@ data class Unlockable(
 
     companion object {
 
-        fun fromConfig(config: ConfigurationSection) = Unlockable(
+        fun fromConfig(config: ConfigurationSection) = UnlockableImpl(
             config.getInt("seriesId"),
             config.getInt("order"),
             config.getString("message")!!,
@@ -70,9 +62,9 @@ data class Unlockable(
             config.getConfigurationSection("requirements")!!.run {
                 getKeys(false).map { rk ->
                     if (rk == "CURRENCY") {
-                        EconomyRequirement(getDouble(rk))
+                        Unlockable.EconomyRequirement(getDouble(rk))
                     } else {
-                        ItemRequirement(Material.getMaterial(rk)!!, getInt(rk))
+                        Unlockable.ItemRequirement(Material.getMaterial(rk)!!, getInt(rk))
                     }
                 }
             }

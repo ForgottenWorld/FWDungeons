@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import it.forgottenworld.dungeons.api.command.SenderCommand
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
@@ -19,7 +19,7 @@ class CmdDungeonReload : SenderCommand() {
         DungeonManager.finalDungeons.values.flatMap { it.instances.values }.forEach { it.evacuate() }
         DungeonManager.finalDungeons.clear()
 
-        ConfigManager.loadData()
+        Configuration.loadData()
 
         sender.sendFWDMessage(Strings.RELOADING_DUNGEONS_AND_INSTANCES)
 

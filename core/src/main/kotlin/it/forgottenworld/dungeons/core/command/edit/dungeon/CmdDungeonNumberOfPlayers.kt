@@ -21,12 +21,13 @@ class CmdDungeonNumberOfPlayers: PlayerCommand() {
             return true
         }
 
-        val dungeon = sender.editableDungeon ?: run {
+        val dungeon = sender.uniqueId.editableDungeon ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 
-        dungeon.numberOfPlayers = r1..r2
+        dungeon.minPlayers = r1
+        dungeon.maxPlayers = r2
         sender.sendFWDMessage(Strings.NUMBER_OF_PLAYERS_CHANGED)
 
         return true

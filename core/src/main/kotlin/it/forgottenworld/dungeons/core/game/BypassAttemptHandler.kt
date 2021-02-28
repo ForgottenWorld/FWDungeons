@@ -35,7 +35,7 @@ object BypassAttemptHandler {
 
     fun onEntityPotionEffect(event: EntityPotionEffectEvent) {
         val player = event.entity as? Player ?: return
-        if (player.finalInstance != null &&
+        if (player.uniqueId.finalInstance != null &&
             checkedCauses.contains(event.cause) &&
             bannedPotionEffects.contains(event.modifiedType)
         ) {
@@ -45,7 +45,7 @@ object BypassAttemptHandler {
     }
 
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.player.finalInstance == null ||
+        if (event.player.uniqueId.finalInstance == null ||
             event.item?.type != Material.ENDER_PEARL ||
             !(event.action == Action.RIGHT_CLICK_AIR ||
                 event.action == Action.RIGHT_CLICK_BLOCK)) return

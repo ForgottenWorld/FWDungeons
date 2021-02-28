@@ -2,7 +2,6 @@ package it.forgottenworld.dungeons.core.game.dungeon
 
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import org.bukkit.entity.Player
 import java.util.*
 
 object DungeonManager {
@@ -21,20 +20,12 @@ object DungeonManager {
             dungeonInstances[id] = value
         }
 
-    var Player.editableDungeon: EditableDungeon?
-        get() = playerEditableDungeons[uniqueId]
+    var UUID.editableDungeon: EditableDungeon?
+        get() = playerEditableDungeons[this]
         set(value) {
             value?.let {
-                playerEditableDungeons[uniqueId] = it
-            } ?: playerEditableDungeons.remove(uniqueId)
-        }
-
-    var Player.finalInstance
-        get() = playerFinalInstances[uniqueId]
-        set(value) {
-            value?.let {
-                playerFinalInstances[uniqueId] = value
-            } ?: playerFinalInstances.remove(uniqueId)
+                playerEditableDungeons[this] = it
+            } ?: playerEditableDungeons.remove(this)
         }
 
     var UUID.finalInstance

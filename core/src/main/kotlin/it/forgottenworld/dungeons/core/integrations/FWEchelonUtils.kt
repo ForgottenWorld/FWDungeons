@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.core.integrations
 
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
@@ -18,7 +18,7 @@ object FWEchelonUtils {
         val logger = Bukkit.getLogger()
 
         logger.info("Checking for FWEchelon integration...")
-        if (!ConfigManager.fwEchelonIntegration) {
+        if (!Configuration.fwEchelonIntegration) {
             logger.info("FWEchelon integration is not enabled")
             return
         }
@@ -35,14 +35,14 @@ object FWEchelonUtils {
             .mutexActivityService
             .registerMutexActivity(FWDungeonsMutexActivity())
 
-        ConfigManager.useFWEchelon = true
+        Configuration.useFWEchelon = true
     }
 
-    fun isPlayerFree(player: Player) = !ConfigManager.useFWEchelon ||
+    fun isPlayerFree(player: Player) = !Configuration.useFWEchelon ||
         !FWEchelon.api.mutexActivityService.isPlayerInMutexActivity(player)
 
     fun playerIsNoLongerFree(player: Player) {
-        if (!ConfigManager.useFWEchelon) return
+        if (!Configuration.useFWEchelon) return
         FWEchelon
             .api
             .mutexActivityService
@@ -54,7 +54,7 @@ object FWEchelonUtils {
     }
 
     fun playerIsNowFree(player: Player) {
-        if (!ConfigManager.useFWEchelon) return
+        if (!Configuration.useFWEchelon) return
         FWEchelon
             .api
             .mutexActivityService
@@ -71,12 +71,12 @@ object FWEchelonUtils {
         override fun onAllPlayersForceRemoved(reason: String?) {
             val insts = DungeonManager.playerFinalInstances.values
             if (reason != null) {
-                insts.flatMap { it.players }.forEach {
-                    it?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))
+                for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
+                    pl?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))
                 }
             } else {
-                insts.flatMap { it.players }.forEach {
-                    it?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED)
+                for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
+                    pl?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED)
                 }
             }
             insts.forEach {
@@ -85,7 +85,7 @@ object FWEchelonUtils {
         }
 
         override fun onPlayerForceRemoved(player: Player, reason: String?) {
-            val inst = player.finalInstance ?: return
+            val inst = player.uniqueId.finalInstance ?: return
             if (reason != null) {
                 player.sendFWDMessage(Strings.YOU_WILL_BE_EVACUATED_BECAUSE.format(reason))
             } else {

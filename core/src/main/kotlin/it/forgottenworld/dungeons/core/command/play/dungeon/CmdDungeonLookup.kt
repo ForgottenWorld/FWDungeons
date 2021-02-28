@@ -21,7 +21,7 @@ class CmdDungeonLookup: SenderCommand() {
                 return true
             }
 
-        val instance = player.finalInstance
+        val instance = player.uniqueId.finalInstance
             ?: run {
                 sender.sendFWDMessage(Strings.PLAYER_IS_NOT_IN_PARTY_OR_INSTANCE)
                 return true

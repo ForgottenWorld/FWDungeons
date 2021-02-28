@@ -82,7 +82,7 @@ NEA_PROVIDE_MIN_MAX_PLAYERS: "Argomenti insufficienti: inserisci il numero minim
 NEA_PROVIDE_NAME: "Argomenti insufficienti: inserisci un nome"
 NOT_EDITING_ANY_DUNGEONS: "Non stai modificando alcun dungeon"
 NOT_ENOUGH_PLAYERS_FOR_DUNGEON: "Non ci sono abbastanza player per avviare l'istanza"
-NOT_PARTY_LEADER: "Ora sei il leader del party"
+NOW_PARTY_LEADER: "Ora sei il leader del party"
 NOW_EDITING_DUNGEON_WITH_ID: "Stai ora modificando il dungeon con id %d"
 NOW_HOLDING_WAND_FOR_MAKING_IE: "Stai ora tenendo in mano una bacchetta per creare %s"
 NO_ACTIVE_AREA_WITH_SUCH_ID: "Non ci sono active area con questo id"

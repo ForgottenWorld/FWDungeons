@@ -2,11 +2,12 @@ package it.forgottenworld.dungeons.core.game.dungeon
 
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.math.toVector
-import it.forgottenworld.dungeons.api.math.toVector3i
-import it.forgottenworld.dungeons.core.config.ConfigManager
+import it.forgottenworld.dungeons.core.FWDungeonsPlugin
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.chest.ChestImpl
 import it.forgottenworld.dungeons.core.game.detection.CubeGridFactory.triggerGrid
@@ -15,7 +16,9 @@ import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
-import it.forgottenworld.dungeons.core.utils.*
+import it.forgottenworld.dungeons.core.utils.firstGap
+import it.forgottenworld.dungeons.core.utils.launchAsync
+import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.block.Block
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -27,11 +30,12 @@ class FinalDungeon(
     override val description: String,
     override val difficulty: Dungeon.Difficulty,
     override val points: Int,
-    override val numberOfPlayers: IntRange,
+    override val minPlayers: Int,
+    override val maxPlayers: Int,
     override val box: Box,
     override val startingLocation: Vector3i,
-    override val triggers: Map<Int, TriggerImpl>,
-    override val activeAreas: Map<Int, ActiveAreaImpl>,
+    override val triggers: Map<Int, Trigger>,
+    override val activeAreas: Map<Int, ActiveArea>,
     override val chests: Map<Int, Chest>
 ) : Dungeon {
 
@@ -59,20 +63,24 @@ class FinalDungeon(
             name,
             description,
             difficulty,
-            numberOfPlayers,
+            minPlayers,
+            maxPlayers,
             box.clone(),
             startingLocation.copy(),
             points,
             instances.values.map { ins -> ins.origin.copy() }.toMutableList(),
             triggers,
             activeAreas
-        ).also { player.editableDungeon = it }
+        ).also {
+            player.uniqueId.editableDungeon = it
+        }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     fun import(at: Vector3i): Boolean {
         if (instances.isNotEmpty()) return false
         val config = YamlConfiguration()
-        val file = File(plugin.dataFolder, "instances.yml")
+        val file = File(FWDungeonsPlugin.getInstance().dataFolder, "instances.yml")
         if (file.exists()) config.load(file)
         val dgconf = config.createSection("$id")
         dgconf.createSection("$0").run {
@@ -80,15 +88,14 @@ class FinalDungeon(
             set("y", at.y)
             set("z", at.z)
         }
-        createInstance(ConfigManager.dungeonWorld.getBlockAt(at.x, at.y, at.z))
-        @Suppress("BlockingMethodInNonBlockingContext")
-        (launchAsync { config.save(file) })
+        createInstance(Configuration.dungeonWorld.getBlockAt(at.x, at.y, at.z))
+        launchAsync { config.save(file) }
         return true
     }
 
     fun createInstance(target: Block): DungeonInstanceImpl {
         val id = instances.keys.firstGap()
-        val newInstance = DungeonInstanceImpl(id, this, target.vector3i)
+        val newInstance = DungeonInstanceImpl(id, this, Vector3i.ofBlock(target))
         newInstance.resetInstance()
         instances = instances + (id to newInstance)
         return newInstance
@@ -101,16 +108,16 @@ class FinalDungeon(
             set("description", dungeon.description)
             set("difficulty", dungeon.difficulty.toString())
             set("points", dungeon.points)
-            set("numberOfPlayers", dungeon.numberOfPlayers.toList())
+            set("numberOfPlayers", listOf(minPlayers, maxPlayers))
             set("width", dungeon.box.width)
             set("height", dungeon.box.height)
             set("depth", dungeon.box.depth)
             set("startingLocation", dungeon.startingLocation.toVector())
             dungeon.triggers.values.forEach {
-                it.toConfig(createSection("triggers.${it.id}"))
+                (it as TriggerImpl).toConfig(createSection("triggers.${it.id}"))
             }
             dungeon.activeAreas.values.forEach {
-                it.toConfig(createSection("activeAreas.${it.id}"))
+                (it as ActiveAreaImpl).toConfig(createSection("activeAreas.${it.id}"))
             }
             dungeon.chests.values.forEach {
                 (it as ChestImpl).toConfig(createSection("chests.${it.id}"))
@@ -151,20 +158,23 @@ class FinalDungeon(
                 }
                 ?: mapOf()
 
+            val noOfPlayers = getIntegerList("numberOfPlayers")
+
             val dungeon = FinalDungeon(
                 id,
                 getString("name")!!,
                 getString("description")!!,
                 Dungeon.Difficulty.fromString(getString("difficulty")!!)!!,
                 getInt("points", 0),
-                getIntegerList("numberOfPlayers").let { it.first()..it.last() },
+                noOfPlayers[0],
+                noOfPlayers[1],
                 Box(
                     Vector3i.ZERO,
                     getInt("width"),
                     getInt("height"),
                     getInt("depth")
                 ),
-                getVector("startingLocation")!!.toVector3i(),
+                Vector3i.ofBukkitVector(getVector("startingLocation")!!),
                 triggers,
                 activeAreas,
                 chests

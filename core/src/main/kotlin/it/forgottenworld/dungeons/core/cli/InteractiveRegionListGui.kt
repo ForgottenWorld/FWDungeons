@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.core.cli
 
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
+import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
 import it.forgottenworld.dungeons.core.utils.clickEvent
@@ -23,7 +23,7 @@ object InteractiveRegionListGui {
         append(" X ", ChatColor.RED)
         clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${interactiveEl.id}")
         append("]", ChatColor.WHITE)
-        if (interactiveEl is TriggerImpl) {
+        if (interactiveEl is Trigger) {
             append(" [", ChatColor.WHITE)
             if (interactiveEl.effectCode.isEmpty()) {
                 append(" NO CODE ", ChatColor.GRAY)

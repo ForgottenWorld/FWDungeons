@@ -13,12 +13,16 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 inline fun chatComponent(build: ComponentBuilder.() -> Unit): Array<BaseComponent> = ComponentBuilder()
-    .apply { build() }
+    .apply(build)
     .create()
 
-inline fun Player.sendJsonMessage(build: ComponentBuilder.() -> Unit) = spigot().sendMessage(*chatComponent(build))
+inline fun Player.sendJsonMessage(build: ComponentBuilder.() -> Unit) = spigot()
+    .sendMessage(*chatComponent(build))
 
-fun Player.sendJsonMessage(chatComponent: Array<BaseComponent>) = spigot().sendMessage(*chatComponent)
+fun Player.sendJsonMessage(chatComponent: Array<BaseComponent>) = spigot()
+    .sendMessage(*chatComponent)
+
+fun CommandSender.sendFWDMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
 
 fun ComponentBuilder.clickEvent(
     action: ClickEvent.Action,
@@ -39,5 +43,3 @@ fun ComponentBuilder.append(
     text: String,
     color: ChatColor
 ): ComponentBuilder = append(text).color(color)
-
-fun CommandSender.sendFWDMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")

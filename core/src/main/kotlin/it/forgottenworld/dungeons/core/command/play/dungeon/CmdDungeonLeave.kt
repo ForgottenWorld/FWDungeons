@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 class CmdDungeonLeave : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        sender.finalInstance?.let {
+        sender.uniqueId.finalInstance?.let {
             if (it.inGame) {
                 sender.sendFWDMessage(Strings.INSTANCE_HAS_STARTED_CANT_LEAVE_NOW)
                 return true

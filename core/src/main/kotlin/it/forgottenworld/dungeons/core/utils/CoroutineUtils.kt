@@ -3,6 +3,7 @@
 package it.forgottenworld.dungeons.core.utils
 
 import com.okkero.skedule.BukkitDispatcher
+import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,6 +13,6 @@ fun launch(f: suspend CoroutineScope.() -> Unit) = CoroutineScope(Dispatchers.mi
 
 fun launchAsync(f: suspend CoroutineScope.() -> Unit) = CoroutineScope(Dispatchers.async).launch(block = f)
 
-val Dispatchers.minecraft: CoroutineContext get() = BukkitDispatcher(plugin)
+val Dispatchers.minecraft: CoroutineContext get() = BukkitDispatcher(FWDungeonsPlugin.getInstance())
 
-val Dispatchers.async: CoroutineContext get() = BukkitDispatcher(plugin, true)
+val Dispatchers.async: CoroutineContext get() = BukkitDispatcher(FWDungeonsPlugin.getInstance(), true)

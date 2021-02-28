@@ -30,7 +30,7 @@ data class WarpbackData(
         val Player.currentWarpbackData get() = WarpbackData(
             gameMode,
             location.world.uid,
-            location.toVector3i()
+            Vector3i.ofLocation(location)
         )
     }
 }

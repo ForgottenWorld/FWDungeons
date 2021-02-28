@@ -2,11 +2,12 @@ package it.forgottenworld.dungeons.core.scripting
 
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import it.forgottenworld.dungeons.core.utils.MobSpawnData
+import it.forgottenworld.dungeons.core.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.core.utils.launch
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import kotlinx.coroutines.delay
 import net.md_5.bungee.api.ChatColor
+import org.bukkit.Bukkit
 import org.bukkit.Material
 
 object CodeParser {
@@ -40,19 +41,23 @@ object CodeParser {
             when {
                 code.startsWith(Consts.PREFIX_MYTHIC_MOB) -> {
                     if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
-                    mobs.add(MobSpawnData(
+                    mobs.add(
+                        MobSpawnData(
                         currentActiveArea,
                         code.removePrefix(Consts.PREFIX_MYTHIC_MOB),
                         true
-                    ))
+                    )
+                    )
                 }
                 code.startsWith(Consts.PREFIX_VANILLA_MOB) -> {
                     if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
-                    mobs.add(MobSpawnData(
+                    mobs.add(
+                        MobSpawnData(
                         currentActiveArea,
                         code.removePrefix(Consts.PREFIX_VANILLA_MOB),
                         false
-                    ))
+                    )
+                    )
                 }
                 code.startsWith(Consts.PREFIX_ACTIVE_AREA) -> {
                     currentActiveArea = code.removePrefix(Consts.PREFIX_ACTIVE_AREA).toInt()
@@ -85,14 +90,18 @@ object CodeParser {
                     }
                 }
                 Consts.CODE_FINISH -> parsed.add {
-                    it.players.forEach { p -> p?.sendFWDMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS) }
+                    for (uuid in it.players) {
+                        Bukkit.getPlayer(uuid)?.sendFWDMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS)
+                    }
                     launch {
                         delay(5000)
                         it.onInstanceFinish(true)
                     }
                 }
                 Consts.CODE_BREAK -> return { for (f in parsed) f(it) }
-                Consts.CODE_WHEN_DONE -> throw ScriptingException("whenDone used outside of combatObjective statement")
+                Consts.CODE_WHEN_DONE -> {
+                    throw ScriptingException("whenDone used outside of combatObjective statement")
+                }
                 else -> throw ScriptingException("Unrecognized code $code")
             }
         }
