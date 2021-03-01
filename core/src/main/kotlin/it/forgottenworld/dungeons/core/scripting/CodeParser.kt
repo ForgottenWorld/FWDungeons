@@ -1,13 +1,8 @@
 package it.forgottenworld.dungeons.core.scripting
 
-import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import it.forgottenworld.dungeons.core.game.objective.MobSpawnData
-import it.forgottenworld.dungeons.core.utils.launch
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
-import kotlinx.coroutines.delay
+import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import net.md_5.bungee.api.ChatColor
-import org.bukkit.Bukkit
 import org.bukkit.Material
 
 object CodeParser {
@@ -33,7 +28,7 @@ object CodeParser {
 
     private fun parseCombatObjective(
         codeIterator: Iterator<String>
-    ): (DungeonInstanceImpl) -> Unit {
+    ): (DungeonInstance) -> Unit {
         var currentActiveArea: Int? = null
         val mobs = mutableListOf<MobSpawnData>()
         while (codeIterator.hasNext()) {
@@ -72,8 +67,8 @@ object CodeParser {
         return {}
     }
 
-    private fun parseTokens(codeIterator: Iterator<String>): (DungeonInstanceImpl) -> Unit {
-        val parsed = mutableListOf<(DungeonInstanceImpl) -> Unit>()
+    private fun parseTokens(codeIterator: Iterator<String>): (DungeonInstance) -> Unit {
+        val parsed = mutableListOf<(DungeonInstance) -> Unit>()
         while (codeIterator.hasNext()) {
             when (val code = codeIterator.next()) {
                 Consts.CODE_COMBAT_OBJECTIVE -> {
@@ -90,13 +85,7 @@ object CodeParser {
                     }
                 }
                 Consts.CODE_FINISH -> parsed.add {
-                    for (uuid in it.players) {
-                        Bukkit.getPlayer(uuid)?.sendFWDMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS)
-                    }
-                    launch {
-                        delay(5000)
-                        it.onInstanceFinish(true)
-                    }
+                    it.onFinishTriggered()
                 }
                 Consts.CODE_BREAK -> return { for (f in parsed) f(it) }
                 Consts.CODE_WHEN_DONE -> {

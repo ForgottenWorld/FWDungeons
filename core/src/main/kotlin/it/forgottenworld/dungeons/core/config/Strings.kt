@@ -1,6 +1,10 @@
 package it.forgottenworld.dungeons.core.config
 
+import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.YamlConfiguration
+import java.io.File
+import java.io.InputStreamReader
 import kotlin.reflect.KProperty
 
 object Strings {
@@ -21,7 +25,23 @@ object Strings {
         }
     }
 
-    fun loadFromRes(conf: FileConfiguration) {
+    fun load(plugin: FWDungeonsPlugin) {
+        val stringsFile = File(plugin.dataFolder, "strings.yml")
+        val conf = YamlConfiguration()
+        if (!stringsFile.exists()) {
+            YamlConfiguration().run {
+                load(InputStreamReader(plugin.getResource("strings.it.yml")!!))
+                save(File(plugin.dataFolder, "strings.it.yml"))
+            }
+            conf.load(InputStreamReader(plugin.getResource("strings.yml")!!))
+            conf.save(stringsFile)
+        } else {
+            conf.load(stringsFile)
+        }
+        loadFromRes(conf)
+    }
+
+    private fun loadFromRes(conf: FileConfiguration) {
         for (rs in loadedResourceStrings) rs.value = null
         loadedResourceStrings.clear()
         stringMap = conf.getKeys(false).associateWith { conf.getString(it) ?: "STRING_$it" }

@@ -2,9 +2,8 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
+import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -32,7 +31,7 @@ class CmdDungeonEdit : PlayerCommand() {
             return true
         }
 
-        if (dungeon.instances.isEmpty()) {
+        if (DungeonManager.getDungeonInstances(dungeon).isEmpty()) {
             sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
             return true
         }

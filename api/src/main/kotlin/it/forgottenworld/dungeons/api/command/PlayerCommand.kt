@@ -11,7 +11,6 @@ abstract class PlayerCommand : TerminalCommand<Player> {
         } else {
             sender.sendMessage("This command may only be executed by players")
         }
-
         return true
     }
 }

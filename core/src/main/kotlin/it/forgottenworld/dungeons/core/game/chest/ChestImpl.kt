@@ -2,7 +2,6 @@ package it.forgottenworld.dungeons.core.game.chest
 
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Storage
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
@@ -16,7 +15,7 @@ data class ChestImpl(
     override val minItems: Int = 1,
     override val maxItems: Int = 4,
     override val itemChanceMap: Map<Material, Int> = mapOf()
-) : Chest, Storage.Storable {
+) : Chest {
 
     override val items: Array<ItemStack>
 

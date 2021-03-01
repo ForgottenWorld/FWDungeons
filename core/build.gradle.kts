@@ -1,14 +1,17 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
     kotlin("jvm")
     maven
-    // id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 dependencies {
     implementation(project(":api"))
+    implementation(Libs.Guice.guice)
+    implementation(Libs.Guice.assistedInject)
     compileOnly(Libs.paper)
     compileOnly(Libs.skedule)
     compileOnly(Libs.coroutinesCore)
@@ -20,6 +23,14 @@ dependencies {
 
 description = "fwdungeons"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+tasks.withType<ShadowJar> {
+    dependencies {
+        val included = setOf("it.forgottenworld", "com.google.inject")
+        exclude { !included.contains(it.moduleGroup) }
+    }
+    relocate("com.google.inject", "it.forgottenworld.dungeons.inject")
+}
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"

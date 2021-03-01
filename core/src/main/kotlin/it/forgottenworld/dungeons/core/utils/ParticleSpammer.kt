@@ -1,18 +1,18 @@
 package it.forgottenworld.dungeons.core.utils
 
 import it.forgottenworld.dungeons.api.math.Box
-import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.api.math.Vector3d
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import org.bukkit.Location
 import org.bukkit.Particle
+import org.bukkit.World
 
 class ParticleSpammer(
     private val particle: Particle,
     private val count: Int,
     private val interval: Long,
-    private val locations: List<Vector3i>
+    private val locations: List<Vector3d>,
+    world: World
 ) {
 
     private var job: Job? = null
@@ -23,19 +23,19 @@ class ParticleSpammer(
     }
 
     init {
+        start(world)
+    }
+
+    private fun start(world: World) {
         job = launch {
             while (true) {
                 delay(interval)
-                val world = Configuration.dungeonWorld
                 locations.forEach {
                     world.spawnParticle(
                         particle,
-                        Location(
-                            Configuration.dungeonWorld,
-                            it.x + 0.5,
-                            it.y + 0.5,
-                            it.z + 0.5
-                        ),
+                        it.x + 0.5,
+                        it.y + 0.5,
+                        it.z + 0.5,
                         count
                     )
                 }
@@ -45,33 +45,35 @@ class ParticleSpammer(
 
     companion object {
 
-        fun highlightBox(box: Box) {
+        fun highlightBox(box: Box, world: World) {
             repeatedlySpawnParticles(
                 Particle.COMPOSTER,
-                box.getAllBlocks(Configuration.dungeonWorld).map { it.location },
-                1,
-                500,
-                20
+                box.getCenterOfAllBlocks(),
+                20,
+                world
             )
         }
 
-        fun repeatedlySpawnParticles(
+        fun activeAreaSwirls(box: Box, world: World) {
+            repeatedlySpawnParticles(
+                Particle.PORTAL,
+                box.getCenterOfAllBlocks(),
+                4,
+                world
+            )
+        }
+
+        private fun repeatedlySpawnParticles(
             particle: Particle,
-            locations: Iterable<Location>,
-            count: Int,
-            interval: Long,
-            iterations: Int
+            locations: Iterable<Vector3d>,
+            iterations: Int,
+            world: World
         ) {
-            val world = Configuration.dungeonWorld
             launch {
                 for (i in 0 until iterations) {
-                    delay(interval)
+                    delay(500)
                     locations.forEach {
-                        world.spawnParticle(
-                            particle,
-                            it.clone().add(0.5, 0.5, 0.5),
-                            count
-                        )
+                        world.spawnParticle(particle, it.x, it.y, it.z, 1)
                     }
                 }
             }

@@ -5,8 +5,9 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.storage.Storage
 
-interface Dungeon {
+interface Dungeon : Storage.Storable {
     val id: Int
     val name: String
     val description: String

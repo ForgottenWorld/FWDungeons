@@ -1,10 +1,15 @@
 package it.forgottenworld.dungeons.core.config
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
-import it.forgottenworld.dungeons.core.config.Storage.toConfig
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
+import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
@@ -12,8 +17,12 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import javax.naming.ConfigurationException
 
-
-object Configuration {
+@Singleton
+class Configuration @Inject constructor(
+    private val plugin: FWDungeonsPlugin,
+    private val dungeonInstanceFactory: DungeonInstanceFactory,
+    private val storage: Storage,
+) {
 
     lateinit var config: FileConfiguration
 
@@ -28,16 +37,17 @@ object Configuration {
     val easyRankingIntegration by lazy { config.getBoolean("easyRankingIntegration", false) }
     var useEasyRanking = false
 
-    val fwEchelonIntegration by lazy { config.getBoolean("fwEchelonIntegration") }
+    val fwEchelonIntegration by lazy { config.getBoolean("fwEchelonIntegration", false) }
     var useFWEchelon = false
 
-    val vaultIntegration by lazy { config.getBoolean("vaultIntegration") }
+    val vaultIntegration by lazy { config.getBoolean("vaultIntegration", false) }
     var useVault = false
 
     val dungeonWorld
         get() = Bukkit.getWorld(dungeonWorldId) ?: error("Dungeon world not found!")
 
     private val dungeonNameRegex = Regex("""[0-9]+\.yml""")
+
     private fun loadDungeonConfigs(dataFolder: File) {
         val dir = File(dataFolder, "dungeons").apply {
             if (isFile || (!exists() && mkdir())) return
@@ -45,8 +55,8 @@ object Configuration {
         for (file in dir.list()?.filter { it.matches(dungeonNameRegex) } ?: return) {
             try {
                 val config = YamlConfiguration().apply { load(File(dir, file)) }
-                val dungeon = Storage.load<FinalDungeon>(config)
-                DungeonManager.finalDungeons[dungeon.id] = dungeon
+                val dungeon = storage.load(Dungeon::class, config)
+                DungeonManager.finalDungeons[dungeon.id] = dungeon as FinalDungeon
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -57,7 +67,7 @@ object Configuration {
     fun saveDungeonConfig(dungeon: FinalDungeon) {
         try {
             val dir = File(
-                FWDungeonsPlugin.getInstance().dataFolder,
+                plugin.dataFolder,
                 "dungeons"
             ).apply {
                 if (!exists() && !mkdir()) return
@@ -70,7 +80,7 @@ object Configuration {
             val conf = YamlConfiguration()
             if (existsAlready) conf.load(file)
 
-            dungeon.toConfig(conf)
+            storage.save(dungeon, conf)
             launchAsync { conf.save(file) }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -78,7 +88,7 @@ object Configuration {
     }
 
     private fun loadInstancesFromConfig() {
-        val file = File(FWDungeonsPlugin.getInstance().dataFolder, "instances.yml")
+        val file = File(plugin.dataFolder, "instances.yml")
         val conf = YamlConfiguration()
         if (file.exists()) conf.load(file) else file.createNewFile()
 
@@ -92,16 +102,25 @@ object Configuration {
                 continue
             }
             for (iId in sec.getKeys(false)) {
-                DungeonInstanceImpl.fromConfig(dId, sec.getConfigurationSection(iId)!!)
+                storage.load<DungeonInstance>(sec.getConfigurationSection(iId)!!)
             }
         }
     }
 
     fun loadData() {
-        FWDungeonsPlugin.getInstance().reloadConfig()
-        FWDungeonsPlugin.getInstance().loadStrings()
-        config = FWDungeonsPlugin.getInstance().config
-        loadDungeonConfigs(FWDungeonsPlugin.getInstance().dataFolder)
+        val logger = Bukkit.getLogger()
+
+        logger.info("Loading configuration...")
+        plugin.reloadConfig()
+
+        logger.info("    Loading strings...")
+        Strings.load(plugin)
+        config = plugin.config
+
+        logger.info("    Loading dungeons...")
+        loadDungeonConfigs(plugin.dataFolder)
+
+        logger.info("    Loading instances...")
         loadInstancesFromConfig()
     }
 }

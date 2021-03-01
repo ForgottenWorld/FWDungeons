@@ -1,6 +1,8 @@
 package it.forgottenworld.dungeons.api.game.unlockables
 
-interface UnlockableSeries {
+import it.forgottenworld.dungeons.api.storage.Storage
+
+interface UnlockableSeries : Storage.Storable {
     val id: Int
     val name: String
     val description: String

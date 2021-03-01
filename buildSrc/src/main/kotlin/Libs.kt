@@ -6,4 +6,11 @@ object Libs {
     const val easyRanking = "com.github.ForgottenWorld:EasyRanking:0.2.0"
     const val fwEchelonApi = "com.github.ForgottenWorld.FWEchelon:fwechelon-api:v0.1.0"
     const val vault = "com.github.MilkBowl:VaultAPI:1.7"
+
+    object Guice {
+        const val version = "5.0.1"
+
+        const val guice = "com.google.inject:guice:$version"
+        const val assistedInject = "com.google.inject.extensions:guice-assistedinject:$version"
+    }
 }

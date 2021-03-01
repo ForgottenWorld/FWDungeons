@@ -1,20 +1,16 @@
 package it.forgottenworld.dungeons.core
 
-import it.forgottenworld.dungeons.core.game.BypassAttemptHandler
+import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.game.RespawnManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.detection.BypassAttemptHandler
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerRespawnEvent
-import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.event.player.*
 
 
 class SpigotEventDispatcher : Listener {

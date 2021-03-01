@@ -1,25 +1,24 @@
 package it.forgottenworld.dungeons.core.game.objective
 
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
+import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import org.bukkit.Bukkit.getEntity
 import org.bukkit.entity.LivingEntity
 import java.util.*
 
-class CombatObjective(
-    val instance: DungeonInstanceImpl,
+class CombatObjectiveImpl(
+    override val instance: DungeonInstance,
     private val mobsToKill: MutableList<UUID>,
-    var onAllKilled: (DungeonInstanceImpl) -> Unit
-) {
+    override var onAllKilled: (DungeonInstance) -> Unit
+) : CombatObjective {
 
-    private var aborting = false
-    private val shouldBeRemoved
-        get() = mobsToKill.isEmpty()
+    override var aborting = false
 
-    fun onMobKilled(uuid: UUID) {
+    override fun onMobKilled(uuid: UUID) {
         mobsToKill.remove(uuid)
         uuid.combatObjective = null
-        if (!shouldBeRemoved) return
+        if (mobsToKill.isNotEmpty()) return
         if (aborting) {
             aborting = false
             return
@@ -28,7 +27,7 @@ class CombatObjective(
         instance.instanceObjectives.remove(this)
     }
 
-    fun abort() {
+    override fun abort() {
         aborting = true
         mobsToKill
             .map { getEntity(it) }

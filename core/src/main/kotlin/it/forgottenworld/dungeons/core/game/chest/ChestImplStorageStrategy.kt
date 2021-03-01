@@ -1,13 +1,14 @@
 package it.forgottenworld.dungeons.core.game.chest
 
+import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Storage
+import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 
-class ChestImplStorageStrategy : Storage.StorageStrategy<ChestImpl> {
+class ChestImplStorageStrategy : Storage.StorageStrategy<Chest> {
 
-    override fun toConfig(obj: ChestImpl, config: ConfigurationSection) {
+    override fun toConfig(obj: Chest, config: ConfigurationSection, storage: Storage) {
         config.set("id", obj.id)
         config.set("position", obj.position.toVector())
         config.set("minItems", obj.minItems)
@@ -19,7 +20,7 @@ class ChestImplStorageStrategy : Storage.StorageStrategy<ChestImpl> {
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection): ChestImpl {
+    override fun fromConfig(config: ConfigurationSection, storage: Storage): ChestImpl {
         val id = config.getInt("id")
         val position = Vector3i.ofBukkitVector(config.getVector("position")!!)
         val label = config.getString("label")

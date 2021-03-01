@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 

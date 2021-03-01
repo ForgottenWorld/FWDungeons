@@ -1,24 +1,25 @@
 package it.forgottenworld.dungeons.core.integrations
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.echelonapi.FWEchelon
 import it.forgottenworld.echelonapi.mutexactivity.MutexActivity
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
-object FWEchelonUtils {
-
-    const val MUTEX_ACTIVITY_NAME = "FWDungeons"
+class FWEchelonUtils @Inject constructor(
+    private val configuration: Configuration
+) {
 
     fun checkFWEchelonIntegration() {
         val logger = Bukkit.getLogger()
 
         logger.info("Checking for FWEchelon integration...")
-        if (!Configuration.fwEchelonIntegration) {
+        if (!configuration.fwEchelonIntegration) {
             logger.info("FWEchelon integration is not enabled")
             return
         }
@@ -35,14 +36,14 @@ object FWEchelonUtils {
             .mutexActivityService
             .registerMutexActivity(FWDungeonsMutexActivity())
 
-        Configuration.useFWEchelon = true
+        configuration.useFWEchelon = true
     }
 
-    fun isPlayerFree(player: Player) = !Configuration.useFWEchelon ||
+    fun isPlayerFree(player: Player) = !configuration.useFWEchelon ||
         !FWEchelon.api.mutexActivityService.isPlayerInMutexActivity(player)
 
     fun playerIsNoLongerFree(player: Player) {
-        if (!Configuration.useFWEchelon) return
+        if (!configuration.useFWEchelon) return
         FWEchelon
             .api
             .mutexActivityService
@@ -54,7 +55,7 @@ object FWEchelonUtils {
     }
 
     fun playerIsNowFree(player: Player) {
-        if (!Configuration.useFWEchelon) return
+        if (!configuration.useFWEchelon) return
         FWEchelon
             .api
             .mutexActivityService
@@ -93,6 +94,10 @@ object FWEchelonUtils {
             }
             inst.rescuePlayer(player)
         }
+    }
+
+    companion object {
+        const val MUTEX_ACTIVITY_NAME = "FWDungeons"
     }
 
 }

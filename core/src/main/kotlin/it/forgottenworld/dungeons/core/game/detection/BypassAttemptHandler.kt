@@ -1,7 +1,7 @@
-package it.forgottenworld.dungeons.core.game
+package it.forgottenworld.dungeons.core.game.detection
 
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player

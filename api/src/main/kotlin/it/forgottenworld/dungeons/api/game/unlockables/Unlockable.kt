@@ -1,8 +1,9 @@
 package it.forgottenworld.dungeons.api.game.unlockables
 
+import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Material
 
-interface Unlockable {
+interface Unlockable : Storage.Storable {
     val seriesId: Int
     val order: Int
     val message: String

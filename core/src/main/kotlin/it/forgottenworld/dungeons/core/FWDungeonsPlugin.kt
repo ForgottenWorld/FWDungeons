@@ -1,63 +1,53 @@
 package it.forgottenworld.dungeons.core
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.core.command.edit.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.core.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.integrations.VaultUtils
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.File
-import java.io.InputStreamReader
 
 class FWDungeonsPlugin : JavaPlugin() {
 
+    @Inject private lateinit var vaultUtils: VaultUtils
+    @Inject private lateinit var easyRankingUtils: EasyRankingUtils
+    @Inject private lateinit var fwEchelonUtils: FWEchelonUtils
+
+    @Inject private lateinit var fwDungeonsEditCommand: FWDungeonsEditCommand
+    @Inject private lateinit var fWDungeonsPlayCommand: FWDungeonsPlayCommand
+    @Inject private lateinit var configuration: Configuration
+
     override fun onEnable() {
+
+        logger.info("Injecting dependencies...")
+
+        MainModule(this)
+            .createInjector()
+            .injectMembers(this)
+
+        logger.info("Saving default config...")
+
         saveDefaultConfig()
 
-        logger.info("Loading data...")
-
-        loadStrings()
-        Configuration.loadData()
+        configuration.loadData()
 
         logger.info("Registering commands...")
 
-        getCommand("fwdungeonsedit")!!.setExecutor(FWDungeonsEditCommand())
-        getCommand("fwdungeons")!!.setExecutor(FWDungeonsPlayCommand())
+        getCommand("fwdungeonsedit")!!.setExecutor(fwDungeonsEditCommand)
+        getCommand("fwdungeons")!!.setExecutor(fWDungeonsPlayCommand)
 
         logger.info("Registering events...")
 
         server.pluginManager.registerEvents(SpigotEventDispatcher(), this)
 
-        EasyRankingUtils.checkEasyRankingIntegration()
-        FWEchelonUtils.checkFWEchelonIntegration()
-        VaultUtils.checkVaultIntegration()
+        easyRankingUtils.checkEasyRankingIntegration()
+        fwEchelonUtils.checkFWEchelonIntegration()
+        vaultUtils.checkVaultIntegration()
     }
-
-    fun loadStrings() {
-        val stringsFile = File(dataFolder, "strings.yml")
-        val conf = YamlConfiguration()
-        if (!stringsFile.exists()) {
-            YamlConfiguration().run {
-                load(InputStreamReader(getResource("strings.it.yml")!!))
-                save(File(dataFolder, "strings.it.yml"))
-            }
-            conf.load(InputStreamReader(getResource("strings.yml")!!))
-            conf.save(stringsFile)
-        } else conf.load(stringsFile)
-        Strings.loadFromRes(conf)
-    }
-
 
     override fun onDisable() {
         logger.info("Disabling FWDungeons...")
     }
-
-    companion object {
-
-        fun getInstance() = getPlugin(FWDungeonsPlugin::class.java)
-    }
-
 }

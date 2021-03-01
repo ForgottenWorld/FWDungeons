@@ -1,5 +1,7 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
+import com.google.inject.assistedinject.Assisted
+import com.google.inject.assistedinject.AssistedInject
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
@@ -10,12 +12,14 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
-import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
+import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerFactory
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -24,22 +28,67 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import java.io.File
 
-class EditableDungeon(
-    editor: Player,
-    override var id: Int = NEW_DUNGEON_TEMP_ID,
-    override var name: String = "NEW DUNGEON",
-    override var description: String = "",
-    override var difficulty: Dungeon.Difficulty = Dungeon.Difficulty.MEDIUM,
-    override var minPlayers: Int = 1,
-    override var maxPlayers: Int = 2,
-    override var box: Box? = null,
-    override var startingLocation: Vector3i? = null,
-    override var points: Int = 0,
-    var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
-    triggers: Map<Int, Trigger> = mutableMapOf(),
-    activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
-    override var chests: MutableMap<Int, Chest> = mutableMapOf()
+class EditableDungeon @AssistedInject constructor(
+    @Assisted editor: Player,
+    @Assisted override var id: Int = NEW_DUNGEON_TEMP_ID,
+    @Assisted override var name: String = "NEW DUNGEON",
+    @Assisted override var description: String = "",
+    @Assisted override var difficulty: Dungeon.Difficulty = Dungeon.Difficulty.MEDIUM,
+    @Assisted override var minPlayers: Int = 1,
+    @Assisted override var maxPlayers: Int = 2,
+    @Assisted override var box: Box? = null,
+    @Assisted override var startingLocation: Vector3i? = null,
+    @Assisted override var points: Int = 0,
+    @Assisted var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
+    @Assisted triggers: Map<Int, Trigger> = mutableMapOf(),
+    @Assisted activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
+    @Assisted override var chests: MutableMap<Int, Chest> = mutableMapOf(),
+    private val activeAreaFactory: ActiveAreaFactory,
+    private val triggerFactory: TriggerFactory,
+    private val plugin: FWDungeonsPlugin,
+    private val configuration: Configuration,
+    private val namespacedKeys: NamespacedKeys,
+    private val dungeonFactory: DungeonFactory,
+    private val dungeonInstanceFactory: DungeonInstanceFactory
 ) : Dungeon {
+
+    @AssistedInject
+    constructor(
+        @Assisted editor: Player,
+        @Assisted dungeon: Dungeon,
+        activeAreaFactory: ActiveAreaFactory,
+        triggerFactory: TriggerFactory,
+        plugin: FWDungeonsPlugin,
+        configuration: Configuration,
+        namespacedKeys: NamespacedKeys,
+        dungeonFactory: DungeonFactory,
+        dungeonInstanceFactory: DungeonInstanceFactory
+    ) : this(
+        editor,
+        dungeon.id,
+        dungeon.name,
+        dungeon.description,
+        dungeon.difficulty,
+        dungeon.minPlayers,
+        dungeon.maxPlayers,
+        dungeon.box!!.copy(),
+        dungeon.startingLocation!!.copy(),
+        dungeon.points,
+        DungeonManager.getDungeonInstances(dungeon)
+            .values
+            .map { it.origin }
+            .toMutableList(),
+        dungeon.triggers,
+        dungeon.activeAreas,
+        dungeon.chests.toMutableMap(),
+        activeAreaFactory,
+        triggerFactory,
+        plugin,
+        configuration,
+        namespacedKeys,
+        dungeonFactory,
+        dungeonInstanceFactory
+    )
 
     private val editor = editor.uniqueId
 
@@ -72,31 +121,12 @@ class EditableDungeon(
     private var activeAreaParticleSpammer: ParticleSpammer? = null
 
     fun finalize(): FinalDungeon {
-        val newId = if (id == NEW_DUNGEON_TEMP_ID ||
-            DungeonManager.finalDungeons.containsKey(id)
-        ) {
-            DungeonManager.finalDungeons.keys.firstGap()
-        } else {
-            id
+        if (id == NEW_DUNGEON_TEMP_ID) {
+            id = DungeonManager.finalDungeons.keys.firstGap()
         }
-
-        val finalDungeon = FinalDungeon(
-            newId,
-            name,
-            description,
-            difficulty,
-            points,
-            minPlayers,
-            maxPlayers,
-            box!!.clone(),
-            startingLocation!!.copy(),
-            triggers,
-            activeAreas,
-            chests
-        )
-
-        DungeonManager.finalDungeons[newId] = finalDungeon
-        saveToConfigAndCreateInstances(newId, finalDungeon)
+        val finalDungeon = dungeonFactory.createFinal(this)
+        DungeonManager.finalDungeons[id] = finalDungeon
+        saveToConfigAndCreateInstances(id, finalDungeon)
         onDestroy()
         return finalDungeon
     }
@@ -105,19 +135,23 @@ class EditableDungeon(
     private fun saveToConfigAndCreateInstances(newId: Int, finalDungeon: FinalDungeon) {
         try {
             val config = YamlConfiguration()
-            val file = File(FWDungeonsPlugin.getInstance().dataFolder, "instances.yml")
+            val file = File(plugin.dataFolder, "instances.yml")
             if (file.exists()) config.load(file)
             val dgConf = config.createSection("$newId")
-            finalDungeon.instances = finalInstanceLocations.withIndex().map { (k, v) ->
-                dgConf.createSection("$k").run {
-                    set("x", v.x)
-                    set("y", v.y)
-                    set("z", v.z)
+            DungeonManager.setDungeonInstances(
+                finalDungeon,
+                finalInstanceLocations.withIndex().associate { (k, v) ->
+                    dgConf.createSection("$k").run {
+                        set("x", v.x)
+                        set("y", v.y)
+                        set("z", v.z)
+                    }
+                    k to dungeonInstanceFactory.create(
+                        finalDungeon,
+                        Vector3i.ofBlock(configuration.dungeonWorld.getBlockAt(v.x, v.y, v.z))
+                    )
                 }
-                k to finalDungeon.createInstance(
-                    Configuration.dungeonWorld.getBlockAt(v.x, v.y, v.z)
-                )
-            }.toMap()
+            )
             launchAsync { config.save(file) }
         } catch (e: Exception) {
             Bukkit.getLogger().warning(e.message)
@@ -143,7 +177,12 @@ class EditableDungeon(
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
-        val activeArea = ActiveAreaImpl(id, box.withContainerOriginZero(testOrigin))
+        val activeArea = activeAreaFactory.create(
+            id,
+            box.withContainerOriginZero(testOrigin),
+            Material.AIR,
+            null
+        )
         activeAreas = activeAreas.plus(id to activeArea)
         highlightNewInteractiveRegion(activeArea)
         return id
@@ -167,7 +206,7 @@ class EditableDungeon(
 
     private fun newTrigger(box: Box): Int {
         val id = triggers.keys.firstGap()
-        val trigger = TriggerImpl(id, box.withContainerOriginZero(testOrigin))
+        val trigger = triggerFactory.create(id, box.withContainerOriginZero(testOrigin))
         highlightNewInteractiveRegion(trigger)
         triggers = triggers.plus(id to trigger)
         return id
@@ -213,7 +252,10 @@ class EditableDungeon(
     }.toString().dropLast(2)
 
     private fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
-        ParticleSpammer.highlightBox(interactiveRegion.withContainerOrigin(Vector3i.ZERO, testOrigin).box)
+        ParticleSpammer.highlightBox(
+            interactiveRegion.withContainerOrigin(Vector3i.ZERO, testOrigin).box,
+            configuration.dungeonWorld
+        )
     }
 
     private fun updateTriggerParticleSpammers(newTriggers: Collection<Trigger>) {
@@ -236,7 +278,13 @@ class EditableDungeon(
             val box = it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin)
             it.box.getFrame(box)
         }
-        return ParticleSpammer(particle, 1, 500, frameBlocks)
+        return ParticleSpammer(
+            particle,
+            1,
+            500,
+            frameBlocks,
+            configuration.dungeonWorld
+        )
     }
 
     private fun updateParticleSpammers() {
@@ -265,11 +313,11 @@ class EditableDungeon(
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
 
         val isTriggerWand = persistentDataContainer
-            .get(NamespacedKeys.TRIGGER_TOOL, PersistentDataType.SHORT)
+            .get(namespacedKeys.triggerTool, PersistentDataType.SHORT)
             ?.toShort() == 1.toShort()
 
         val isActiveAreaWand = !isTriggerWand && persistentDataContainer
-            .get(NamespacedKeys.ACTIVE_AREA_TOOL, PersistentDataType.SHORT)
+            .get(namespacedKeys.activeAreaTool, PersistentDataType.SHORT)
             ?.toShort() == 1.toShort()
 
         if (!isTriggerWand && !isActiveAreaWand) return
@@ -287,6 +335,6 @@ class EditableDungeon(
     }
 
     companion object {
-        private const val NEW_DUNGEON_TEMP_ID = -69420
+        const val NEW_DUNGEON_TEMP_ID = -69420
     }
 }

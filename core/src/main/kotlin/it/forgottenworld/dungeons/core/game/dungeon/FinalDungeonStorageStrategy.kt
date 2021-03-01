@@ -1,52 +1,51 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Storage
-import it.forgottenworld.dungeons.core.config.Storage.toConfig
+import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.core.game.chest.ChestImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import org.bukkit.configuration.ConfigurationSection
 
-class FinalDungeonStorageStrategy: Storage.StorageStrategy<FinalDungeon> {
+class FinalDungeonStorageStrategy @Inject constructor(
+    private val dungeonFactory: DungeonFactory
+): Storage.StorageStrategy<Dungeon> {
 
-    override fun toConfig(obj: FinalDungeon, config: ConfigurationSection) {
-
-        config.run {
-            set("id", obj.id)
-            set("name", obj.name)
-            set("description", obj.description)
-            set("difficulty", obj.difficulty.toString())
-            set("points", obj.points)
-            set("numberOfPlayers", listOf(
-                obj.minPlayers,
-                obj.maxPlayers
-            ))
-            set("width", obj.box.width)
-            set("height", obj.box.height)
-            set("depth", obj.box.depth)
-            set("startingLocation", obj.startingLocation.toVector())
-            obj.triggers.values.forEach {
-                (it as TriggerImpl).toConfig(createSection("triggers.${it.id}"))
-            }
-            obj.activeAreas.values.forEach {
-                (it as ActiveAreaImpl).toConfig(createSection("activeAreas.${it.id}"))
-            }
-            obj.chests.values.forEach {
-                (it as ChestImpl).toConfig(createSection("chests.${it.id}"))
-            }
+    override fun toConfig(obj: Dungeon, config: ConfigurationSection, storage: Storage) {
+        config.set("id", obj.id)
+        config.set("name", obj.name)
+        config.set("description", obj.description)
+        config.set("difficulty", obj.difficulty.toString())
+        config.set("points", obj.points)
+        config.set("numberOfPlayers", listOf(
+            obj.minPlayers,
+            obj.maxPlayers
+        ))
+        config.set("width", obj.box!!.width)
+        config.set("height", obj.box!!.height)
+        config.set("depth", obj.box!!.depth)
+        config.set("startingLocation", obj.startingLocation!!.toVector())
+        obj.triggers.values.forEach {
+            storage.save(it, config.createSection("triggers.${it.id}"))
+        }
+        obj.activeAreas.values.forEach {
+            storage.save(it, config.createSection("activeAreas.${it.id}"))
+        }
+        obj.chests.values.forEach {
+            storage.save(it, config.createSection("chests.${it.id}"))
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection) = config.run {
+    override fun fromConfig(config: ConfigurationSection, storage: Storage) = config.run {
         val triggers = getConfigurationSection("triggers")
             ?.getKeys(false)
             ?.map { it.toInt() }
             ?.associateWith {
-                val sec = getConfigurationSection("triggers.$it")!!
-                Storage.load<TriggerImpl>(sec)
+                storage.load<TriggerImpl>(getConfigurationSection("triggers.$it")!!)
             }
             ?: mapOf()
 
@@ -54,8 +53,7 @@ class FinalDungeonStorageStrategy: Storage.StorageStrategy<FinalDungeon> {
             ?.getKeys(false)
             ?.map { it.toInt() }
             ?.associateWith {
-                val sec = getConfigurationSection("activeAreas.$it")!!
-                Storage.load<ActiveAreaImpl>(sec)
+                storage.load<ActiveArea>(getConfigurationSection("activeAreas.$it")!!)
             }
             ?: mapOf()
 
@@ -63,13 +61,13 @@ class FinalDungeonStorageStrategy: Storage.StorageStrategy<FinalDungeon> {
             ?.getKeys(false)
             ?.map { it.toInt() }
             ?.associateWith {
-                Storage.load<ChestImpl>(getConfigurationSection("chests.$it")!!)
+                storage.load<ChestImpl>(getConfigurationSection("chests.$it")!!)
             }
             ?: mapOf()
 
         val noOfPlayers = getIntegerList("numberOfPlayers")
 
-        val dungeon = FinalDungeon(
+        val dungeon = dungeonFactory.createFinal(
             getInt("id"),
             getString("name")!!,
             getString("description")!!,

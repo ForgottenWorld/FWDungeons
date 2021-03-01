@@ -1,13 +1,16 @@
 package it.forgottenworld.dungeons.core.game.unlockables
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
-import it.forgottenworld.dungeons.core.config.Storage
+import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 
-class UnlockableImplStorageStrategy : Storage.StorageStrategy<UnlockableImpl> {
+class UnlockableStorageStrategy @Inject constructor(
+    private val unlockableFactory: UnlockableFactory
+) : Storage.StorageStrategy<Unlockable> {
 
-    override fun toConfig(obj: UnlockableImpl, config: ConfigurationSection) {
+    override fun toConfig(obj: Unlockable, config: ConfigurationSection, storage: Storage) {
         config.set("seriesId", obj.seriesId)
         config.set("order", obj.order)
         config.set("message", obj.message)
@@ -26,7 +29,7 @@ class UnlockableImplStorageStrategy : Storage.StorageStrategy<UnlockableImpl> {
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection) = UnlockableImpl(
+    override fun fromConfig(config: ConfigurationSection, storage: Storage) = unlockableFactory.create(
         config.getInt("seriesId"),
         config.getInt("order"),
         config.getString("message")!!,

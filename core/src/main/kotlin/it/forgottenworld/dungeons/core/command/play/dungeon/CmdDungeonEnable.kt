@@ -2,8 +2,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -35,7 +34,7 @@ class CmdDungeonEnable : SenderCommand() {
             return true
         }
 
-        if (dungeon.instances.isEmpty()) {
+        if (DungeonManager.getDungeonInstances(dungeon).isEmpty()) {
             sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
             return true
         }

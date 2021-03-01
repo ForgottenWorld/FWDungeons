@@ -1,11 +1,14 @@
 package it.forgottenworld.dungeons.core.command.edit.helpers
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.ACTIVE_AREA
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.TRIGGER
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -13,7 +16,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-object InteractiveRegionCommandHelper {
+@Singleton
+class InteractiveRegionCommandHelper @Inject constructor(
+    private val namespacedKeys: NamespacedKeys,
+    private val configuration: Configuration
+) {
 
     private val Type.singular get() = when(this) {
         ACTIVE_AREA -> "active area"
@@ -137,7 +144,10 @@ object InteractiveRegionCommandHelper {
         val irs = if (type == TRIGGER) dungeon.triggers else dungeon.activeAreas
         if (!dungeon.hasTestOrigin) return
         val ir = irs[ieId] ?: return
-        ParticleSpammer.highlightBox(ir.box.withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin))
+        ParticleSpammer.highlightBox(
+            ir.box.withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin),
+            configuration.dungeonWorld
+        )
 
         sender.sendFWDMessage(Strings.HIGHLIGHTED_IE_WITH_ID.format(type.plural, ieId))
     }
@@ -148,7 +158,7 @@ object InteractiveRegionCommandHelper {
             return
         }
         val material = if (type == TRIGGER) Material.GOLDEN_HOE else Material.GOLDEN_SHOVEL
-        val nsk = if (type == TRIGGER) NamespacedKeys.TRIGGER_TOOL else NamespacedKeys.ACTIVE_AREA_TOOL
+        val nsk = if (type == TRIGGER) namespacedKeys.triggerTool else namespacedKeys.activeAreaTool
         val itemStack = ItemStack(material, 1).apply {
             itemMeta = itemMeta.apply {
                 persistentDataContainer.set(nsk, PersistentDataType.SHORT, 1)

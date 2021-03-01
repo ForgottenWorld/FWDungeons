@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.game.unlockables
 
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
-import it.forgottenworld.dungeons.core.config.Storage
+import it.forgottenworld.dungeons.api.storage.Storage
 
 data class UnlockableSeriesImpl(
     override val id: Int,

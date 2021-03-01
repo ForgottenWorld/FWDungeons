@@ -1,57 +1,65 @@
 package it.forgottenworld.dungeons.core.command.edit
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.BranchingCommand
 import it.forgottenworld.dungeons.api.command.TreeCommand
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaHl
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaLabel
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaList
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaPos1
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaPos2
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaUnmake
-import it.forgottenworld.dungeons.core.command.edit.activearea.CmdActiveAreaWand
+import it.forgottenworld.dungeons.core.command.edit.activearea.*
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestAdd
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestLabel
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestRemove
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonCreate
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonDescription
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonDifficulty
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonDiscard
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonEdit
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonHlFrames
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonImport
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonInstanceAdd
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonInstanceRemove
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonName
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonNumberOfPlayers
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonPoints
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonPos1
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonPos2
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonSave
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonSetStart
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonVolumeMap
-import it.forgottenworld.dungeons.core.command.edit.dungeon.CmdDungeonWriteOut
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerCode
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerHl
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerLabel
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerList
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerPos1
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerPos2
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerUnmake
-import it.forgottenworld.dungeons.core.command.edit.trigger.CmdTriggerWand
+import it.forgottenworld.dungeons.core.command.edit.dungeon.*
+import it.forgottenworld.dungeons.core.command.edit.trigger.*
 
-class FWDungeonsEditCommand : TreeCommand(
+class FWDungeonsEditCommand @Inject constructor(
+    cmdActiveAreaPos1: CmdActiveAreaPos1,
+    cmdActiveAreaPos2: CmdActiveAreaPos2,
+    cmdActiveAreaUnmake: CmdActiveAreaUnmake,
+    cmdActiveAreaLabel: CmdActiveAreaLabel,
+    cmdActiveAreaWand: CmdActiveAreaWand,
+    cmdActiveAreaList: CmdActiveAreaList,
+    cmdActiveAreaHl: CmdActiveAreaHl,
+    cmdTriggerPos1: CmdTriggerPos1,
+    cmdTriggerPos2: CmdTriggerPos2,
+    cmdTriggerUnmake: CmdTriggerUnmake,
+    cmdTriggerLabel: CmdTriggerLabel,
+    cmdTriggerWand: CmdTriggerWand,
+    cmdTriggerList: CmdTriggerList,
+    cmdTriggerHl: CmdTriggerHl,
+    cmdTriggerCode: CmdTriggerCode,
+    cmdChestAdd: CmdChestAdd,
+    cmdChestRemove: CmdChestRemove,
+    cmdChestLabel: CmdChestLabel,
+    cmdDungeonCreate: CmdDungeonCreate,
+    cmdDungeonEdit: CmdDungeonEdit,
+    cmdDungeonName: CmdDungeonName,
+    cmdDungeonPos1: CmdDungeonPos1,
+    cmdDungeonPos2: CmdDungeonPos2,
+    cmdDungeonInstanceAdd: CmdDungeonInstanceAdd,
+    cmdDungeonInstanceRemove: CmdDungeonInstanceRemove,
+    cmdDungeonWriteOut: CmdDungeonWriteOut,
+    cmdDungeonSetStart: CmdDungeonSetStart,
+    cmdDungeonDiscard: CmdDungeonDiscard,
+    cmdDungeonDifficulty: CmdDungeonDifficulty,
+    cmdDungeonDescription: CmdDungeonDescription,
+    cmdDungeonNumberOfPlayers: CmdDungeonNumberOfPlayers,
+    cmdDungeonSave: CmdDungeonSave,
+    cmdDungeonPoints: CmdDungeonPoints,
+    cmdDungeonHlFrames: CmdDungeonHlFrames,
+    cmdDungeonVolumeMap: CmdDungeonVolumeMap,
+    cmdDungeonImport: CmdDungeonImport
+) : TreeCommand(
     "fwdungeonsedit",
     BranchingCommand(
         mapOf(
             *(BranchingCommand(
                 mapOf(
-                    "pos1" to CmdActiveAreaPos1(),
-                    "pos2" to CmdActiveAreaPos2(),
-                    "unmake" to CmdActiveAreaUnmake(),
-                    "label" to CmdActiveAreaLabel(),
-                    "wand" to CmdActiveAreaWand(),
-                    "list" to CmdActiveAreaList(),
-                    "hl" to CmdActiveAreaHl()
+                    "pos1" to cmdActiveAreaPos1,
+                    "pos2" to cmdActiveAreaPos2,
+                    "unmake" to cmdActiveAreaUnmake,
+                    "label" to cmdActiveAreaLabel,
+                    "wand" to cmdActiveAreaWand,
+                    "list" to cmdActiveAreaList,
+                    "hl" to cmdActiveAreaHl
                 )
             ).let {
                 arrayOf(
@@ -61,14 +69,14 @@ class FWDungeonsEditCommand : TreeCommand(
             }),
             *(BranchingCommand(
                 mapOf(
-                    "pos1" to CmdTriggerPos1(),
-                    "pos2" to CmdTriggerPos2(),
-                    "unmake" to CmdTriggerUnmake(),
-                    "label" to CmdTriggerLabel(),
-                    "wand" to CmdTriggerWand(),
-                    "list" to CmdTriggerList(),
-                    "hl" to CmdTriggerHl(),
-                    "code" to CmdTriggerCode()
+                    "pos1" to cmdTriggerPos1,
+                    "pos2" to cmdTriggerPos2,
+                    "unmake" to cmdTriggerUnmake,
+                    "label" to cmdTriggerLabel,
+                    "wand" to cmdTriggerWand,
+                    "list" to cmdTriggerList,
+                    "hl" to cmdTriggerHl,
+                    "code" to cmdTriggerCode
                 )
             ).let {
                 arrayOf(
@@ -78,9 +86,9 @@ class FWDungeonsEditCommand : TreeCommand(
             }),
             *(BranchingCommand(
                 mapOf(
-                    "add" to CmdChestAdd(),
-                    "remove" to CmdChestRemove(),
-                    "label" to CmdChestLabel()
+                    "add" to cmdChestAdd,
+                    "remove" to cmdChestRemove,
+                    "label" to cmdChestLabel
                 )
             ).let {
                 arrayOf(
@@ -90,24 +98,24 @@ class FWDungeonsEditCommand : TreeCommand(
             }),
             *(BranchingCommand(
                 mapOf(
-                    "create" to CmdDungeonCreate(),
-                    "edit" to CmdDungeonEdit(),
-                    "name" to CmdDungeonName(),
-                    "pos1" to CmdDungeonPos1(),
-                    "pos2" to CmdDungeonPos2(),
-                    "instadd" to CmdDungeonInstanceAdd(),
-                    "instremove" to CmdDungeonInstanceRemove(),
-                    "writeout" to CmdDungeonWriteOut(),
-                    "setstart" to CmdDungeonSetStart(),
-                    "discard" to CmdDungeonDiscard(),
-                    "difficulty" to CmdDungeonDifficulty(),
-                    "description" to CmdDungeonDescription(),
-                    "players" to CmdDungeonNumberOfPlayers(),
-                    "save" to CmdDungeonSave(),
-                    "points" to CmdDungeonPoints(),
-                    "hlframes" to CmdDungeonHlFrames(),
-                    "volmap" to CmdDungeonVolumeMap(),
-                    "import" to CmdDungeonImport()
+                    "create" to cmdDungeonCreate,
+                    "edit" to cmdDungeonEdit,
+                    "name" to cmdDungeonName,
+                    "pos1" to cmdDungeonPos1,
+                    "pos2" to cmdDungeonPos2,
+                    "instadd" to cmdDungeonInstanceAdd,
+                    "instremove" to cmdDungeonInstanceRemove,
+                    "writeout" to cmdDungeonWriteOut,
+                    "setstart" to cmdDungeonSetStart,
+                    "discard" to cmdDungeonDiscard,
+                    "difficulty" to cmdDungeonDifficulty,
+                    "description" to cmdDungeonDescription,
+                    "players" to cmdDungeonNumberOfPlayers,
+                    "save" to cmdDungeonSave,
+                    "points" to cmdDungeonPoints,
+                    "hlframes" to cmdDungeonHlFrames,
+                    "volmap" to cmdDungeonVolumeMap,
+                    "import" to cmdDungeonImport
                 )
             ).let {
                 arrayOf(

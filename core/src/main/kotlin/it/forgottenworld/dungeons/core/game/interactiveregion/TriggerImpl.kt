@@ -1,22 +1,23 @@
 package it.forgottenworld.dungeons.core.game.interactiveregion
 
+import com.google.inject.Inject
+import com.google.inject.assistedinject.Assisted
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Storage
+import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.scripting.CodeParser
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-data class TriggerImpl(
-    override val id: Int,
-    override val box: Box,
-    override val effectCode: List<String> = listOf(),
-    override val requiresWholeParty: Boolean = false,
-    override var label: String? = null
+data class TriggerImpl @Inject constructor(
+    @Assisted override val id: Int,
+    @Assisted override val box: Box,
+    @Assisted override val effectCode: List<String>,
+    @Assisted override val requiresWholeParty: Boolean,
+    @Assisted override var label: String?
 ) : Trigger, Storage.Storable {
 
     private val effect = CodeParser.parseScript(effectCode)
@@ -48,13 +49,7 @@ data class TriggerImpl(
         box = box.withContainerOriginZero(oldOrigin)
     )
 
-    override fun proc(instance: DungeonInstance) {
-        if (instance !is DungeonInstanceImpl) return
-        if (instance.proccedTriggers.contains(id) ||
-            requiresWholeParty &&
-            instance.playerTriggers.values.count { it == id } != instance.playerCount
-        ) return
-        instance.proccedTriggers.add(id)
+    override fun executeEffect(instance: DungeonInstance) {
         effect.invoke(instance)
     }
 }

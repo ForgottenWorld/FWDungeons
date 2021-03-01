@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.game
 
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.utils.WarpbackData
+import it.forgottenworld.dungeons.core.utils.RespawnData
 import it.forgottenworld.dungeons.core.utils.launch
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import kotlinx.coroutines.delay
@@ -22,13 +22,15 @@ object RespawnManager {
         }
     }
 
-    private val playerRespawnData = mutableMapOf<UUID, WarpbackData>()
+    private val playerRespawnData = mutableMapOf<UUID, RespawnData>()
 
     var UUID.respawnData
         get() = playerRespawnData[this]
         set(value) {
-            value?.let {
-                playerRespawnData[this] = it
-            } ?: playerRespawnData.remove(this)
+            if (value != null) {
+                playerRespawnData[this] = value
+            } else {
+                playerRespawnData.remove(this)
+            }
         }
 }

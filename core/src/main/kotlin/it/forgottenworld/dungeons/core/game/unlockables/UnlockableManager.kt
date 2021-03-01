@@ -1,20 +1,26 @@
 package it.forgottenworld.dungeons.core.game.unlockables
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
-import it.forgottenworld.dungeons.core.config.Storage
+import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.util.*
 
-object UnlockableManager {
+@Singleton
+class UnlockableManager @Inject constructor(
+    private val storage: Storage
+) {
 
     private val unlockableSeries = mutableMapOf<Int, UnlockableSeries>()
     private val playerUnlockProgress = mutableMapOf<Pair<UUID, Int>, Int>()
 
     fun loadUnlockablesFromConfig(config: ConfigurationSection) {
         for (key in config.getKeys(false)) {
-            val series = Storage.load<UnlockableSeriesImpl>(config.getConfigurationSection(key)!!)
+            val series = storage.load<UnlockableSeries>(config.getConfigurationSection(key)!!)
             unlockableSeries[series.id] = series
         }
     }

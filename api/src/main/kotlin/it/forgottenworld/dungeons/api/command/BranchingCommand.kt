@@ -7,7 +7,9 @@ class BranchingCommand(val bindings: Map<String, CommandHandler>) : CommandHandl
     override fun walkExecute(
         sender: CommandSender,
         args: Array<out String>
-    ) = args.isNotEmpty() && bindings[args[0]]
-        ?.walkExecute(sender, args.copyOfRange(1,args.size))
-        ?: false
+    ): Boolean {
+        if (args.isEmpty()) return false
+        val binding = bindings[args[0]] ?: return false
+        return binding.walkExecute(sender, args.copyOfRange(1, args.size))
+    }
 }

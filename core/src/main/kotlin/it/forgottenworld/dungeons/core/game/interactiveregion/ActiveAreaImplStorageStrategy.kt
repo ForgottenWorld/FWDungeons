@@ -1,25 +1,27 @@
 package it.forgottenworld.dungeons.core.game.interactiveregion
 
+import com.google.inject.Inject
+import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
-import it.forgottenworld.dungeons.core.config.Storage
+import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 
-class ActiveAreaImplStorageStrategy : Storage.StorageStrategy<ActiveAreaImpl> {
+class ActiveAreaImplStorageStrategy @Inject constructor(
+    private val activeAreaFactory: ActiveAreaFactory
+) : Storage.StorageStrategy<ActiveArea> {
 
-    override fun toConfig(obj: ActiveAreaImpl, config: ConfigurationSection) {
-        with(config) {
-            set("id", obj.id)
-            obj.label?.let { l -> set("label", l) }
-            set("origin", obj.box.origin.toVector())
-            set("width", obj.box.width)
-            set("height", obj.box.height)
-            set("depth", obj.box.depth)
-            set("startingMaterial", obj.startingMaterial.name)
-        }
+    override fun toConfig(obj: ActiveArea, config: ConfigurationSection, storage: Storage) {
+        config.set("id", obj.id)
+        obj.label?.let { l -> config.set("label", l) }
+        config.set("origin", obj.box.origin.toVector())
+        config.set("width", obj.box.width)
+        config.set("height", obj.box.height)
+        config.set("depth", obj.box.depth)
+        config.set("startingMaterial", obj.startingMaterial.name)
     }
 
-    override fun fromConfig(config: ConfigurationSection) = ActiveAreaImpl(
+    override fun fromConfig(config: ConfigurationSection, storage: Storage) = activeAreaFactory.create(
         config.getInt("id"),
         Box.fromConfig(config),
         Material.getMaterial(config.getString("startingMaterial")!!)!!,

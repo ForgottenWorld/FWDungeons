@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.game.objective
+package it.forgottenworld.dungeons.api.game.objective
 
 data class MobSpawnData(
     val activeAreaId: Int,

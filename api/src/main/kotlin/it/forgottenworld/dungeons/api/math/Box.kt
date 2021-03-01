@@ -8,12 +8,12 @@ import org.bukkit.entity.Player
 import org.bukkit.util.BoundingBox
 import kotlin.math.abs
 
-class Box(
+data class Box(
     val origin: Vector3i,
     val width: Int,
     val height: Int,
     val depth: Int,
-) : Cloneable {
+) {
 
     fun getBoundingBox(origin: Vector3i = this.origin) = BoundingBox.of(
         origin.toBlockVector(),
@@ -84,8 +84,31 @@ class Box(
         Vector3i.ZERO
     )
 
-    fun getAllBlocks(world: World, containerOrigin: Vector3i = Vector3i.ZERO): Set<Block> {
-        val blocks = mutableSetOf<Block>()
+    fun getCenterOfAllBlocks(
+        containerOrigin: Vector3i = Vector3i.ZERO
+    ): List<Vector3d> {
+        val blocks = mutableListOf<Vector3d>()
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                for (z in 0 until depth) {
+                    blocks.add(
+                        Vector3d(
+                            containerOrigin.x + origin.x + x + 0.5,
+                            containerOrigin.y + origin.y + y + 0.5,
+                            containerOrigin.z + origin.z + z + 0.5
+                        )
+                    )
+                }
+            }
+        }
+        return blocks
+    }
+
+    fun getAllBlocks(
+        world: World,
+        containerOrigin: Vector3i = Vector3i.ZERO
+    ) : List<Block> {
+        val blocks = mutableListOf<Block>()
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
@@ -102,45 +125,43 @@ class Box(
         return blocks
     }
 
-    fun getFrame(origin: Vector3i = this.origin): List<Vector3i> {
-        val minX = origin.x
-        val maxX = origin.x + width - 1
-        val minY = origin.y
-        val maxY = origin.y + height - 1
-        val minZ = origin.z
-        val maxZ = origin.z + depth - 1
+    fun getFrame(origin: Vector3i = this.origin): List<Vector3d> {
+        val minX = origin.x + 0.5
+        val maxX = origin.x + width - 0.5
+        val minY = origin.y + 0.5
+        val maxY = origin.y + height - 0.5
+        val minZ = origin.z + 0.5
+        val maxZ = origin.z + depth - 0.5
         return mutableListOf(
-            Vector3i(minX, minY, minZ),
-            Vector3i(minX, minY, maxZ),
-            Vector3i(minX, maxY, minZ),
-            Vector3i(maxX, minY, minZ),
-            Vector3i(maxX, maxY, minZ),
-            Vector3i(minX, maxY, maxZ),
-            Vector3i(maxX, minY, maxZ),
-            Vector3i(maxX, maxY, maxZ)
+            Vector3d(minX, minY, minZ),
+            Vector3d(minX, minY, maxZ),
+            Vector3d(minX, maxY, minZ),
+            Vector3d(maxX, minY, minZ),
+            Vector3d(maxX, maxY, minZ),
+            Vector3d(minX, maxY, maxZ),
+            Vector3d(maxX, minY, maxZ),
+            Vector3d(maxX, maxY, maxZ)
         ).apply {
             for (x in 1 until width - 1) {
-                add(Vector3i(minX + x, minY, minZ))
-                add(Vector3i(minX + x, maxY, maxZ))
-                add(Vector3i(minX + x, minY, maxZ))
-                add(Vector3i(minX + x, maxY, minZ))
+                add(Vector3d(minX + x, minY, minZ))
+                add(Vector3d(minX + x, maxY, maxZ))
+                add(Vector3d(minX + x, minY, maxZ))
+                add(Vector3d(minX + x, maxY, minZ))
             }
             for (y in 1 until height - 1) {
-                add(Vector3i(minX, minY + y, minZ))
-                add(Vector3i(maxX, minY + y, maxZ))
-                add(Vector3i(maxX, minY + y, minZ))
-                add(Vector3i(minX, minY + y, maxZ))
+                add(Vector3d(minX, minY + y, minZ))
+                add(Vector3d(maxX, minY + y, maxZ))
+                add(Vector3d(maxX, minY + y, minZ))
+                add(Vector3d(minX, minY + y, maxZ))
             }
             for (z in 1 until depth - 1) {
-                add(Vector3i(minX, minY, minZ + z))
-                add(Vector3i(maxX, maxY, minZ + z))
-                add(Vector3i(minX, maxY, minZ + z))
-                add(Vector3i(maxX, minY, minZ + z))
+                add(Vector3d(minX, minY, minZ + z))
+                add(Vector3d(maxX, maxY, minZ + z))
+                add(Vector3d(minX, maxY, minZ + z))
+                add(Vector3d(maxX, minY, minZ + z))
             }
         }
     }
-
-    public override fun clone() = Box(origin.copy(), width, height, depth)
 
     class Builder {
 

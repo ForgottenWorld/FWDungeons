@@ -1,40 +1,36 @@
 package it.forgottenworld.dungeons.core.game.interactiveregion
 
+import com.google.inject.Inject
+import com.google.inject.assistedinject.Assisted
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Storage
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.Particle
 import kotlin.random.Random
 
-data class ActiveAreaImpl(
-    override val id: Int,
-    override val box: Box,
-    override val startingMaterial: Material = Material.AIR,
-    override var label: String? = null
+data class ActiveAreaImpl @Inject constructor(
+    @Assisted override val id: Int,
+    @Assisted override val box: Box,
+    @Assisted override val startingMaterial: Material = Material.AIR,
+    @Assisted override var label: String? = null,
+    private val configuration : Configuration
 ) : ActiveArea, Storage.Storable {
 
     override fun fillWithMaterial(material: Material, instance: DungeonInstance) {
-        val blocks = box.getAllBlocks(Configuration.dungeonWorld, instance.origin)
+        val blocks = box.getAllBlocks(configuration.dungeonWorld, instance.origin)
         for (it in blocks) it.setType(material, true)
-        ParticleSpammer.repeatedlySpawnParticles(
-            Particle.PORTAL,
-            blocks.map { it.location },
-            1,
-            500,
-            4
-        )
+        ParticleSpammer.activeAreaSwirls(box, configuration.dungeonWorld)
     }
 
     override fun getRandomLocationOnFloor(dungeonInstance: DungeonInstance): Location {
         val origin = box.origin.withRefSystemOrigin(Vector3i.ZERO, dungeonInstance.origin)
         return Location(
-            Configuration.dungeonWorld,
+            configuration.dungeonWorld,
             Random.nextInt(origin.x, origin.x + box.width) + 0.5,
             origin.y.toDouble(),
             Random.nextInt(origin.z, origin.z + box.depth) + 0.5

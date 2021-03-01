@@ -5,11 +5,10 @@ import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.NestableGrid3iToNi
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import kotlin.properties.ReadOnlyProperty
 
-object CubeGridFactory {
+object TriggerGridFactory {
 
-    private fun tessellateAroundBox(box: Box): NestableGrid3iToNi {
+    private fun createGridForBox(box: Box): NestableGrid3iToNi {
         val opposite = box.getOriginOpposite()
         return NestableGrid3iToNi(
             opposite.x,
@@ -45,39 +44,13 @@ object CubeGridFactory {
         }
     }
 
-    private fun lookupTriggersForPosition(
-        x: Int,
-        y: Int,
-        z: Int,
-        grid: NestableGrid3iToNi,
-        triggers: Map<Int, Trigger>
-    ): Trigger? {
-        for (id in grid[x,y,z] ?: return null) {
-            val trig = triggers[id]!!
-            if (trig.containsXYZ(x,y,z)) return trig
-        }
-        return null
-    }
-
-    private fun createFinalDungeonGrid(
+    fun createFinalDungeonGrid(
         finalDungeon: FinalDungeon
     ): NestableGrid3iToNi {
-        val grid = tessellateAroundBox(finalDungeon.box)
+        val grid = createGridForBox(finalDungeon.box)
         mapTriggersOntoGrid(grid, finalDungeon.triggers)
         return grid
     }
-
-    fun FinalDungeon.triggerGrid(): ReadOnlyProperty<FinalDungeon, NestableGrid3iToNi> {
-        val grid = createFinalDungeonGrid(this)
-        return ReadOnlyProperty { _, _ -> grid }
-    }
-
-    fun NestableGrid3iToNi.checkPositionAgainstTriggers(
-        x: Int,
-        y: Int,
-        z: Int,
-        triggers: Map<Int, Trigger>
-    ) = lookupTriggersForPosition(x, y, z, this, triggers)
 
     private const val GRID_INITIAL_CELL_SIZE = 16
 }

@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerTeleportEvent
 import java.util.*
 
-data class WarpbackData(
+data class RespawnData(
     val gameMode: GameMode,
     val worldId: UUID,
     val position: Vector3i
@@ -27,7 +27,7 @@ data class WarpbackData(
     }
 
     companion object {
-        val Player.currentWarpbackData get() = WarpbackData(
+        val Player.currentWarpbackData get() = RespawnData(
             gameMode,
             location.world.uid,
             Vector3i.ofLocation(location)

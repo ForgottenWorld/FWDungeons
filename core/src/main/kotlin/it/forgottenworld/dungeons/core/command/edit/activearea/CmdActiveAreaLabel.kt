@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.core.command.edit.activearea
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.core.command.edit.helpers.InteractiveRegionCommandHelper
@@ -7,7 +8,9 @@ import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-class CmdActiveAreaLabel : PlayerCommand() {
+class CmdActiveAreaLabel @Inject constructor(
+    private val interactiveRegionCommandHelper: InteractiveRegionCommandHelper
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
@@ -25,7 +28,7 @@ class CmdActiveAreaLabel : PlayerCommand() {
                 return true
             }
             val label = args.drop(1).joinToString(" ").trim()
-            InteractiveRegionCommandHelper.labelInteractiveRegion(
+            interactiveRegionCommandHelper.labelInteractiveRegion(
                 sender,
                 label,
                 InteractiveRegion.Type.ACTIVE_AREA,
@@ -34,7 +37,11 @@ class CmdActiveAreaLabel : PlayerCommand() {
             return true
         }
         val label = args.joinToString(" ").trim()
-        InteractiveRegionCommandHelper.labelInteractiveRegion(sender, label, InteractiveRegion.Type.ACTIVE_AREA)
+        interactiveRegionCommandHelper.labelInteractiveRegion(
+            sender,
+            label,
+            InteractiveRegion.Type.ACTIVE_AREA
+        )
         return true
     }
 }

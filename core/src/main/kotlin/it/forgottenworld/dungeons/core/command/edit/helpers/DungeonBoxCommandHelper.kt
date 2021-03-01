@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.command.edit.helpers
 
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material

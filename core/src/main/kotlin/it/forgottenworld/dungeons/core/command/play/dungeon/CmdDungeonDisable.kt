@@ -2,8 +2,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager.instances
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -23,7 +22,7 @@ class CmdDungeonDisable : SenderCommand() {
         }
 
         val res = DungeonManager.finalDungeons[dungeonId]?.let { d ->
-            d.instances.values.forEach { it.evacuate() }
+            DungeonManager.getDungeonInstances(d).values.forEach { it.evacuate() }
             d.isActive = false
         } != null
 

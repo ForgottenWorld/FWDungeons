@@ -1,29 +1,30 @@
 package it.forgottenworld.dungeons.core.game.unlockables
 
-import it.forgottenworld.dungeons.core.config.Storage
-import it.forgottenworld.dungeons.core.config.Storage.toConfig
+import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
+import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.configuration.ConfigurationSection
 
-class UnlockableSeriesImplStorageStrategy : Storage.StorageStrategy<UnlockableSeriesImpl> {
+class UnlockableSeriesImplStorageStrategy : Storage.StorageStrategy<UnlockableSeries> {
 
-    override fun toConfig(obj: UnlockableSeriesImpl, config: ConfigurationSection) {
+    override fun toConfig(obj: UnlockableSeries, config: ConfigurationSection, storage: Storage) {
         config.set("id", obj.id)
         config.set("name", obj.name)
         config.set("description", obj.description)
         config.createSection("unlockables").run {
             for ((i,unl) in obj.unlockables.withIndex()) {
-                (unl as UnlockableImpl).toConfig(createSection("$i"))
+                storage.save(unl, createSection("$i"))
             }
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection) = UnlockableSeriesImpl(
+    override fun fromConfig(config: ConfigurationSection, storage: Storage) = UnlockableSeriesImpl(
         config.getInt("id"),
         config.getString("name")!!,
         config.getString("description")!!,
         config.getConfigurationSection("unlockables")!!.run {
             getKeys(false).map {
-                Storage.load<UnlockableImpl>(getConfigurationSection(it)!!)
+                storage.load(getConfigurationSection(it)!!)
             }
         }
     )
