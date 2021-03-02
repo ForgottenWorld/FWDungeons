@@ -4,6 +4,8 @@ import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
+import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
@@ -13,7 +15,6 @@ import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerFactory
@@ -28,33 +29,34 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import java.io.File
 
-class EditableDungeon @AssistedInject constructor(
-    @Assisted editor: Player,
-    @Assisted override var id: Int = NEW_DUNGEON_TEMP_ID,
-    @Assisted override var name: String = "NEW DUNGEON",
-    @Assisted override var description: String = "",
+class EditableDungeonImpl @AssistedInject constructor(
+    @Assisted("editor") editor: Player,
+    @Assisted("id") override var id: Int = EditableDungeon.NEW_DUNGEON_TEMP_ID,
+    @Assisted("name") override var name: String = "NEW DUNGEON",
+    @Assisted("description") override var description: String = "",
     @Assisted override var difficulty: Dungeon.Difficulty = Dungeon.Difficulty.MEDIUM,
-    @Assisted override var minPlayers: Int = 1,
-    @Assisted override var maxPlayers: Int = 2,
+    @Assisted("minPlayers") override var minPlayers: Int = 1,
+    @Assisted("maxPlayers") override var maxPlayers: Int = 2,
     @Assisted override var box: Box? = null,
     @Assisted override var startingLocation: Vector3i? = null,
-    @Assisted override var points: Int = 0,
-    @Assisted var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
+    @Assisted("points") override var points: Int = 0,
+    @Assisted override var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
     @Assisted triggers: Map<Int, Trigger> = mutableMapOf(),
     @Assisted activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
-    @Assisted override var chests: MutableMap<Int, Chest> = mutableMapOf(),
+    @Assisted override val chests: MutableMap<Int, Chest> = mutableMapOf(),
     private val activeAreaFactory: ActiveAreaFactory,
     private val triggerFactory: TriggerFactory,
     private val plugin: FWDungeonsPlugin,
     private val configuration: Configuration,
     private val namespacedKeys: NamespacedKeys,
     private val dungeonFactory: DungeonFactory,
-    private val dungeonInstanceFactory: DungeonInstanceFactory
-) : Dungeon {
+    private val dungeonInstanceFactory: DungeonInstanceFactory,
+    private val dungeonManager: DungeonManager
+) : EditableDungeon {
 
     @AssistedInject
     constructor(
-        @Assisted editor: Player,
+        @Assisted("editor") editor: Player,
         @Assisted dungeon: Dungeon,
         activeAreaFactory: ActiveAreaFactory,
         triggerFactory: TriggerFactory,
@@ -62,7 +64,8 @@ class EditableDungeon @AssistedInject constructor(
         configuration: Configuration,
         namespacedKeys: NamespacedKeys,
         dungeonFactory: DungeonFactory,
-        dungeonInstanceFactory: DungeonInstanceFactory
+        dungeonInstanceFactory: DungeonInstanceFactory,
+        dungeonManager: DungeonManager
     ) : this(
         editor,
         dungeon.id,
@@ -74,7 +77,7 @@ class EditableDungeon @AssistedInject constructor(
         dungeon.box!!.copy(),
         dungeon.startingLocation!!.copy(),
         dungeon.points,
-        DungeonManager.getDungeonInstances(dungeon)
+        dungeonManager.getDungeonInstances(dungeon)
             .values
             .map { it.origin }
             .toMutableList(),
@@ -87,12 +90,13 @@ class EditableDungeon @AssistedInject constructor(
         configuration,
         namespacedKeys,
         dungeonFactory,
-        dungeonInstanceFactory
+        dungeonInstanceFactory,
+        dungeonManager
     )
 
     private val editor = editor.uniqueId
 
-    lateinit var testOrigin: Vector3i
+    override lateinit var testOrigin: Vector3i
 
     init {
         if (finalInstanceLocations.isNotEmpty()) setupTestBox()
@@ -110,22 +114,22 @@ class EditableDungeon @AssistedInject constructor(
             updateActiveAreaParticleSpammers(value.values)
         }
 
-    val dungeonBoxBuilder = Box.Builder()
-    val triggerBoxBuilder = Box.Builder()
-    val activeAreaBoxBuilder = Box.Builder()
+    override val dungeonBoxBuilder = Box.Builder()
+    override val triggerBoxBuilder = Box.Builder()
+    override val activeAreaBoxBuilder = Box.Builder()
 
-    val hasTestOrigin get() = this::testOrigin.isInitialized
+    override val hasTestOrigin get() = this::testOrigin.isInitialized
 
     private var hlFrames = false
     private var triggerParticleSpammer: ParticleSpammer? = null
     private var activeAreaParticleSpammer: ParticleSpammer? = null
 
-    fun finalize(): FinalDungeon {
-        if (id == NEW_DUNGEON_TEMP_ID) {
-            id = DungeonManager.finalDungeons.keys.firstGap()
+    override fun finalize(): FinalDungeon {
+        if (id == EditableDungeon.NEW_DUNGEON_TEMP_ID) {
+            id = dungeonManager.finalDungeons.keys.firstGap()
         }
         val finalDungeon = dungeonFactory.createFinal(this)
-        DungeonManager.finalDungeons[id] = finalDungeon
+        dungeonManager.finalDungeons[id] = finalDungeon
         saveToConfigAndCreateInstances(id, finalDungeon)
         onDestroy()
         return finalDungeon
@@ -138,7 +142,7 @@ class EditableDungeon @AssistedInject constructor(
             val file = File(plugin.dataFolder, "instances.yml")
             if (file.exists()) config.load(file)
             val dgConf = config.createSection("$newId")
-            DungeonManager.setDungeonInstances(
+            dungeonManager.setDungeonInstances(
                 finalDungeon,
                 finalInstanceLocations.withIndex().associate { (k, v) ->
                     dgConf.createSection("$k").run {
@@ -154,23 +158,23 @@ class EditableDungeon @AssistedInject constructor(
             )
             launchAsync { config.save(file) }
         } catch (e: Exception) {
-            Bukkit.getLogger().warning(e.message)
+            sendConsoleMessage(e.message ?: e.toString())
         }
     }
 
-    fun labelInteractiveRegion(type: InteractiveRegion.Type, label: String, id: Int = -1) {
+    override fun labelInteractiveRegion(type: InteractiveRegion.Type, label: String, id: Int) {
         when (type) {
             InteractiveRegion.Type.TRIGGER -> labelTrigger(label, id)
             InteractiveRegion.Type.ACTIVE_AREA -> labelActiveArea(label, id)
         }
     }
 
-    fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) = when (type) {
+    override fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) = when (type) {
         InteractiveRegion.Type.TRIGGER -> unmakeTrigger(ieId)
         InteractiveRegion.Type.ACTIVE_AREA -> unmakeActiveArea(ieId)
     }
 
-    fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) = when (type) {
+    override fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) = when (type) {
         InteractiveRegion.Type.TRIGGER -> newTrigger(box)
         InteractiveRegion.Type.ACTIVE_AREA -> newActiveArea(box)
     }
@@ -228,23 +232,23 @@ class EditableDungeon @AssistedInject constructor(
         }
     }
 
-    fun setupTestBox() {
+    override fun setupTestBox() {
         testOrigin = finalInstanceLocations.first()
     }
 
-    fun onDestroy(restoreFormer: Boolean = false) {
+    override fun onDestroy(restoreFormer: Boolean) {
         stopParticleSpammers()
         dungeonBoxBuilder.clear()
         triggerBoxBuilder.clear()
         activeAreaBoxBuilder.clear()
-        editor.editableDungeon = null
+        dungeonManager.setPlayerEditableDungeon(editor, null)
         if (restoreFormer) {
-            DungeonManager.finalDungeons[id]?.isBeingEdited = false
+            dungeonManager.finalDungeons[id]?.isBeingEdited = false
         }
         Bukkit.getPlayer(editor)?.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }
 
-    fun whatIsMissingForWriteout() = StringBuilder().apply {
+    override fun whatIsMissingForWriteout() = StringBuilder().apply {
         if (!hasTestOrigin) append(Strings.WIM_BOX)
         if (startingLocation == null) append(Strings.WIM_STARTING_LOCATION)
         if (triggers.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_TRIGGER)
@@ -300,7 +304,7 @@ class EditableDungeon @AssistedInject constructor(
         activeAreaParticleSpammer = null
     }
 
-    fun toggleEditorHighlights() {
+    override fun toggleEditorHighlights() {
         hlFrames = !hlFrames
         if (hlFrames) {
             updateParticleSpammers()
@@ -309,7 +313,7 @@ class EditableDungeon @AssistedInject constructor(
         }
     }
 
-    fun onPlayerInteract(event: PlayerInteractEvent) {
+    override fun onPlayerInteract(event: PlayerInteractEvent) {
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
 
         val isTriggerWand = persistentDataContainer
@@ -334,7 +338,4 @@ class EditableDungeon @AssistedInject constructor(
         event.player.performCommand(cmd)
     }
 
-    companion object {
-        const val NEW_DUNGEON_TEMP_ID = -69420
-    }
 }

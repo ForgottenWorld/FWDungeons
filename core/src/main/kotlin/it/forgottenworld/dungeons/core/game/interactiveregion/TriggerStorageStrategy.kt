@@ -7,11 +7,12 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.scripting.CodeParser
 import org.bukkit.configuration.ConfigurationSection
 
-class TriggerImplStorageStrategy @Inject constructor(
-    private val triggerFactory: TriggerFactory
+class TriggerStorageStrategy @Inject constructor(
+    private val triggerFactory: TriggerFactory,
+    private val codeParser: CodeParser
 ) : Storage.StorageStrategy<Trigger> {
 
-    override fun toConfig(obj: Trigger, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(obj: Trigger, config: ConfigurationSection, storage: Storage) {
         config.set("id", obj.id)
         obj.label?.let { config.set("label", it) }
         config.set("origin", obj.origin.toVector())
@@ -22,10 +23,10 @@ class TriggerImplStorageStrategy @Inject constructor(
         config.set("requiresWholeParty", obj.requiresWholeParty)
     }
 
-    override fun fromConfig(config: ConfigurationSection, storage: Storage) = triggerFactory.create(
+    override fun fromStorage(config: ConfigurationSection, storage: Storage) = triggerFactory.create(
         config.getInt("id"),
         Box.fromConfig(config),
-        CodeParser.cleanupCode(config.getString("effect")!!),
+        codeParser.cleanupCode(config.getString("effect")!!),
         config.getBoolean("requiresWholeParty"),
         config.getString("label")
     )

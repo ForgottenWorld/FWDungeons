@@ -1,15 +1,18 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-class CmdDungeonLeave : PlayerCommand() {
+class CmdDungeonLeave @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        sender.uniqueId.finalInstance?.let {
+        dungeonManager.getPlayerInstance(sender.uniqueId)?.let {
             if (it.isInGame) {
                 sender.sendFWDMessage(Strings.INSTANCE_HAS_STARTED_CANT_LEAVE_NOW)
                 return true

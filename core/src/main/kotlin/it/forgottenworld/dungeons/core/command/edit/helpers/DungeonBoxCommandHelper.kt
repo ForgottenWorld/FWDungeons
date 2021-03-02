@@ -1,15 +1,20 @@
 package it.forgottenworld.dungeons.core.command.edit.helpers
 
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-object DungeonBoxCommandHelper {
+@Singleton
+class DungeonBoxCommandHelper @Inject constructor(
+    private val dungeonManager: DungeonManager
+) {
 
     fun setDungeonBoxPos(sender: Player, posNo: Int) {
         val block = sender.getTargetSolidBlock()
@@ -19,7 +24,7 @@ object DungeonBoxCommandHelper {
             return
         }
 
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }

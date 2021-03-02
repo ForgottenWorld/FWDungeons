@@ -6,9 +6,9 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 
-class ChestImplStorageStrategy : Storage.StorageStrategy<Chest> {
+class ChestStorageStrategy : Storage.StorageStrategy<Chest> {
 
-    override fun toConfig(obj: Chest, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(obj: Chest, config: ConfigurationSection, storage: Storage) {
         config.set("id", obj.id)
         config.set("position", obj.position.toVector())
         config.set("minItems", obj.minItems)
@@ -20,7 +20,7 @@ class ChestImplStorageStrategy : Storage.StorageStrategy<Chest> {
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection, storage: Storage): ChestImpl {
+    override fun fromStorage(config: ConfigurationSection, storage: Storage): ChestImpl {
         val id = config.getInt("id")
         val position = Vector3i.ofBukkitVector(config.getVector("position")!!)
         val label = config.getString("label")

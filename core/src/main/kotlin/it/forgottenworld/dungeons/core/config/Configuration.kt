@@ -3,14 +3,14 @@ package it.forgottenworld.dungeons.core.config
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.utils.launchAsync
+import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -20,8 +20,8 @@ import javax.naming.ConfigurationException
 @Singleton
 class Configuration @Inject constructor(
     private val plugin: FWDungeonsPlugin,
-    private val dungeonInstanceFactory: DungeonInstanceFactory,
     private val storage: Storage,
+    private val dungeonManager: DungeonManager
 ) {
 
     lateinit var config: FileConfiguration
@@ -56,7 +56,7 @@ class Configuration @Inject constructor(
             try {
                 val config = YamlConfiguration().apply { load(File(dir, file)) }
                 val dungeon = storage.load(Dungeon::class, config)
-                DungeonManager.finalDungeons[dungeon.id] = dungeon as FinalDungeon
+                dungeonManager.finalDungeons[dungeon.id] = dungeon as FinalDungeon
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -92,13 +92,13 @@ class Configuration @Inject constructor(
         val conf = YamlConfiguration()
         if (file.exists()) conf.load(file) else file.createNewFile()
 
-        for (dId in DungeonManager.finalDungeons.keys) {
+        for (dId in dungeonManager.finalDungeons.keys) {
             val sec = conf.getConfigurationSection("$dId")!!
             if (sec.getKeys(false).isEmpty()) {
-                Bukkit.getLogger().warning(
-                    "Dungeon $dId loaded from config has no instances, create one with /fwde d import $dId"
+                sendConsoleMessage(
+                    "${Strings.CONSOLE_PREFIX}Dungeon $dId loaded from config has no instances, create one with /fwde d import $dId"
                 )
-                DungeonManager.finalDungeons[dId]?.isActive = false
+                dungeonManager.finalDungeons[dId]?.isActive = false
                 continue
             }
             for (iId in sec.getKeys(false)) {
@@ -108,19 +108,18 @@ class Configuration @Inject constructor(
     }
 
     fun loadData() {
-        val logger = Bukkit.getLogger()
 
-        logger.info("Loading configuration...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Loading configuration...")
         plugin.reloadConfig()
 
-        logger.info("    Loading strings...")
+        sendConsoleMessage(" -- Loading strings...")
         Strings.load(plugin)
         config = plugin.config
 
-        logger.info("    Loading dungeons...")
+        sendConsoleMessage(" -- Loading dungeons...")
         loadDungeonConfigs(plugin.dataFolder)
 
-        logger.info("    Loading instances...")
+        sendConsoleMessage(" -- Loading instances...")
         loadInstancesFromConfig()
     }
 }

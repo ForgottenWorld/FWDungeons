@@ -1,9 +1,11 @@
 package it.forgottenworld.dungeons.core.game.detection
 
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.NestableGrid3iToNi
 
-object TriggerChecker {
+@Singleton
+class TriggerChecker {
 
     private fun lookupTriggersForPosition(
         x: Int, y: Int, z: Int,

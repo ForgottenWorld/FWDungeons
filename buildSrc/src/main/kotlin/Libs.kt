@@ -8,7 +8,7 @@ object Libs {
     const val vault = "com.github.MilkBowl:VaultAPI:1.7"
 
     object Guice {
-        const val version = "5.0.1"
+        private const val version = "5.0.1"
 
         const val guice = "com.google.inject:guice:$version"
         const val assistedInject = "com.google.inject.extensions:guice-assistedinject:$version"

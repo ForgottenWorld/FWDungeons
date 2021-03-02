@@ -1,12 +1,15 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
-class CmdDungeonDisable : SenderCommand() {
+class CmdDungeonDisable @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : SenderCommand() {
 
     override fun command(sender: CommandSender, args: Array<out String>): Boolean {
         if (args.count() < 1) {
@@ -21,8 +24,8 @@ class CmdDungeonDisable : SenderCommand() {
             return true
         }
 
-        val res = DungeonManager.finalDungeons[dungeonId]?.let { d ->
-            DungeonManager.getDungeonInstances(d).values.forEach { it.evacuate() }
+        val res = dungeonManager.finalDungeons[dungeonId]?.let { d ->
+            dungeonManager.getDungeonInstances(d).values.forEach { it.evacuate() }
             d.isActive = false
         } != null
 

@@ -1,11 +1,13 @@
 package it.forgottenworld.dungeons.core.scripting
 
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
 
-object CodeParser {
+@Singleton
+class CodeParser {
 
     private object Consts {
         const val CODE_FILL_ACTIVE_AREA = "fill"

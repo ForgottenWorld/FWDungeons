@@ -8,7 +8,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.T
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -19,7 +19,8 @@ import org.bukkit.persistence.PersistentDataType
 @Singleton
 class InteractiveRegionCommandHelper @Inject constructor(
     private val namespacedKeys: NamespacedKeys,
-    private val configuration: Configuration
+    private val configuration: Configuration,
+    private val dungeonManager: DungeonManager
 ) {
 
     private val Type.singular get() = when(this) {
@@ -40,7 +41,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
@@ -94,7 +95,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
@@ -112,7 +113,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
     }
 
     fun unMakeInteractiveRegion(sender: Player, type: Type, ieId: Int?) {
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
@@ -129,7 +130,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
     }
 
     fun highlightInteractiveRegion(sender: Player, type: Type, ieId: Int?) {
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }

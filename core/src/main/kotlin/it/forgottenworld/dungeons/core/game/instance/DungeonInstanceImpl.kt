@@ -3,23 +3,21 @@ package it.forgottenworld.dungeons.core.game.instance
 import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
 import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
+import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.cli.JsonMessages
+import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
-import it.forgottenworld.dungeons.core.game.RespawnManager.respawnData
+import it.forgottenworld.dungeons.core.game.RespawnManager
 import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
-import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveImpl
-import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.utils.*
@@ -41,7 +39,14 @@ class DungeonInstanceImpl @AssistedInject constructor(
     @Assisted override val origin: Vector3i,
     private val configuration: Configuration,
     private val easyRankingUtils: EasyRankingUtils,
-    private val fwEchelonUtils: FWEchelonUtils
+    private val fwEchelonUtils: FWEchelonUtils,
+    private val jsonMessageGenerator: JsonMessageGenerator,
+    private val triggerChecker: TriggerChecker,
+    private val randomStringGenerator: RandomStringGenerator,
+    private val combatObjectiveFactory: CombatObjectiveFactory,
+    private val combatObjectiveManager: CombatObjectiveManager,
+    private val respawnManager: RespawnManager,
+    private val dungeonManager: DungeonManager
 ) : DungeonInstance, Storage.Storable {
 
     @AssistedInject
@@ -50,18 +55,32 @@ class DungeonInstanceImpl @AssistedInject constructor(
         @Assisted origin: Vector3i,
         configuration: Configuration,
         easyRankingUtils: EasyRankingUtils,
-        fwEchelonUtils: FWEchelonUtils
+        fwEchelonUtils: FWEchelonUtils,
+        jsonMessageGenerator: JsonMessageGenerator,
+        triggerChecker: TriggerChecker,
+        randomStringGenerator: RandomStringGenerator,
+        combatObjectiveFactory: CombatObjectiveFactory,
+        combatObjectiveManager: CombatObjectiveManager,
+        respawnManager: RespawnManager,
+        dungeonManager: DungeonManager
     ) : this(
-        DungeonManager.getDungeonInstances(dungeon).keys.firstGap(),
+        dungeonManager.getDungeonInstances(dungeon).keys.firstGap(),
         dungeon,
         origin,
         configuration,
         easyRankingUtils,
-        fwEchelonUtils
+        fwEchelonUtils,
+        jsonMessageGenerator,
+        triggerChecker,
+        randomStringGenerator,
+        combatObjectiveFactory,
+        combatObjectiveManager,
+        respawnManager,
+        dungeonManager
     ) {
         resetInstance()
-        val curInstances = DungeonManager.getDungeonInstances(dungeon)
-        DungeonManager.setDungeonInstances(dungeon, curInstances + (id to this))
+        val curInstances = dungeonManager.getDungeonInstances(dungeon)
+        dungeonManager.setDungeonInstances(dungeon, curInstances + (id to this))
     }
 
     override var leader: UUID? = null
@@ -75,10 +94,10 @@ class DungeonInstanceImpl @AssistedInject constructor(
     override var isTpSafe = true
         private set
 
-    val playerTriggers = mutableMapOf<UUID, Int>()
-    val proccedTriggers = mutableSetOf<Int>()
+    private val playerTriggers = mutableMapOf<UUID, Int>()
+    private val proccedTriggers = mutableSetOf<Int>()
 
-    private val warpbackData = mutableMapOf<UUID, RespawnData>()
+    private val playerRespawnData = mutableMapOf<UUID, RespawnData>()
 
     private val startingPostion = dungeon
         .startingLocation
@@ -86,9 +105,9 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     private fun resetInstance() {
         players.forEach { uuid ->
-            warpbackData.remove(uuid)
+            playerRespawnData.remove(uuid)
             Bukkit.getPlayer(uuid)?.let { fwEchelonUtils.playerIsNowFree(it) }
-            uuid.finalInstance = null
+            dungeonManager.setPlayerInstance(uuid, null)
         }
         players.clear()
         unlock()
@@ -126,7 +145,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     override fun lock() {
         isLocked = true
-        partyKey = RandomString.generate(10)
+        partyKey = randomStringGenerator.generate(10)
     }
 
     override fun unlock() {
@@ -156,7 +175,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
             leader = player.uniqueId
             player.sendJsonMessage {
                 append("${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} ")
-                append(JsonMessages.lockLink())
+                append(jsonMessageGenerator.lockLink())
             }
         } else {
             player.sendFWDMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
@@ -168,7 +187,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         }
 
         players.add(player.uniqueId)
-        player.uniqueId.finalInstance = this
+        dungeonManager.setPlayerInstance(player.uniqueId, this)
         return
     }
 
@@ -185,7 +204,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
     }
 
     private fun preparePlayer(player: Player) {
-        warpbackData[player.uniqueId] = player.currentWarpbackData
+        playerRespawnData[player.uniqueId] = player.currentWarpbackData
         player.gameMode = GameMode.ADVENTURE
         val startingLocation = startingPostion.locationInWorld(configuration.dungeonWorld)
         player.teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
@@ -203,24 +222,24 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     private fun onPlayerEnterTrigger(player: Player, trigger: Trigger) {
         if (configuration.isDebugMode) {
-            (trigger as TriggerImpl).debugLogEnter(player)
+            trigger.debugLogEnter(player)
         }
         onTriggerProc(trigger)
     }
 
     private fun onPlayerExitTrigger(player: Player, trigger: Trigger) {
         if (configuration.isDebugMode) {
-            (trigger as TriggerImpl).debugLogExit(player)
+            trigger.debugLogExit(player)
         }
     }
 
     private fun onPlayerRemoved(player: Player) {
-        warpbackData.remove(player.uniqueId)
+        playerRespawnData.remove(player.uniqueId)
         playerTriggers[player.uniqueId]
             ?.let { dungeon.triggers[it] }
             ?.let { onPlayerExitTrigger(player, it) }
         playerTriggers.remove(player.uniqueId)
-        player.uniqueId.finalInstance = null
+        dungeonManager.setPlayerInstance(player.uniqueId, null)
         players.remove(player.uniqueId)
         fwEchelonUtils.playerIsNowFree(player)
         updatePartyLeader(player)
@@ -251,7 +270,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     override fun onPlayerDeath(player: Player) {
         player.sendFWDMessage(Strings.YOU_DIED_IN_THE_DUNGEON)
-        player.uniqueId.respawnData = warpbackData[player.uniqueId]
+        respawnManager.setPlayerRespawnData(player.uniqueId, playerRespawnData[player.uniqueId])
         onPlayerRemoved(player)
         for (uuid in players) {
             Bukkit.getPlayer(uuid)?.sendFWDMessage(
@@ -282,14 +301,14 @@ class DungeonInstanceImpl @AssistedInject constructor(
         for (uuid in players) {
             val pl = Bukkit.getPlayer(uuid) ?: continue
             pl.sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
-            warpbackData[uuid]?.useWithPlayer(pl)
+            playerRespawnData[uuid]?.useWithPlayer(pl)
         }
 
         resetInstance()
     }
 
     override fun rescuePlayer(player: Player) {
-        warpbackData[player.uniqueId]?.useWithPlayer(player)
+        playerRespawnData[player.uniqueId]?.useWithPlayer(player)
         onPlayerRemoved(player)
     }
 
@@ -305,7 +324,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         z: Int,
         oldTrigger: Trigger?
     ) {
-        val newTrigger = TriggerChecker.checkPositionAgainstTriggers(
+        val newTrigger = triggerChecker.checkPositionAgainstTriggers(
             dungeon.triggerGrid,
             x - origin.x,
             y - origin.y,
@@ -345,8 +364,10 @@ class DungeonInstanceImpl @AssistedInject constructor(
             val aa = dungeon.activeAreas[it.activeAreaId] ?: error("Active area not found")
             spawnMob(it.isMythic, it.mob, aa.getRandomLocationOnFloor(this))
         }.toMutableList()
-        val obj = CombatObjectiveImpl(this, mobUuids, onAllKilled)
-        mobUuids.forEach { it.combatObjective = obj }
+        val obj = combatObjectiveFactory.create(this, mobUuids, onAllKilled)
+        mobUuids.forEach {
+            combatObjectiveManager.setEntityCombatObjective(it, obj)
+        }
         instanceObjectives.add(obj)
     }
 

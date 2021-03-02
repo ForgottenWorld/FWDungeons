@@ -1,13 +1,15 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-class CmdDungeonJoinInstance : PlayerCommand() {
+class CmdDungeonJoinInstance @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.count() < 2) {
@@ -25,7 +27,7 @@ class CmdDungeonJoinInstance : PlayerCommand() {
 
         val pass = if (args.count() > 2) args[2] else ""
 
-        val dungeon = DungeonManager.finalDungeons[dungeonId] ?: run {
+        val dungeon = dungeonManager.finalDungeons[dungeonId] ?: run {
             sender.sendFWDMessage(Strings.INVALID_DUNGEON_ID)
             return true
         }
@@ -35,12 +37,12 @@ class CmdDungeonJoinInstance : PlayerCommand() {
             return true
         }
 
-        if (sender.uniqueId.finalInstance != null) {
+        if (dungeonManager.getPlayerInstance(sender.uniqueId) != null) {
             sender.sendFWDMessage(Strings.ALREADY_IN_PARTY)
             return true
         }
 
-        val instance = DungeonManager.getDungeonInstances(dungeon)[instanceId] ?: run {
+        val instance = dungeonManager.getDungeonInstances(dungeon)[instanceId] ?: run {
             sender.sendFWDMessage(Strings.INVALID_INSTANCE_ID)
             return true
         }

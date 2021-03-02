@@ -1,21 +1,21 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
 import com.google.inject.Inject
+import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
-import it.forgottenworld.dungeons.core.game.chest.ChestImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
 import org.bukkit.configuration.ConfigurationSection
 
 class FinalDungeonStorageStrategy @Inject constructor(
     private val dungeonFactory: DungeonFactory
 ): Storage.StorageStrategy<Dungeon> {
 
-    override fun toConfig(obj: Dungeon, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(obj: Dungeon, config: ConfigurationSection, storage: Storage) {
         config.set("id", obj.id)
         config.set("name", obj.name)
         config.set("description", obj.description)
@@ -40,12 +40,12 @@ class FinalDungeonStorageStrategy @Inject constructor(
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection, storage: Storage) = config.run {
+    override fun fromStorage(config: ConfigurationSection, storage: Storage) = config.run {
         val triggers = getConfigurationSection("triggers")
             ?.getKeys(false)
             ?.map { it.toInt() }
             ?.associateWith {
-                storage.load<TriggerImpl>(getConfigurationSection("triggers.$it")!!)
+                storage.load<Trigger>(getConfigurationSection("triggers.$it")!!)
             }
             ?: mapOf()
 
@@ -61,7 +61,7 @@ class FinalDungeonStorageStrategy @Inject constructor(
             ?.getKeys(false)
             ?.map { it.toInt() }
             ?.associateWith {
-                storage.load<ChestImpl>(getConfigurationSection("chests.$it")!!)
+                storage.load<Chest>(getConfigurationSection("chests.$it")!!)
             }
             ?: mapOf()
 

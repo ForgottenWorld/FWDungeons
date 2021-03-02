@@ -1,18 +1,22 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.cli.JsonMessages
+import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import org.bukkit.entity.Player
 
-class CmdDungeonUnlockParty : PlayerCommand() {
+class CmdDungeonUnlockParty @Inject constructor(
+    private val jsonMessageGenerator: JsonMessageGenerator,
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
 
-        val instance = sender.uniqueId.finalInstance ?: run {
+        val instance = dungeonManager.getPlayerInstance(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.CURRENTLY_NOT_IN_DUNGEON_PARTY)
             return true
         }
@@ -23,7 +27,7 @@ class CmdDungeonUnlockParty : PlayerCommand() {
                 instance.unlock()
                 sender.sendJsonMessage {
                     append("${Strings.CHAT_PREFIX}The dungeon party is now public, anyone can join. To make it private, click ")
-                    append(JsonMessages.lockLink())
+                    append(jsonMessageGenerator.lockLink())
                 }
             }
             else -> sender.sendFWDMessage(Strings.ONLY_LEADER_MAY_OPEN_PARTY)

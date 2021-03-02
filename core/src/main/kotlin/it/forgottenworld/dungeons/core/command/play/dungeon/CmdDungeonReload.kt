@@ -9,7 +9,8 @@ import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
 class CmdDungeonReload @Inject constructor(
-    private val configuration: Configuration
+    private val configuration: Configuration,
+    private val dungeonManager: DungeonManager
 ) : SenderCommand() {
 
     override fun command(sender: CommandSender, args: Array<out String>): Boolean {
@@ -18,8 +19,10 @@ class CmdDungeonReload @Inject constructor(
             return true
         }
 
-        DungeonManager.finalDungeons.values.flatMap { DungeonManager.getDungeonInstances(it).values }.forEach { it.evacuate() }
-        DungeonManager.finalDungeons.clear()
+        dungeonManager.finalDungeons.values.flatMap {
+            dungeonManager.getDungeonInstances(it).values
+        }.forEach { it.evacuate() }
+        dungeonManager.finalDungeons.clear()
 
         configuration.loadData()
 

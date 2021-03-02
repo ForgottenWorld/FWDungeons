@@ -1,51 +1,51 @@
 package it.forgottenworld.dungeons.core.integrations
 
 import com.google.inject.Inject
-import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.plugin.ServicesManager
 
 class VaultUtils @Inject constructor(
-    private val plugin: FWDungeonsPlugin,
-    private val configuration: Configuration
+    private val configuration: Configuration,
+    private val servicesManager: ServicesManager
 ) {
 
-    private val economy get() = plugin
-        .server
-        .servicesManager
-        .getRegistration(Economy::class.java)
-        ?.provider
-
     fun checkVaultIntegration() {
-        val logger = Bukkit.getLogger()
-        logger.info("Checking for Vault integration...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Checking for Vault integration...")
         if (!configuration.vaultIntegration) {
-            logger.info("Vault integration is not enabled")
+            sendConsoleMessage(" -- Vault integration is §4not enabled")
             return
         }
 
-        logger.info("Vault integration is enabled")
+        sendConsoleMessage(" -- Vault integration §2is enabled")
         if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
-            logger.info("Vault is not present")
+            sendConsoleMessage(" -- Vault is §4not present")
             return
         }
 
-        logger.info("Vault is present")
+        sendConsoleMessage(" -- Vault §2is present")
         configuration.useEasyRanking = true
     }
 
     fun canPlayerPay(player: Player, amount: Double): Boolean {
         if (!configuration.useVault) return true
-        return economy?.has(
-            Bukkit.getOfflinePlayer(player.uniqueId),
-            amount
-        ) == true
+        return servicesManager
+            .getRegistration(Economy::class.java)
+            ?.provider
+            ?.has(
+                Bukkit.getOfflinePlayer(player.uniqueId),
+                amount
+            ) == true
     }
 
     fun withdrawPlayer(player: Player, amount: Double) {
         if (!configuration.useVault) return
-        economy?.withdrawPlayer(Bukkit.getOfflinePlayer(player.uniqueId), amount)
+        servicesManager
+            .getRegistration(Economy::class.java)
+            ?.provider?.withdrawPlayer(Bukkit.getOfflinePlayer(player.uniqueId), amount)
     }
 }

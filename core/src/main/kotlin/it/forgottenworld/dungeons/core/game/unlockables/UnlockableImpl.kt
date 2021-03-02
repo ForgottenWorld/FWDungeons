@@ -8,10 +8,10 @@ import it.forgottenworld.dungeons.core.integrations.VaultUtils
 import org.bukkit.entity.Player
 
 data class UnlockableImpl @Inject constructor(
-    @Assisted override val seriesId: Int,
-    @Assisted override val order: Int,
-    @Assisted override val message: String,
-    @Assisted override val unlockedMessage: String,
+    @Assisted("seriesId") override val seriesId: Int,
+    @Assisted("order") override val order: Int,
+    @Assisted("message") override val message: String,
+    @Assisted("unlockedMessage") override val unlockedMessage: String,
     @Assisted override val requirements: List<Unlockable.UnlockableRequirement>,
     private val vaultUtils: VaultUtils
 ) : Unlockable, Storage.Storable {

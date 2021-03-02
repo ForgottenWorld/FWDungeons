@@ -1,15 +1,18 @@
 package it.forgottenworld.dungeons.core.command.edit.chest
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-class CmdChestLabel : PlayerCommand() {
+class CmdChestLabel @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }

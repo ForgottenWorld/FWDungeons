@@ -26,10 +26,19 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 tasks.withType<ShadowJar> {
     dependencies {
-        val included = setOf("it.forgottenworld", "com.google.inject")
-        exclude { !included.contains(it.moduleGroup) }
+        val included = listOf(
+            "it.forgottenworld.dungeons",
+            "com.google.inject",
+            "javax.inject",
+            "aopalliance"
+        )
+        exclude { dep ->
+            included.none { dep.moduleGroup.startsWith(it) }
+        }
     }
-    relocate("com.google.inject", "it.forgottenworld.dungeons.inject")
+    relocate("com.google.inject", "it.forgottenworld.dungeons.google.inject")
+    relocate("javax.inject", "it.forgottenworld.dungeons.javax.inject")
+    relocate("org.aopalliance", "it.forgottenworld.dungeons.org.aopalliance")
 }
 
 tasks.withType<JavaCompile> {

@@ -7,11 +7,11 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 
-class ActiveAreaImplStorageStrategy @Inject constructor(
+class ActiveAreaStorageStrategy @Inject constructor(
     private val activeAreaFactory: ActiveAreaFactory
 ) : Storage.StorageStrategy<ActiveArea> {
 
-    override fun toConfig(obj: ActiveArea, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(obj: ActiveArea, config: ConfigurationSection, storage: Storage) {
         config.set("id", obj.id)
         obj.label?.let { l -> config.set("label", l) }
         config.set("origin", obj.box.origin.toVector())
@@ -21,7 +21,7 @@ class ActiveAreaImplStorageStrategy @Inject constructor(
         config.set("startingMaterial", obj.startingMaterial.name)
     }
 
-    override fun fromConfig(config: ConfigurationSection, storage: Storage) = activeAreaFactory.create(
+    override fun fromStorage(config: ConfigurationSection, storage: Storage) = activeAreaFactory.create(
         config.getInt("id"),
         Box.fromConfig(config),
         Material.getMaterial(config.getString("startingMaterial")!!)!!,

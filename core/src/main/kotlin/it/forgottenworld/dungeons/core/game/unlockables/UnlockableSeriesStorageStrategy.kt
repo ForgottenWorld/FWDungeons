@@ -5,9 +5,13 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.configuration.ConfigurationSection
 
-class UnlockableSeriesImplStorageStrategy : Storage.StorageStrategy<UnlockableSeries> {
+class UnlockableSeriesStorageStrategy : Storage.StorageStrategy<UnlockableSeries> {
 
-    override fun toConfig(obj: UnlockableSeries, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(
+        obj: UnlockableSeries,
+        config: ConfigurationSection,
+        storage: Storage
+    ) {
         config.set("id", obj.id)
         config.set("name", obj.name)
         config.set("description", obj.description)
@@ -18,7 +22,10 @@ class UnlockableSeriesImplStorageStrategy : Storage.StorageStrategy<UnlockableSe
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection, storage: Storage) = UnlockableSeriesImpl(
+    override fun fromStorage(
+        config: ConfigurationSection,
+        storage: Storage
+    ) = UnlockableSeriesImpl(
         config.getInt("id"),
         config.getString("name")!!,
         config.getString("description")!!,

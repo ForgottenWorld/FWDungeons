@@ -1,5 +1,7 @@
 package it.forgottenworld.dungeons.core.cli
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
 import it.forgottenworld.dungeons.core.config.Strings
@@ -12,7 +14,10 @@ import net.md_5.bungee.api.chat.ClickEvent
 import org.bukkit.Bukkit
 import kotlin.math.floor
 
-object DungeonListGui {
+@Singleton
+class DungeonListGuiGenerator @Inject constructor(
+    private val dungeonManager: DungeonManager
+) {
 
     private fun joinClickable(instance: DungeonInstance) = chatComponent {
         val leader = instance.leader == null
@@ -62,7 +67,7 @@ object DungeonListGui {
 
         append("=====================================", ChatColor.DARK_GRAY)
 
-        if (page < DungeonManager.finalDungeons.count() - 1) {
+        if (page < dungeonManager.finalDungeons.count() - 1) {
             append("=[ ")
             color(ChatColor.DARK_GRAY)
             append(pageClickable(">>>>", page + 1))
@@ -89,8 +94,8 @@ object DungeonListGui {
 
     fun showPage(page: Int) = chatComponent {
 
-        if (page < 0 || page > DungeonManager.finalDungeons.count() - 1) return@chatComponent
-        val dng = DungeonManager
+        if (page < 0 || page > dungeonManager.finalDungeons.count() - 1) return@chatComponent
+        val dng = dungeonManager
             .finalDungeons
             .values
             .filter { it.isActive }
@@ -121,7 +126,7 @@ object DungeonListGui {
         val maxPl = dng.maxPlayers
         append("$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n", ChatColor.WHITE)
 
-        for((i, inst) in DungeonManager.getDungeonInstances(dng).values.withIndex()) {
+        for((i, inst) in dungeonManager.getDungeonInstances(dng).values.withIndex()) {
             append(chevrons(1))
             append("${Strings.ROOM} ${i + 1} ")
             append("| ", ChatColor.DARK_GRAY)
@@ -134,7 +139,7 @@ object DungeonListGui {
             append(inst.leader?.let { "  [ ${inst.players.size}/$maxPl ]" } ?: "")
         }
 
-        val paddingLines = 13 - DungeonManager.getDungeonInstances(dng).size - floor(
+        val paddingLines = 13 - dungeonManager.getDungeonInstances(dng).size - floor(
             (dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0
         ).toInt()
         append("\n".repeat(paddingLines))

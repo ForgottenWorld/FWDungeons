@@ -1,13 +1,15 @@
 package it.forgottenworld.dungeons.core.command.edit.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-class CmdDungeonEdit : PlayerCommand() {
+class CmdDungeonEdit @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
@@ -21,17 +23,17 @@ class CmdDungeonEdit : PlayerCommand() {
             return true
         }
 
-        if (sender.uniqueId.editableDungeon != null) {
+        if (dungeonManager.getPlayerEditableDungeon(sender.uniqueId) != null) {
             sender.sendFWDMessage(Strings.ALREADY_EDITING_DUNGEON)
             return true
         }
 
-        val dungeon = DungeonManager.finalDungeons[id] ?: run {
+        val dungeon = dungeonManager.finalDungeons[id] ?: run {
             sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
             return true
         }
 
-        if (DungeonManager.getDungeonInstances(dungeon).isEmpty()) {
+        if (dungeonManager.getDungeonInstances(dungeon).isEmpty()) {
             sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
             return true
         }

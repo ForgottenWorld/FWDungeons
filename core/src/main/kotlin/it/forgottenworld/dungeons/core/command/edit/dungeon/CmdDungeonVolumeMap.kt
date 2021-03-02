@@ -6,17 +6,18 @@ import it.forgottenworld.dungeons.api.serialization.box.BoxVolumeMap.Companion.g
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonVolumeMap @Inject constructor(
     private val plugin: FWDungeonsPlugin,
-    private val configuration: Configuration
+    private val configuration: Configuration,
+    private val dungeonManager: DungeonManager
 ) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }

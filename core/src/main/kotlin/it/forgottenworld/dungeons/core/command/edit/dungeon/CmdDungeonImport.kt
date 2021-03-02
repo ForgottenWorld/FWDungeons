@@ -1,15 +1,18 @@
 package it.forgottenworld.dungeons.core.command.edit.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
+import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-class CmdDungeonImport : PlayerCommand() {
+class CmdDungeonImport @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
@@ -29,7 +32,7 @@ class CmdDungeonImport : PlayerCommand() {
             return true
         }
 
-        val dungeon = DungeonManager.finalDungeons[id] ?: run {
+        val dungeon = dungeonManager.finalDungeons[id] ?: run {
             sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
             return true
         }

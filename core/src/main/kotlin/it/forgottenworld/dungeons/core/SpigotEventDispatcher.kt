@@ -1,10 +1,10 @@
 package it.forgottenworld.dungeons.core
 
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import com.google.inject.Inject
+import it.forgottenworld.dungeons.core.game.CombatObjectiveManager
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.game.RespawnManager
 import it.forgottenworld.dungeons.core.game.detection.BypassAttemptHandler
-import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager.combatObjective
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
@@ -12,19 +12,23 @@ import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 
-
-class SpigotEventDispatcher : Listener {
+class SpigotEventDispatcher @Inject constructor(
+    private val bypassAttemptHandler: BypassAttemptHandler,
+    private val combatObjectiveManager: CombatObjectiveManager,
+    private val respawnManager: RespawnManager,
+    private val dungeonManager: DungeonManager
+) : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
-        event.entity.uniqueId.editableDungeon?.onDestroy(true)
-        event.entity.uniqueId.finalInstance?.onPlayerDeath(event.entity)
+        dungeonManager.getPlayerEditableDungeon(event.entity.uniqueId)?.onDestroy(true)
+        dungeonManager.getPlayerInstance(event.entity.uniqueId)?.onPlayerDeath(event.entity)
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        event.player.uniqueId.editableDungeon?.onDestroy(true)
-        event.player.uniqueId.finalInstance?.onPlayerLeave(event.player)
+        dungeonManager.getPlayerEditableDungeon(event.player.uniqueId)?.onDestroy(true)
+        dungeonManager.getPlayerInstance(event.player.uniqueId)?.onPlayerLeave(event.player)
     }
 
     @EventHandler
@@ -33,34 +37,36 @@ class SpigotEventDispatcher : Listener {
             event.from.y == event.to.y &&
             event.from.z == event.to.z
         ) return
-        event.player.uniqueId.finalInstance?.onPlayerMove(event.player)
+        dungeonManager.getPlayerInstance(event.player.uniqueId)?.onPlayerMove(event.player)
     }
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        event.player.uniqueId.editableDungeon?.onPlayerInteract(event)
-        BypassAttemptHandler.onPlayerInteract(event)
+        dungeonManager.getPlayerEditableDungeon(event.player.uniqueId)?.onPlayerInteract(event)
+        bypassAttemptHandler.onPlayerInteract(event)
     }
 
     @EventHandler
     fun onEntityDeath(event: EntityDeathEvent) {
-        event.entity.uniqueId.combatObjective?.onMobKilled(event.entity.uniqueId)
+        combatObjectiveManager
+            .getEntityCombatObjective(event.entity.uniqueId)
+            ?.onMobKilled(event.entity.uniqueId)
     }
 
     @EventHandler
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
-        if (event.player.uniqueId.finalInstance?.isTpSafe != false) return
-        BypassAttemptHandler.onPlayerTeleport(event)
+        if (dungeonManager.getPlayerInstance(event.player.uniqueId)?.isTpSafe != false) return
+        bypassAttemptHandler.onPlayerTeleport(event)
     }
 
     @EventHandler
     fun onEntityPotionEffect(event: EntityPotionEffectEvent) {
-        BypassAttemptHandler.onEntityPotionEffect(event)
+        bypassAttemptHandler.onEntityPotionEffect(event)
     }
 
     @EventHandler
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
-        RespawnManager.onPlayerRespawn(event)
+        respawnManager.onPlayerRespawn(event)
     }
 
 }

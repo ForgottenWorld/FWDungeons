@@ -1,15 +1,19 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.cli.JsonMessages
+import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
-class CmdDungeonInvite : PlayerCommand() {
+class CmdDungeonInvite @Inject constructor(
+    private val jsonMessageGenerator: JsonMessageGenerator,
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
@@ -17,7 +21,7 @@ class CmdDungeonInvite : PlayerCommand() {
             return true
         }
 
-        val instance = sender.uniqueId.finalInstance ?: run {
+        val instance = dungeonManager.getPlayerInstance(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.CURRENTLY_NOT_IN_DUNGEON_PARTY)
             return true
         }
@@ -33,7 +37,7 @@ class CmdDungeonInvite : PlayerCommand() {
         }
 
         toPlayer.sendJsonMessage(
-            JsonMessages.invitation(
+            jsonMessageGenerator.invitation(
                 sender.name,
                 instance.dungeon.id,
                 instance.id,

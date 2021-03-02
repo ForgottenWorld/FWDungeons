@@ -8,8 +8,8 @@ interface Storage {
     interface Storable
 
     interface StorageStrategy<T : Storable> {
-        fun toConfig(obj: T, config: ConfigurationSection, storage: Storage)
-        fun fromConfig(config: ConfigurationSection, storage: Storage): T
+        fun toStorage(obj: T, config: ConfigurationSection, storage: Storage)
+        fun fromStorage(config: ConfigurationSection, storage: Storage): T
     }
 
     fun <T : Storable> load(klass: KClass<T>, config: ConfigurationSection): T

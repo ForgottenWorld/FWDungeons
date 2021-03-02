@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.echelonapi.FWEchelon
 import it.forgottenworld.echelonapi.mutexactivity.MutexActivity
@@ -12,25 +12,24 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 class FWEchelonUtils @Inject constructor(
-    private val configuration: Configuration
+    private val configuration: Configuration,
+    private val dungeonManager: DungeonManager
 ) {
 
     fun checkFWEchelonIntegration() {
-        val logger = Bukkit.getLogger()
-
-        logger.info("Checking for FWEchelon integration...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Checking for FWEchelon integration...")
         if (!configuration.fwEchelonIntegration) {
-            logger.info("FWEchelon integration is not enabled")
+            sendConsoleMessage(" -- FWEchelon integration is §4not enabled")
             return
         }
 
-        logger.info("FWEchelon integration is enabled")
+        sendConsoleMessage(" -- FWEchelon integration §2is enabled")
         if (Bukkit.getPluginManager().getPlugin("FWEchelon") == null) {
-            logger.info("FWEchelon is not present")
+            sendConsoleMessage(" -- FWEchelon is §4not present")
             return
         }
 
-        logger.info("FWEchelon is present")
+        sendConsoleMessage(" -- FWEchelon §2is present")
 
         FWEchelon.api
             .mutexActivityService
@@ -65,12 +64,12 @@ class FWEchelonUtils @Inject constructor(
             )
     }
 
-    private class FWDungeonsMutexActivity : MutexActivity {
+    private inner class FWDungeonsMutexActivity : MutexActivity {
 
         override val id = MUTEX_ACTIVITY_NAME
 
         override fun onAllPlayersForceRemoved(reason: String?) {
-            val insts = DungeonManager.playerFinalInstances.values
+            val insts = dungeonManager.playerInstances.values
             if (reason != null) {
                 for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
                     pl?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))
@@ -86,7 +85,7 @@ class FWEchelonUtils @Inject constructor(
         }
 
         override fun onPlayerForceRemoved(player: Player, reason: String?) {
-            val inst = player.uniqueId.finalInstance ?: return
+            val inst = dungeonManager.getPlayerInstance(player.uniqueId) ?: return
             if (reason != null) {
                 player.sendFWDMessage(Strings.YOU_WILL_BE_EVACUATED_BECAUSE.format(reason))
             } else {
@@ -99,5 +98,4 @@ class FWEchelonUtils @Inject constructor(
     companion object {
         const val MUTEX_ACTIVITY_NAME = "FWDungeons"
     }
-
 }

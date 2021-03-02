@@ -1,16 +1,20 @@
 package it.forgottenworld.dungeons.core.command.edit.trigger
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.editableDungeon
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.scripting.CodeParser
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
-class CmdTriggerCode : PlayerCommand() {
+class CmdTriggerCode @Inject constructor(
+    private val codeParser: CodeParser,
+    private val dungeonManager: DungeonManager
+) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val dungeon = sender.uniqueId.editableDungeon ?: run {
+        val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
@@ -25,7 +29,7 @@ class CmdTriggerCode : PlayerCommand() {
             return true
         }
 
-        val code = CodeParser.beautify(trigger.effectCode)
+        val code = codeParser.beautify(trigger.effectCode)
 
         sender.sendFWDMessage("\n§7[ CODE ]")
         sender.sendMessage(code)

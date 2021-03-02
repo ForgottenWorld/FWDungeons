@@ -10,7 +10,11 @@ class UnlockableStorageStrategy @Inject constructor(
     private val unlockableFactory: UnlockableFactory
 ) : Storage.StorageStrategy<Unlockable> {
 
-    override fun toConfig(obj: Unlockable, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(
+        obj: Unlockable,
+        config: ConfigurationSection,
+        storage: Storage
+    ) {
         config.set("seriesId", obj.seriesId)
         config.set("order", obj.order)
         config.set("message", obj.message)
@@ -29,7 +33,10 @@ class UnlockableStorageStrategy @Inject constructor(
         }
     }
 
-    override fun fromConfig(config: ConfigurationSection, storage: Storage) = unlockableFactory.create(
+    override fun fromStorage(
+        config: ConfigurationSection,
+        storage: Storage
+    ) = unlockableFactory.create(
         config.getInt("seriesId"),
         config.getInt("order"),
         config.getString("message")!!,

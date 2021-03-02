@@ -1,12 +1,15 @@
 package it.forgottenworld.dungeons.core.game.detection
 
+import com.google.inject.Singleton
+import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.NestableGrid3iToNi
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 
-object TriggerGridFactory {
+@Singleton
+class TriggerGridFactory {
 
     private fun createGridForBox(box: Box): NestableGrid3iToNi {
         val opposite = box.getOriginOpposite()
@@ -47,10 +50,13 @@ object TriggerGridFactory {
     fun createFinalDungeonGrid(
         finalDungeon: FinalDungeon
     ): NestableGrid3iToNi {
+        sendConsoleMessage(" -- Calculating trigger grid for §5${finalDungeon.name}")
         val grid = createGridForBox(finalDungeon.box)
         mapTriggersOntoGrid(grid, finalDungeon.triggers)
         return grid
     }
 
-    private const val GRID_INITIAL_CELL_SIZE = 16
+    companion object {
+        private const val GRID_INITIAL_CELL_SIZE = 16
+    }
 }

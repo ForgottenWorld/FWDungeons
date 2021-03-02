@@ -9,17 +9,15 @@ import kotlin.reflect.KProperty
 
 object Strings {
 
-    lateinit var stringMap: Map<String, String>
-
+    private lateinit var stringResourceMap: Map<String, String>
     private val loadedResourceStrings = mutableSetOf<ResourceString>()
 
     private class ResourceString {
-
         var value: String? = null
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
             if (value != null) return value!!
-            value = stringMap.getOrDefault(property.name, "STRING_${property.name}")
+            value = stringResourceMap.getOrDefault(property.name, "STRING_${property.name}")
             loadedResourceStrings.add(this)
             return value!!
         }
@@ -44,11 +42,12 @@ object Strings {
     private fun loadFromRes(conf: FileConfiguration) {
         for (rs in loadedResourceStrings) rs.value = null
         loadedResourceStrings.clear()
-        stringMap = conf.getKeys(false).associateWith { conf.getString(it) ?: "STRING_$it" }
+        stringResourceMap = conf.getKeys(false).associateWith { conf.getString(it) ?: "STRING_$it" }
     }
 
     const val CHAT_PREFIX = "§4F§6W§eD§f "
     const val CHAT_PREFIX_NO_SPACE = "§4F§6W§eD§f"
+    const val CONSOLE_PREFIX = "§f[§4F§6W§eD§fungeons] "
 
     val ACTIVE_AREAS by ResourceString()
     val ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET by ResourceString()

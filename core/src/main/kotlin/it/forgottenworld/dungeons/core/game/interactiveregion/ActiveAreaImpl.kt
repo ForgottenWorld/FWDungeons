@@ -13,12 +13,13 @@ import org.bukkit.Location
 import org.bukkit.Material
 import kotlin.random.Random
 
-data class ActiveAreaImpl @Inject constructor(
+class ActiveAreaImpl @Inject constructor(
     @Assisted override val id: Int,
     @Assisted override val box: Box,
     @Assisted override val startingMaterial: Material = Material.AIR,
     @Assisted override var label: String? = null,
-    private val configuration : Configuration
+    private val configuration : Configuration,
+    private val activeAreaFactory: ActiveAreaFactory
 ) : ActiveArea, Storage.Storable {
 
     override fun fillWithMaterial(material: Material, instance: DungeonInstance) {
@@ -37,11 +38,12 @@ data class ActiveAreaImpl @Inject constructor(
         )
     }
 
-    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = copy(
-        box = box.withContainerOrigin(oldOrigin, newOrigin)
+    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = activeAreaFactory.create(
+        id,
+        box.withContainerOrigin(oldOrigin, newOrigin),
+        startingMaterial,
+        label
     )
 
-    override fun withContainerOriginZero(oldOrigin: Vector3i) = copy(
-        box = box.withContainerOriginZero(oldOrigin)
-    )
+    override fun withContainerOriginZero(oldOrigin: Vector3i) = withContainerOrigin(oldOrigin, Vector3i.ZERO)
 }

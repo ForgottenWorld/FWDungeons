@@ -1,5 +1,6 @@
 package it.forgottenworld.dungeons.core.cli
 
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
@@ -7,7 +8,8 @@ import it.forgottenworld.dungeons.core.utils.clickEvent
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 
-object JsonMessages {
+@Singleton
+class JsonMessageGenerator {
 
     fun invitation(
         senderName: String,

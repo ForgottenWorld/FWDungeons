@@ -1,13 +1,16 @@
 package it.forgottenworld.dungeons.core.command.play.dungeon
 
+import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
-class CmdDungeonLookup: SenderCommand() {
+class CmdDungeonLookup @Inject constructor(
+    private val dungeonManager: DungeonManager
+) : SenderCommand() {
 
     override fun command(sender: CommandSender, args: Array<out String>): Boolean {
         if (args.count() == 0) {
@@ -21,7 +24,7 @@ class CmdDungeonLookup: SenderCommand() {
                 return true
             }
 
-        val instance = player.uniqueId.finalInstance
+        val instance = dungeonManager.getPlayerInstance(player.uniqueId)
             ?: run {
                 sender.sendFWDMessage(Strings.PLAYER_IS_NOT_IN_PARTY_OR_INSTANCE)
                 return true

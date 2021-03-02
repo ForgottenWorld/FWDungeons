@@ -1,9 +1,10 @@
 package it.forgottenworld.dungeons.core.cli
 
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeon
+import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
 import it.forgottenworld.dungeons.core.utils.clickEvent
@@ -11,9 +12,8 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import kotlin.math.floor
 
-object InteractiveRegionListGui {
-
-    private const val ITEMS_PER_PAGE = 16
+@Singleton
+class InteractiveRegionListGuiGenerator {
 
     private fun clickables(interactiveEl: InteractiveRegion, type: String) = chatComponent {
         append("  [", ChatColor.WHITE)
@@ -123,5 +123,9 @@ object InteractiveRegionListGui {
 
         append("\n".repeat(ITEMS_PER_PAGE - dungeon.triggers.size))
         append(paginator(page, floor(dungeon.triggers.size / ITEMS_PER_PAGE.toDouble()).toInt(), "t"))
+    }
+
+    companion object {
+        private const val ITEMS_PER_PAGE = 16
     }
 }

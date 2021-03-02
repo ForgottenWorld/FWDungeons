@@ -4,9 +4,11 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.core.command.edit.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.core.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.integrations.VaultUtils
+import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import org.bukkit.plugin.java.JavaPlugin
 
 class FWDungeonsPlugin : JavaPlugin() {
@@ -17,30 +19,33 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     @Inject private lateinit var fwDungeonsEditCommand: FWDungeonsEditCommand
     @Inject private lateinit var fWDungeonsPlayCommand: FWDungeonsPlayCommand
+
     @Inject private lateinit var configuration: Configuration
+
+    @Inject private lateinit var spigotEventDispatcher: SpigotEventDispatcher
 
     override fun onEnable() {
 
-        logger.info("Injecting dependencies...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Injecting dependencies...")
 
-        MainModule(this)
+        DIModule(this)
             .createInjector()
             .injectMembers(this)
 
-        logger.info("Saving default config...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Saving default config...")
 
         saveDefaultConfig()
 
         configuration.loadData()
 
-        logger.info("Registering commands...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Registering commands...")
 
         getCommand("fwdungeonsedit")!!.setExecutor(fwDungeonsEditCommand)
         getCommand("fwdungeons")!!.setExecutor(fWDungeonsPlayCommand)
 
-        logger.info("Registering events...")
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Registering events...")
 
-        server.pluginManager.registerEvents(SpigotEventDispatcher(), this)
+        server.pluginManager.registerEvents(spigotEventDispatcher, this)
 
         easyRankingUtils.checkEasyRankingIntegration()
         fwEchelonUtils.checkFWEchelonIntegration()
@@ -48,6 +53,6 @@ class FWDungeonsPlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
-        logger.info("Disabling FWDungeons...")
+        sendConsoleMessage("Disabling FWDungeons...")
     }
 }

@@ -1,7 +1,9 @@
 package it.forgottenworld.dungeons.core.game.detection
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager.finalInstance
+import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -11,7 +13,10 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.potion.PotionEffectType
 
-object BypassAttemptHandler {
+@Singleton
+class BypassAttemptHandler @Inject constructor(
+    private val dungeonManager: DungeonManager
+) {
 
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
 
@@ -35,7 +40,7 @@ object BypassAttemptHandler {
 
     fun onEntityPotionEffect(event: EntityPotionEffectEvent) {
         val player = event.entity as? Player ?: return
-        if (player.uniqueId.finalInstance != null &&
+        if (dungeonManager.getPlayerInstance(player.uniqueId) != null &&
             checkedCauses.contains(event.cause) &&
             bannedPotionEffects.contains(event.modifiedType)
         ) {
@@ -45,7 +50,7 @@ object BypassAttemptHandler {
     }
 
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.player.uniqueId.finalInstance == null ||
+        if (dungeonManager.getPlayerInstance(event.player.uniqueId) == null ||
             event.item?.type != Material.ENDER_PEARL ||
             !(event.action == Action.RIGHT_CLICK_AIR ||
                 event.action == Action.RIGHT_CLICK_BLOCK)) return
