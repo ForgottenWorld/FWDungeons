@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.api.game.interactiveregion
 
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Location
 import org.bukkit.Material

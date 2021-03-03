@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.scripting
 
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Material
@@ -50,10 +50,10 @@ class CodeParser {
                     if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
                     mobs.add(
                         MobSpawnData(
-                        currentActiveArea,
-                        code.removePrefix(Consts.PREFIX_VANILLA_MOB),
-                        false
-                    )
+                            currentActiveArea,
+                            code.removePrefix(Consts.PREFIX_VANILLA_MOB),
+                            false
+                        )
                     )
                 }
                 code.startsWith(Consts.PREFIX_ACTIVE_AREA) -> {

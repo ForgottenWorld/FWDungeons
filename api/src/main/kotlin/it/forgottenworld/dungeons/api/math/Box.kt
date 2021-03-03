@@ -125,6 +125,25 @@ data class Box(
         return blocks
     }
 
+    fun getBlockIterator(
+        world: World,
+        containerOrigin: Vector3i = Vector3i.ZERO
+    ) = iterator {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                for (z in 0 until depth) {
+                    yield(
+                        world.getBlockAt(
+                            containerOrigin.x + origin.x + x,
+                            containerOrigin.y + origin.y + y,
+                            containerOrigin.z + origin.z + z
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     fun getFrame(origin: Vector3i = this.origin): List<Vector3d> {
         val minX = origin.x + 0.5
         val maxX = origin.x + width - 0.5

@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.api.game.objective
 
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import java.util.*
 
 interface CombatObjective {

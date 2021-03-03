@@ -8,7 +8,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.T
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment

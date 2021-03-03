@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.game.interactiveregion
+package it.forgottenworld.dungeons.core.game.interactiveregion.activearea
 
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
@@ -9,6 +9,6 @@ interface ActiveAreaFactory {
         id: Int,
         box: Box,
         startingMaterial: Material,
-        label: String?,
+        label: String? = null,
     ) : ActiveArea
 }

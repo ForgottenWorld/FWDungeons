@@ -18,7 +18,13 @@ commands:
     aliases: [ fwdungeons,fwd ]
   fwdungeonsedit:
     description: Access FWDungeons functions.
-    usage: /fwdungeonsedit [ dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes ] | trigger [ pos1 | pos2 | label | unmake | wand | list | hl ] | activearea [ pos1 | pos2 | label | unmake | wand | list | hl ]]
+    usage: >
+      /fwdungeonsedit [
+      dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes | import | volmap ] |
+      trigger [ pos1 | pos2 | label | unmake | wand | list | hl | code ] |
+      activearea [ pos1 | pos2 | label | unmake | wand | list | hl ] |
+      chest [ add | label | remove ] |
+      unlockables [ bindplate | unbindplate | lookup ] ]
     aliases: [ fwdungeonsedit,fwde ]
 permissions:
   fwdungeonsedit.dungeon.create:
@@ -122,6 +128,15 @@ permissions:
     default: op
   fwdungeonsedit.activearea.hl:
     description: Allows the player to use /fwdungeonsedit activearea hl
+    default: op
+  fwdungeonsedit.unlockables.bindplate:
+    description: Allows the player to use /fwdungeonsedit unlockables bindplate
+    default: op
+  fwdungeonsedit.unlockables.unbindplate:
+    description: Allows the player to use /fwdungeonsedit unlockables unbindplate
+    default: op
+  fwdungeonsedit.unlockables.lookupplate:
+    description: Allows the player to use /fwdungeonsedit unlockables lookupplate
     default: op
   fwdungeons.list:
     description: Allows the player to use /fwdungeons list

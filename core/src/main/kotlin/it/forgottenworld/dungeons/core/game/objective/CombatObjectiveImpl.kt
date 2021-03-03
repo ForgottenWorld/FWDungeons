@@ -2,9 +2,8 @@ package it.forgottenworld.dungeons.core.game.objective
 
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
-import it.forgottenworld.dungeons.core.game.CombatObjectiveManager
 import org.bukkit.Bukkit.getEntity
 import org.bukkit.entity.LivingEntity
 import java.util.*

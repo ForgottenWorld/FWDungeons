@@ -42,6 +42,12 @@ class VaultUtils @Inject constructor(
             ) == true
     }
 
+    fun formatCurrency(amount: Double) = servicesManager
+        .getRegistration(Economy::class.java)
+        ?.provider
+        ?.currencyNamePlural()
+        ?.let { "$it $amount" }
+
     fun withdrawPlayer(player: Player, amount: Double) {
         if (!configuration.useVault) return
         servicesManager

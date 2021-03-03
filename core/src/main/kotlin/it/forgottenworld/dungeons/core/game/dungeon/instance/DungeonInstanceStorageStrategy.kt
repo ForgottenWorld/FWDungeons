@@ -1,10 +1,10 @@
-package it.forgottenworld.dungeons.core.game.instance
+package it.forgottenworld.dungeons.core.game.dungeon.instance
 
 import com.google.inject.Inject
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import org.bukkit.configuration.ConfigurationSection
 
 class DungeonInstanceStorageStrategy @Inject constructor(
@@ -22,7 +22,7 @@ class DungeonInstanceStorageStrategy @Inject constructor(
 
     override fun fromStorage(config: ConfigurationSection, storage: Storage) = dungeonInstanceFactory.create(
         config.getInt("id"),
-        dungeonManager.finalDungeons[config.getInt(("dId"))]!!,
+        dungeonManager.getFinalDungeonById(config.getInt(("dId")))!!,
         Vector3i(config.getInt("x"),config.getInt("y"),config.getInt("z"))
     )
 }

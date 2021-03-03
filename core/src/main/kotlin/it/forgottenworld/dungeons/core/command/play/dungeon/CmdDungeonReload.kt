@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -19,10 +19,12 @@ class CmdDungeonReload @Inject constructor(
             return true
         }
 
-        dungeonManager.finalDungeons.values.flatMap {
-            dungeonManager.getDungeonInstances(it).values
-        }.forEach { it.evacuate() }
-        dungeonManager.finalDungeons.clear()
+        dungeonManager
+            .getAllFinalDungeons()
+            .flatMap { dungeonManager.getDungeonInstances(it).values }
+            .forEach { it.evacuate() }
+
+        dungeonManager.clearFinalDungeons()
 
         configuration.loadData()
 

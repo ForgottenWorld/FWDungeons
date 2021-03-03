@@ -7,7 +7,7 @@ import com.google.inject.Provider
 import com.google.inject.assistedinject.FactoryModuleBuilder
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
@@ -17,12 +17,12 @@ import it.forgottenworld.dungeons.core.config.StorageImpl
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonFactory
 import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeonImpl
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonImpl
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaImpl
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerImpl
+import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
+import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceImpl
+import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaImpl
+import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerImpl
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveImpl
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableFactory

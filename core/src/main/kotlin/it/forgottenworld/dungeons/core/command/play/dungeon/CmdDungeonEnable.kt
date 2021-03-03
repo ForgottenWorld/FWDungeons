@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -22,7 +22,7 @@ class CmdDungeonEnable @Inject constructor(
             return true
         }
 
-        val dungeon = dungeonManager.finalDungeons[id] ?: run {
+        val dungeon = dungeonManager.getFinalDungeonById(id) ?: run {
             sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
             return true
         }
@@ -42,7 +42,7 @@ class CmdDungeonEnable @Inject constructor(
             return true
         }
 
-        dungeon.isActive = true
+        dungeonManager.enableDungeon(id)
         sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_WAS_ENABLED.format(id))
 
         return true

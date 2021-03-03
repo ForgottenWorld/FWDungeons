@@ -1,10 +1,10 @@
-package it.forgottenworld.dungeons.core.game.instance
+package it.forgottenworld.dungeons.core.game.dungeon.instance
 
 import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
 import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
@@ -13,15 +13,16 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.CombatObjectiveManager
-import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.RespawnManager
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
+import it.forgottenworld.dungeons.core.game.respawn.RespawnData
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.utils.*
-import it.forgottenworld.dungeons.core.utils.RespawnData.Companion.currentWarpbackData
+import it.forgottenworld.dungeons.core.game.respawn.RespawnData.Companion.currentWarpbackData
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -77,10 +78,14 @@ class DungeonInstanceImpl @AssistedInject constructor(
         combatObjectiveManager,
         respawnManager,
         dungeonManager
-    ) {
-        resetInstance()
+    )
+
+    init {
         val curInstances = dungeonManager.getDungeonInstances(dungeon)
         dungeonManager.setDungeonInstances(dungeon, curInstances + (id to this))
+        for (aa in dungeon.activeAreas.values) {
+            aa.fillWithMaterial(aa.startingMaterial, this)
+        }
     }
 
     override var leader: UUID? = null

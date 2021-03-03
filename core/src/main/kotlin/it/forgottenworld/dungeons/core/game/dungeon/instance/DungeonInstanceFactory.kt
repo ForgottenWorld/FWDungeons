@@ -1,6 +1,6 @@
-package it.forgottenworld.dungeons.core.game.instance
+package it.forgottenworld.dungeons.core.game.dungeon.instance
 
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 

@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.game.interactiveregion
+package it.forgottenworld.dungeons.core.game.interactiveregion.trigger
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger

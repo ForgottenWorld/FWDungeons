@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.game
+package it.forgottenworld.dungeons.core.game.objective
 
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective

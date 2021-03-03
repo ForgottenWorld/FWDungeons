@@ -1,10 +1,11 @@
 package it.forgottenworld.dungeons.core
 
 import com.google.inject.Inject
-import it.forgottenworld.dungeons.core.game.CombatObjectiveManager
-import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.RespawnManager
 import it.forgottenworld.dungeons.core.game.detection.BypassAttemptHandler
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
+import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
+import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
@@ -16,7 +17,8 @@ class SpigotEventDispatcher @Inject constructor(
     private val bypassAttemptHandler: BypassAttemptHandler,
     private val combatObjectiveManager: CombatObjectiveManager,
     private val respawnManager: RespawnManager,
-    private val dungeonManager: DungeonManager
+    private val dungeonManager: DungeonManager,
+    private val unlockableManager: UnlockableManager
 ) : Listener {
 
     @EventHandler
@@ -43,6 +45,7 @@ class SpigotEventDispatcher @Inject constructor(
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         dungeonManager.getPlayerEditableDungeon(event.player.uniqueId)?.onPlayerInteract(event)
+        unlockableManager.onPlayerInteract(event)
         bypassAttemptHandler.onPlayerInteract(event)
     }
 

@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.utils
+package it.forgottenworld.dungeons.core.game.respawn
 
 import it.forgottenworld.dungeons.api.math.Vector3i
 import org.bukkit.Bukkit

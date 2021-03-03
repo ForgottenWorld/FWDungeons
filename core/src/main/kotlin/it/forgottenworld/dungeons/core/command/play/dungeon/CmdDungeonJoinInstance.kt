@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.entity.Player
 
@@ -27,7 +27,7 @@ class CmdDungeonJoinInstance @Inject constructor(
 
         val pass = if (args.count() > 2) args[2] else ""
 
-        val dungeon = dungeonManager.finalDungeons[dungeonId] ?: run {
+        val dungeon = dungeonManager.getFinalDungeonById(dungeonId) ?: run {
             sender.sendFWDMessage(Strings.INVALID_DUNGEON_ID)
             return true
         }

@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -26,9 +26,10 @@ class CmdDungeonEvacuate @Inject constructor(
         }
 
         sender.sendFWDMessage(
-            if (dungeonManager.finalDungeons[dungeonId]
+            if (dungeonManager.getFinalDungeonById(dungeonId)
                     ?.let { dungeonManager.getDungeonInstances(it) }
-                    ?.get(instanceId)?.evacuate() != null
+                    ?.get(instanceId)
+                    ?.evacuate() != null
             ) {
                 Strings.ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET
             } else {

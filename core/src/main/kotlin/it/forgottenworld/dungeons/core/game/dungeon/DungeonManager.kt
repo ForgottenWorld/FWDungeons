@@ -1,20 +1,50 @@
-package it.forgottenworld.dungeons.core.game
+package it.forgottenworld.dungeons.core.game.dungeon
 
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
+import it.forgottenworld.dungeons.core.utils.firstGap
 import java.util.*
 
 @Singleton
 class DungeonManager {
 
-    val finalDungeons = mutableMapOf<Int, FinalDungeon>()
-
+    private val finalDungeons = mutableMapOf<Int, FinalDungeon>()
     private val playerEditableDungeons = mutableMapOf<UUID, EditableDungeon>()
     private val dungeonInstances = mutableMapOf<Int, Map<Int, DungeonInstance>>()
-    val playerInstances = mutableMapOf<UUID, DungeonInstance>()
+    private val playerInstances = mutableMapOf<UUID, DungeonInstance>()
+
+    val finalDungeonIds get() = finalDungeons.keys
+
+    val finalDungeonCount get() = finalDungeons.size
+
+    fun getFirstAvailableFinalDungeonId() = finalDungeons.keys.firstGap()
+
+    fun clearFinalDungeons() {
+        finalDungeons.clear()
+    }
+
+    fun enableDungeon(id: Int) {
+        finalDungeons[id]?.isActive = true
+    }
+
+    fun disableDungeon(id: Int) {
+        finalDungeons[id]?.isActive = false
+    }
+
+    fun getAllFinalDungeons() = finalDungeons.values
+
+    fun getAllActiveFinalDungeons() = finalDungeons.values.filter { it.isActive }
+
+    fun registerFinalDungeon(dungeon: FinalDungeon) {
+        finalDungeons[dungeon.id] = dungeon
+    }
+
+    fun getFinalDungeonById(id: Int) = finalDungeons[id]
+
+    fun getAllBusyInstances() = playerInstances.values.distinct()
 
     fun getDungeonInstances(dungeon: Dungeon): Map<Int, DungeonInstance> {
         dungeonInstances[dungeon.id]?.let { return it }

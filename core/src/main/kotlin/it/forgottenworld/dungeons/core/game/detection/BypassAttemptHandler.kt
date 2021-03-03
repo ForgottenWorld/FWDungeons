@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.game.detection
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player

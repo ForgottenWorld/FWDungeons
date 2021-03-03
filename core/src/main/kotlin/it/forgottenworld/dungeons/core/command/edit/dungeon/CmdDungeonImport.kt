@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.Material
@@ -32,7 +32,7 @@ class CmdDungeonImport @Inject constructor(
             return true
         }
 
-        val dungeon = dungeonManager.finalDungeons[id] ?: run {
+        val dungeon = dungeonManager.getFinalDungeonById(id) ?: run {
             sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
             return true
         }

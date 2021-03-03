@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.integrations
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import it.forgottenworld.echelonapi.FWEchelon
@@ -69,7 +69,7 @@ class FWEchelonUtils @Inject constructor(
         override val id = MUTEX_ACTIVITY_NAME
 
         override fun onAllPlayersForceRemoved(reason: String?) {
-            val insts = dungeonManager.playerInstances.values
+            val insts = dungeonManager.getAllBusyInstances()
             if (reason != null) {
                 for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
                     pl?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))

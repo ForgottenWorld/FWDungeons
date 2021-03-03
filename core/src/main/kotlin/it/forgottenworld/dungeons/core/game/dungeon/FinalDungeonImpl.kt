@@ -13,9 +13,8 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
 import it.forgottenworld.dungeons.core.game.detection.TriggerGridFactory
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
+import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.configuration.file.YamlConfiguration

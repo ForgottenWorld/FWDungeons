@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.api.game.instance
+package it.forgottenworld.dungeons.api.game.dungeon.instance
 
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective

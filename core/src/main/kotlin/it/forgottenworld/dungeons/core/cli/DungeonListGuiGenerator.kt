@@ -3,9 +3,9 @@ package it.forgottenworld.dungeons.core.cli
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
 import it.forgottenworld.dungeons.core.utils.clickEvent
@@ -67,7 +67,7 @@ class DungeonListGuiGenerator @Inject constructor(
 
         append("=====================================", ChatColor.DARK_GRAY)
 
-        if (page < dungeonManager.finalDungeons.count() - 1) {
+        if (page < dungeonManager.finalDungeonCount - 1) {
             append("=[ ")
             color(ChatColor.DARK_GRAY)
             append(pageClickable(">>>>", page + 1))
@@ -94,11 +94,9 @@ class DungeonListGuiGenerator @Inject constructor(
 
     fun showPage(page: Int) = chatComponent {
 
-        if (page < 0 || page > dungeonManager.finalDungeons.count() - 1) return@chatComponent
+        if (page < 0 || page > dungeonManager.finalDungeonCount - 1) return@chatComponent
         val dng = dungeonManager
-            .finalDungeons
-            .values
-            .filter { it.isActive }
+            .getAllActiveFinalDungeons()
             .getOrNull(page) ?: return@chatComponent
 
         append("====================[ ", ChatColor.DARK_GRAY)

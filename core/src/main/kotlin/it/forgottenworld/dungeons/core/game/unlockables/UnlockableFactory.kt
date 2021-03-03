@@ -9,6 +9,6 @@ interface UnlockableFactory {
         @Assisted("order") order: Int,
         @Assisted("message") message: String,
         @Assisted("unlockedMessage") unlockedMessage: String,
-        requirements: List<Unlockable.UnlockableRequirement>
+        requirements: List<Unlockable.Requirement>
     ) : Unlockable
 }

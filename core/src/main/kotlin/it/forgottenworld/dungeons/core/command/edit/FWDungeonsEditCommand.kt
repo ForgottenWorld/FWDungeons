@@ -9,6 +9,9 @@ import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestLabel
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestRemove
 import it.forgottenworld.dungeons.core.command.edit.dungeon.*
 import it.forgottenworld.dungeons.core.command.edit.trigger.*
+import it.forgottenworld.dungeons.core.command.edit.unlockables.CmdUnlockablesBindPlate
+import it.forgottenworld.dungeons.core.command.edit.unlockables.CmdUnlockablesLookupPlate
+import it.forgottenworld.dungeons.core.command.edit.unlockables.CmdUnlockablesUnbindPlate
 
 class FWDungeonsEditCommand @Inject constructor(
     cmdActiveAreaPos1: CmdActiveAreaPos1,
@@ -46,7 +49,10 @@ class FWDungeonsEditCommand @Inject constructor(
     cmdDungeonPoints: CmdDungeonPoints,
     cmdDungeonHlFrames: CmdDungeonHlFrames,
     cmdDungeonVolumeMap: CmdDungeonVolumeMap,
-    cmdDungeonImport: CmdDungeonImport
+    cmdDungeonImport: CmdDungeonImport,
+    cmdUnlockablesBindPlate: CmdUnlockablesBindPlate,
+    cmdUnlockablesLookupPlate: CmdUnlockablesLookupPlate,
+    cmdUnlockablesUnbindPlate: CmdUnlockablesUnbindPlate
 ) : TreeCommand(
     "fwdungeonsedit",
     BranchingCommand(
@@ -122,7 +128,19 @@ class FWDungeonsEditCommand @Inject constructor(
                     "dungeon" to it,
                     "d" to it
                 )
-            })
+            }),
+            *(BranchingCommand(
+                mapOf(
+                    "bindplate" to cmdUnlockablesBindPlate,
+                    "lookupplate" to cmdUnlockablesLookupPlate,
+                    "unbindplate" to cmdUnlockablesUnbindPlate
+                )
+            ).let {
+                arrayOf(
+                    "unlockables" to it,
+                    "unl" to it
+                )
+            }),
         )
     )
 )

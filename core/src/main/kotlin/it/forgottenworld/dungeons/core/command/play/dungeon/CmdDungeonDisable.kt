@@ -3,7 +3,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendFWDMessage
 import org.bukkit.command.CommandSender
 
@@ -24,7 +24,7 @@ class CmdDungeonDisable @Inject constructor(
             return true
         }
 
-        val res = dungeonManager.finalDungeons[dungeonId]?.let { d ->
+        val res = dungeonManager.getFinalDungeonById(dungeonId)?.let { d ->
             dungeonManager.getDungeonInstances(d).values.forEach { it.evacuate() }
             d.isActive = false
         } != null

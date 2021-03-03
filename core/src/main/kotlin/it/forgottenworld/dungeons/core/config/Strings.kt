@@ -197,4 +197,13 @@ object Strings {
     val YOU_WILL_BE_TPED_SHORTLY by ResourceString()
     val YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS by ResourceString()
     val YOU_WISH_YOU_COULD by ResourceString()
+    val PROVIDE_VALID_UNLOCKABLE_SERIES_ID by ResourceString()
+    val PROVIDE_VALID_UNLOCKABLE_ID by ResourceString()
+    val NO_PRESSURE_PLATE_BELOW_YOU by ResourceString()
+    val PRESSURE_PLATE_IS_NOT_BOUND by ResourceString()
+    val PRESSURE_PLATE_IS_NOW_BOUND by ResourceString()
+    val PRESSURE_PLATE_IS_BOUND_TO by ResourceString()
+    val REQUIREMENTS_NOT_MET by ResourceString()
+    val YOU_CANT_UNLOCK_YET by ResourceString()
+    val PRESSURE_PLATE_HAS_BEEN_UNBOUND by ResourceString()
 }

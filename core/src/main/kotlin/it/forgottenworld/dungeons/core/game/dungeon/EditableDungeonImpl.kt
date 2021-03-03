@@ -14,10 +14,9 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.DungeonManager
-import it.forgottenworld.dungeons.core.game.instance.DungeonInstanceFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.ActiveAreaFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.TriggerFactory
+import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerFactory
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -126,10 +125,10 @@ class EditableDungeonImpl @AssistedInject constructor(
 
     override fun finalize(): FinalDungeon {
         if (id == EditableDungeon.NEW_DUNGEON_TEMP_ID) {
-            id = dungeonManager.finalDungeons.keys.firstGap()
+            id = dungeonManager.getFirstAvailableFinalDungeonId()
         }
         val finalDungeon = dungeonFactory.createFinal(this)
-        dungeonManager.finalDungeons[id] = finalDungeon
+        dungeonManager.registerFinalDungeon(finalDungeon)
         saveToConfigAndCreateInstances(id, finalDungeon)
         onDestroy()
         return finalDungeon
@@ -181,12 +180,37 @@ class EditableDungeonImpl @AssistedInject constructor(
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
+        
+        val volume = box.width * box.height * box.depth
+        val materialCounts = mutableMapOf<Material, Int>()
+        var prevalentMaterial = Material.AIR
+        var prevalentCount = 0
+        var runnerUpCount = 0
+        for ((i,block) in box.getBlockIterator(
+            configuration.dungeonWorld,
+            testOrigin
+        ).withIndex()) {
+            val count = (materialCounts[block.type] ?: 0) + 1
+            materialCounts[block.type] = count
+            if (count > prevalentCount) {
+                if (prevalentMaterial != block.type) {
+                    runnerUpCount = prevalentCount
+                    prevalentMaterial = block.type
+                }
+                prevalentCount = count
+            } else if (count > runnerUpCount) {
+                runnerUpCount = count
+            }
+            if (volume - i - 1 < prevalentCount - runnerUpCount) break
+        }
+        
         val activeArea = activeAreaFactory.create(
             id,
             box.withContainerOriginZero(testOrigin),
-            Material.AIR,
+            prevalentMaterial,
             null
         )
+        
         activeAreas = activeAreas.plus(id to activeArea)
         highlightNewInteractiveRegion(activeArea)
         return id
@@ -243,7 +267,7 @@ class EditableDungeonImpl @AssistedInject constructor(
         activeAreaBoxBuilder.clear()
         dungeonManager.setPlayerEditableDungeon(editor, null)
         if (restoreFormer) {
-            dungeonManager.finalDungeons[id]?.isBeingEdited = false
+            dungeonManager.getFinalDungeonById(id)?.isBeingEdited = false
         }
         Bukkit.getPlayer(editor)?.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }

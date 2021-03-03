@@ -2,12 +2,18 @@ package it.forgottenworld.dungeons.core.game.unlockables
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
+import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
+import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerInteractEvent
 import java.util.*
 
 @Singleton
@@ -17,6 +23,7 @@ class UnlockableManager @Inject constructor(
 
     private val unlockableSeries = mutableMapOf<Int, UnlockableSeries>()
     private val playerUnlockProgress = mutableMapOf<Pair<UUID, Int>, Int>()
+    private val unlockablePositions = mutableMapOf<Pair<UUID, Vector3i>, Pair<Int, Int>>()
 
     fun loadUnlockablesFromConfig(config: ConfigurationSection) {
         for (key in config.getKeys(false)) {
@@ -25,19 +32,78 @@ class UnlockableManager @Inject constructor(
         }
     }
 
+    fun lookUpPlate(
+        worldId: UUID,
+        position: Vector3i
+    ) = unlockablePositions[worldId to position]
+
+    fun bindPlateToUnlockable(
+        seriesId: Int,
+        unlockableId: Int,
+        worldId: UUID,
+        position: Vector3i
+    ) {
+        unlockablePositions[worldId to position] = seriesId to unlockableId
+    }
+
+    fun unbindPlate(
+        worldId: UUID,
+        position: Vector3i
+    ) = unlockablePositions.remove(worldId to position) != null
+
+    fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (event.action != Action.PHYSICAL) return
+        val block = event.clickedBlock ?: return
+        if (RECOGNIZED_PRESSURE_PLATE_TYPES.contains(block.type)) {
+            onPlayerStepOnPlate(event.player, block.location)
+        }
+    }
+
     fun hasPlayerUnlocked(player: Player, seriesId: Int, unlockableOrder: Int) =
         playerUnlockProgress[player.uniqueId to seriesId] ?: 0 >= unlockableOrder
 
-    fun tryPlayerUnlock(player: Player, unlockable: Unlockable): Boolean {
-        val key = player.uniqueId to unlockable.seriesId
+    private fun onPlayerStepOnPlate(player: Player, location: Location) {
+        val (seriesId, unlockableOrder) = lookUpPlate(
+            location.world.uid,
+            Vector3i.ofLocation(location)
+        ) ?: return
+
+        tryPlayerUnlock(player, seriesId, unlockableOrder)
+    }
+
+    private fun tryPlayerUnlock(player: Player, seriesId: Int, unlockableOrder: Int) {
+        val key = player.uniqueId to seriesId
         val progress = playerUnlockProgress[key] ?: run {
             playerUnlockProgress[key] = 0
             0
         }
-        if (progress == unlockable.order) {
-            playerUnlockProgress[key] = progress + 1
-            return true
+        val unlockable = unlockableSeries[seriesId]!!.unlockables[unlockableOrder]
+        player.sendFWDMessage(unlockable.message)
+        if (progress == unlockableOrder) {
+            player.sendFWDMessage(unlockable.printRequirements())
+            if (unlockable.executeRequirements(player)) {
+                player.sendFWDMessage(unlockable.unlockedMessage)
+                playerUnlockProgress[key] = progress + 1
+            } else {
+                player.sendFWDMessage(Strings.REQUIREMENTS_NOT_MET)
+            }
+            return
         }
-        return false
+        player.sendFWDMessage(Strings.YOU_CANT_UNLOCK_YET.format(seriesId, unlockableOrder))
+    }
+
+    companion object {
+        val RECOGNIZED_PRESSURE_PLATE_TYPES = setOf(
+            Material.ACACIA_PRESSURE_PLATE,
+            Material.BIRCH_PRESSURE_PLATE,
+            Material.CRIMSON_PRESSURE_PLATE,
+            Material.DARK_OAK_PRESSURE_PLATE,
+            Material.JUNGLE_PRESSURE_PLATE,
+            Material.OAK_PRESSURE_PLATE,
+            Material.POLISHED_BLACKSTONE_PRESSURE_PLATE,
+            Material.SPRUCE_PRESSURE_PLATE,
+            Material.STONE_PRESSURE_PLATE,
+            Material.WARPED_PRESSURE_PLATE
+        )
     }
 }

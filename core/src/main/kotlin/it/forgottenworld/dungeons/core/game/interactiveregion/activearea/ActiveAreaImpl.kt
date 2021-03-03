@@ -1,8 +1,8 @@
-package it.forgottenworld.dungeons.core.game.interactiveregion
+package it.forgottenworld.dungeons.core.game.interactiveregion.activearea
 
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
-import it.forgottenworld.dungeons.api.game.instance.DungeonInstance
+import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
