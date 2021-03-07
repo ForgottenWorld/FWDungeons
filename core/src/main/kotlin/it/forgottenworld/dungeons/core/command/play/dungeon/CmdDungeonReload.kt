@@ -2,14 +2,14 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
-import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.command.CommandSender
 
 class CmdDungeonReload @Inject constructor(
-    private val configuration: Configuration,
+    private val plugin: FWDungeonsPlugin,
     private val dungeonManager: DungeonManager
 ) : SenderCommand() {
 
@@ -26,7 +26,7 @@ class CmdDungeonReload @Inject constructor(
 
         dungeonManager.clearFinalDungeons()
 
-        configuration.loadData()
+        plugin.loadData()
 
         sender.sendPrefixedMessage(Strings.RELOADING_DUNGEONS_AND_INSTANCES)
 

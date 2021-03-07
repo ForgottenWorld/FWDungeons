@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.core.game.chest
 
 import it.forgottenworld.dungeons.api.game.chest.Chest
-import it.forgottenworld.dungeons.api.serialization.edit
-import it.forgottenworld.dungeons.api.serialization.read
+import it.forgottenworld.dungeons.api.storage.edit
+import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.Material

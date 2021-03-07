@@ -2,14 +2,12 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonWriteOut @Inject constructor(
-    private val configuration: Configuration,
     private val dungeonManager: DungeonManager
 ) : PlayerCommand() {
 
@@ -26,7 +24,7 @@ class CmdDungeonWriteOut @Inject constructor(
         }
 
         val finalDungeon = dungeon.finalize()
-        configuration.saveDungeonConfig(finalDungeon)
+        dungeonManager.saveDungeonToStorage(finalDungeon)
         sender.sendPrefixedMessage(Strings.DUNGEON_EXPORTED)
 
         return true

@@ -5,6 +5,8 @@ import it.forgottenworld.dungeons.core.command.edit.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.core.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.integrations.VaultUtils
@@ -34,6 +36,33 @@ class FWDungeonsPlugin : JavaPlugin() {
     @Inject
     private lateinit var bukkitEventListener: BukkitEventListener
 
+    @Inject
+    private lateinit var dungeonManager: DungeonManager
+
+    @Inject
+    private lateinit var unlockableManager: UnlockableManager
+
+    fun loadData(reload: Boolean = true) {
+
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Loading configuration...")
+        if (reload) {
+            reloadConfig()
+            configuration.reload()
+        }
+
+        sendConsoleMessage(" -- Loading strings...")
+        Strings.load(this)
+
+        sendConsoleMessage(" -- Loading unlockables...")
+        unlockableManager.loadUnlockablesFromStorage()
+
+        sendConsoleMessage(" -- Loading dungeons...")
+        dungeonManager.loadDungeonsFromStorage()
+
+        sendConsoleMessage(" -- Loading instances...")
+        dungeonManager.loadInstancesFromStorage()
+    }
+
     override fun onEnable() {
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Injecting dependencies...")
@@ -46,7 +75,7 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         saveDefaultConfig()
 
-        configuration.loadData()
+        loadData(false)
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Registering commands...")
 

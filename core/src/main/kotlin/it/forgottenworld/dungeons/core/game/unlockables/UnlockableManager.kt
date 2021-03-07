@@ -6,11 +6,12 @@ import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.api.storage.read
+import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
@@ -25,10 +26,15 @@ class UnlockableManager @Inject constructor(
     private val playerUnlockProgress = mutableMapOf<Pair<UUID, Int>, Int>()
     private val unlockablePositions = mutableMapOf<Pair<UUID, Vector3i>, Pair<Int, Int>>()
 
-    fun loadUnlockablesFromConfig(config: ConfigurationSection) {
-        for (key in config.getKeys(false)) {
-            val series = storage.load<UnlockableSeries>(config.getConfigurationSection(key)!!)
-            unlockableSeries[series.id] = series
+    fun loadUnlockablesFromStorage() {
+        yaml {
+            load(storage.unlockablesFile)
+            read {
+                forEachSection { _, sec ->
+                    val series = storage.load<UnlockableSeries>(sec)
+                    unlockableSeries[series.id] = series
+                }
+            }
         }
     }
 

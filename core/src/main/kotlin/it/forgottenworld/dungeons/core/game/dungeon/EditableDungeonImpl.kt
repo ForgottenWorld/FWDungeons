@@ -12,6 +12,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
@@ -22,7 +23,6 @@ import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Particle
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
@@ -141,18 +141,19 @@ class EditableDungeonImpl @AssistedInject constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     private fun saveToConfigAndCreateInstances(newId: Int, finalDungeon: FinalDungeon) {
         try {
-            val config = YamlConfiguration()
-            val file = File(plugin.dataFolder, "instances.yml")
-            if (file.exists()) config.load(file)
-            val dgConf = config.createSection("$newId")
-            val instances = finalInstanceLocations.withIndex().associate { (k, v) ->
-                val section = dgConf.createSection("$k")
-                val inst = dungeonInstanceFactory.create(finalDungeon, v)
-                storage.save(inst, section)
-                k to inst
+            yaml {
+                val file = File(plugin.dataFolder, "instances.yml")
+                if (file.exists()) load(file)
+                val dgConf = createSection("$newId")
+                val instances = finalInstanceLocations.withIndex().associate { (k, v) ->
+                    val section = dgConf.createSection("$k")
+                    val inst = dungeonInstanceFactory.create(finalDungeon, v)
+                    storage.save(inst, section)
+                    k to inst
+                }
+                dungeonManager.setDungeonInstances(finalDungeon, instances)
+                launchAsync { save(file) }
             }
-            dungeonManager.setDungeonInstances(finalDungeon, instances)
-            launchAsync { config.save(file) }
         } catch (e: Exception) {
             sendConsoleMessage(e.message ?: e.toString())
         }

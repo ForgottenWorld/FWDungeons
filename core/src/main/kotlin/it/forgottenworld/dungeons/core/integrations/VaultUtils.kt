@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.core.integrations
 
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
@@ -9,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicesManager
 
+@Singleton
 class VaultUtils @Inject constructor(
     private val configuration: Configuration,
     private val servicesManager: ServicesManager

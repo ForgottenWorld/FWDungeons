@@ -5,6 +5,7 @@ import com.google.inject.Guice
 import com.google.inject.Injector
 import com.google.inject.Provider
 import com.google.inject.assistedinject.FactoryModuleBuilder
+import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
@@ -38,6 +39,7 @@ class DependenciesModule(private val plugin: FWDungeonsPlugin) : AbstractModule(
         bind(FWDungeonsPlugin::class.java).toInstance(plugin)
         bind(Storage::class.java).to(StorageImpl::class.java)
         bind(ServicesManager::class.java).toProvider(Provider { plugin.server.servicesManager })
+        bind(BukkitAPIHelper::class.java).toInstance(BukkitAPIHelper())
 
         install(
             FactoryModuleBuilder()

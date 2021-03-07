@@ -1,13 +1,7 @@
-package it.forgottenworld.dungeons.api.serialization
+package it.forgottenworld.dungeons.api.storage
 
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.serialization.ConfigurationSerializable
-
-inline fun ConfigurationSection.forEachSection(action: (String, ConfigurationSection) -> Unit) {
-    for (k in getKeys(false)) {
-        action(k, getConfigurationSection(k)!!)
-    }
-}
+import org.bukkit.configuration.file.YamlConfiguration
 
 inline fun ConfigurationSection.edit(
     edit: YamlEditScope.() -> Unit
@@ -25,6 +19,12 @@ class YamlEditScope(val configurationSection: ConfigurationSection) {
     ) = configurationSection.createSection(path).apply { edit(edit) }
 }
 
+inline fun yaml(edit: YamlConfiguration.() -> Unit): YamlConfiguration {
+    val conf = YamlConfiguration()
+    conf.edit()
+    return conf
+}
+
 inline fun <R> ConfigurationSection.read(
     transform: YamlReadScope.() -> R
 ) = YamlReadScope(this).transform()
@@ -33,11 +33,14 @@ class YamlReadScope(val configurationSection: ConfigurationSection) {
 
     inline fun <reified T : Any> get(key: String) = configurationSection.get(key) as T?
 
-    inline fun <reified T : ConfigurationSerializable> getSerializable(key: String) =
-        configurationSection.getSerializable(key, T::class.java)
-
     inline fun <reified T : Any> get(key: String, def: T) =
         configurationSection.get(key) as T? ?: def
+
+    inline fun forEachSection(action: (String, ConfigurationSection) -> Unit) {
+        for (k in configurationSection.getKeys(false)) {
+            action(k, configurationSection.getConfigurationSection(k)!!)
+        }
+    }
 
     inline fun <K, V> associateSections(
         transform: (String, ConfigurationSection) -> Pair<K, V>

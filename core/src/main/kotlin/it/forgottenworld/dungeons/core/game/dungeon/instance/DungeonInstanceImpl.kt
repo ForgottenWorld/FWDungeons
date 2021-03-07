@@ -47,7 +47,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
     private val combatObjectiveFactory: CombatObjectiveFactory,
     private val combatObjectiveManager: CombatObjectiveManager,
     private val respawnManager: RespawnManager,
-    private val dungeonManager: DungeonManager
+    private val dungeonManager: DungeonManager,
+    private val mythicMobsHelper: BukkitAPIHelper
 ) : DungeonInstance, Storage.Storable {
 
     @AssistedInject
@@ -63,7 +64,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         combatObjectiveFactory: CombatObjectiveFactory,
         combatObjectiveManager: CombatObjectiveManager,
         respawnManager: RespawnManager,
-        dungeonManager: DungeonManager
+        dungeonManager: DungeonManager,
+        mythicMobsHelper: BukkitAPIHelper
     ) : this(
         dungeonManager.getDungeonInstances(dungeon).keys.firstGap(),
         dungeon,
@@ -77,7 +79,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         combatObjectiveFactory,
         combatObjectiveManager,
         respawnManager,
-        dungeonManager
+        dungeonManager,
+        mythicMobsHelper
     )
 
     init {
@@ -239,14 +242,14 @@ class DungeonInstanceImpl @AssistedInject constructor(
     }
 
     private fun onPlayerEnterTrigger(player: Player, trigger: Trigger) {
-        if (configuration.isDebugMode) {
+        if (configuration.debugMode) {
             trigger.debugLogEnter(player)
         }
         onTriggerProc(trigger)
     }
 
     private fun onPlayerExitTrigger(player: Player, trigger: Trigger) {
-        if (configuration.isDebugMode) {
+        if (configuration.debugMode) {
             trigger.debugLogExit(player)
         }
     }
@@ -407,8 +410,4 @@ class DungeonInstanceImpl @AssistedInject constructor(
         .world
         ?.spawnEntity(location, EntityType.valueOf(type))
         ?.uniqueId
-
-    companion object {
-        private val mythicMobsHelper by lazy { BukkitAPIHelper() }
-    }
 }

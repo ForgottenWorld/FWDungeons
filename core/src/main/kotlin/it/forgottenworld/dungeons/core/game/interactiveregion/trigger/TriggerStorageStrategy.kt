@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.game.interactiveregion.trigger
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
-import it.forgottenworld.dungeons.api.serialization.edit
-import it.forgottenworld.dungeons.api.serialization.read
+import it.forgottenworld.dungeons.api.storage.edit
+import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.core.scripting.CodeParser

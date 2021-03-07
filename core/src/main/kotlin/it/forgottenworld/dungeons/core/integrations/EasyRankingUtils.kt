@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.core.integrations
 
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
@@ -8,6 +9,7 @@ import me.kaotich00.easyranking.service.ERBoardService
 import org.bukkit.Bukkit
 import java.util.*
 
+@Singleton
 class EasyRankingUtils @Inject constructor(
     private val configuration: Configuration
 ) {
@@ -30,11 +32,11 @@ class EasyRankingUtils @Inject constructor(
     }
 
     fun addScoreToPlayer(uuid: UUID, score: Float) {
-        val board = ERBoardService
-            .getInstance()
+        val boardService = ERBoardService.getInstance()
+        val board = boardService
             .getBoardById("dungeons")
             .orElse(
-                ERBoardService.getInstance().createBoard(
+                boardService.createBoard(
                     "dungeons",
                     Strings.LEADERBOARD_TITLE,
                     Strings.LEADERBOARD_DESCR,
@@ -43,8 +45,6 @@ class EasyRankingUtils @Inject constructor(
                     false
                 )
             )
-        ERBoardService
-            .getInstance()
-            .addScoreToPlayer(board, uuid, score)
+        boardService.addScoreToPlayer(board, uuid, score)
     }
 }

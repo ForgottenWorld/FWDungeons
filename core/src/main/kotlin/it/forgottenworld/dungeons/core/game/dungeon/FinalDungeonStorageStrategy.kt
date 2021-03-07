@@ -7,8 +7,8 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.api.serialization.edit
-import it.forgottenworld.dungeons.api.serialization.read
+import it.forgottenworld.dungeons.api.storage.edit
+import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.configuration.ConfigurationSection

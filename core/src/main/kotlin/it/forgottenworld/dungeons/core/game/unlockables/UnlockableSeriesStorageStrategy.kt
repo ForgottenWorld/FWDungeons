@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.core.game.unlockables
 
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
-import it.forgottenworld.dungeons.api.serialization.edit
-import it.forgottenworld.dungeons.api.serialization.read
+import it.forgottenworld.dungeons.api.storage.edit
+import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.configuration.ConfigurationSection

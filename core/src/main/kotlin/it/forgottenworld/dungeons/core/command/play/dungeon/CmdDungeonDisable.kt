@@ -24,10 +24,7 @@ class CmdDungeonDisable @Inject constructor(
             return true
         }
 
-        val res = dungeonManager.getFinalDungeonById(dungeonId)?.let { d ->
-            dungeonManager.getDungeonInstances(d).values.forEach { it.evacuate() }
-            d.isActive = false
-        } != null
+        val res = dungeonManager.disableDungeon(dungeonId)
 
         sender.sendPrefixedMessage(
             if (res) {

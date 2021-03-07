@@ -2,133 +2,68 @@ package it.forgottenworld.dungeons.core.config
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
-import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
-import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.api.serialization.forEachSection
-import it.forgottenworld.dungeons.core.utils.launchAsync
-import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import org.bukkit.Bukkit
-import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
-import javax.naming.ConfigurationException
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 @Singleton
 class Configuration @Inject constructor(
-    private val plugin: FWDungeonsPlugin,
-    private val storage: Storage,
-    private val dungeonManager: DungeonManager
+    private val plugin: FWDungeonsPlugin
 ) {
 
-    lateinit var config: FileConfiguration
+    private val loadedConfigProperties = mutableListOf<ConfigurationProperty<*>>()
 
-    val isDebugMode by lazy { config.getBoolean("debugMode", false) }
-
-    private val dungeonWorldId by lazy {
-        config.getString("dungeonWorld")
-            ?.let { Bukkit.getWorld(it)?.uid ?: error("Dungeon world not found!") }
-            ?: throw ConfigurationException("dungeonWorld missing from config!")
+    private interface ConfigurationProperty<T : Any> : ReadOnlyProperty<Configuration, T> {
+        var value: T?
     }
 
-    val easyRankingIntegration by lazy { config.getBoolean("easyRankingIntegration", false) }
+    private inline fun <reified T : Any> configurationProperty(
+        default: T? = null
+    ) = object : ConfigurationProperty<T> {
+        override var value: T? = null
+
+        override fun getValue(thisRef: Configuration, property: KProperty<*>): T {
+            if (value == null) {
+                value = plugin.config.read {
+                    get(property.name)
+                        ?: default
+                        ?: error("Value missing from config: ${property.name}")
+                }
+                loadedConfigProperties.add(this)
+            }
+            return value!!
+        }
+    }
+
+
+    val debugMode by configurationProperty(false)
+
+
+    val easyRankingIntegration by configurationProperty(false)
+
     var useEasyRanking = false
 
-    val fwEchelonIntegration by lazy { config.getBoolean("fwEchelonIntegration", false) }
+
+    val fwEchelonIntegration by configurationProperty(false)
+
     var useFWEchelon = false
 
-    val vaultIntegration by lazy { config.getBoolean("vaultIntegration", false) }
+
+    val vaultIntegration by configurationProperty(false)
+
     var useVault = false
 
-    val dungeonWorld
-        get() = Bukkit.getWorld(dungeonWorldId) ?: error("Dungeon world not found!")
 
-    private val dungeonNameRegex = Regex("""[0-9]+\.yml""")
+    private val dungeonWorldName by configurationProperty<String>()
 
-    private fun getDungeonsDir(): File {
-        val dir = File(plugin.dataFolder, "dungeons")
-        if (!dir.exists()) dir.mkdir()
-        return dir
-    }
+    val dungeonWorld get() = Bukkit.getWorld(dungeonWorldName)
+        ?: error("Dungeon world not found!")
 
-    private fun loadDungeonConfigs() {
-        val dir = getDungeonsDir()
-        for (file in dir.list()?.filter { it.matches(dungeonNameRegex) } ?: return) {
-            try {
-                val config = YamlConfiguration().apply { load(File(dir, file)) }
-                val dungeon = storage.load<Dungeon>(config)
-                dungeonManager.registerFinalDungeon(dungeon as FinalDungeon)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    fun saveDungeonConfig(dungeon: FinalDungeon) {
-        try {
-            val dir = getDungeonsDir()
-            val file = File(dir, "${dungeon.id}.yml")
-
-            val existsAlready = file.exists()
-            if (!existsAlready && !file.createNewFile()) return
-
-            val conf = YamlConfiguration()
-            if (existsAlready) conf.load(file)
-
-            storage.save(dungeon, conf)
-            launchAsync { conf.save(file) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun loadInstancesFromConfig() {
-        val file = File(plugin.dataFolder, "instances.yml")
-        val conf = YamlConfiguration()
-        if (file.exists()) {
-            conf.load(file)
-        } else {
-            file.createNewFile()
-        }
-
-        for (dungeonId in dungeonManager.finalDungeonIds) {
-            val sec = conf.getConfigurationSection("$dungeonId")
-                ?: conf.createSection("$dungeonId")
-            var any = false
-            sec.forEachSection { _, section ->
-                any = true
-                storage.load<DungeonInstance>(section)
-            }
-            if (!any) {
-                sendConsoleMessage(
-                    "${Strings.CONSOLE_PREFIX}Dungeon $dungeonId loaded " +
-                        "from config has no instances, create one with " +
-                        "/fwde d import $dungeonId"
-                )
-                dungeonManager.disableDungeon(dungeonId)
-                continue
-            }
-        }
-    }
-
-    fun loadData() {
-
-        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Loading configuration...")
-        plugin.reloadConfig()
-
-        sendConsoleMessage(" -- Loading strings...")
-        Strings.load(plugin)
-        config = plugin.config
-
-        sendConsoleMessage(" -- Loading dungeons...")
-        loadDungeonConfigs()
-
-        sendConsoleMessage(" -- Loading instances...")
-        loadInstancesFromConfig()
+    fun reload() {
+        loadedConfigProperties.forEach { it.value = null }
+        loadedConfigProperties.clear()
     }
 }

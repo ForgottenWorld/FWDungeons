@@ -11,15 +11,15 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.edit
+import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerGridFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import java.io.File
 
 class FinalDungeonImpl @AssistedInject constructor(
     @Assisted("id") override val id: Int,
@@ -36,7 +36,6 @@ class FinalDungeonImpl @AssistedInject constructor(
     @Assisted override val chests: Map<Int, Chest>,
     @Assisted("unlockableSeriesId") override val unlockableSeriesId: Int? = null,
     @Assisted("unlockableId") override val unlockableId: Int? = null,
-    private val plugin: FWDungeonsPlugin,
     private val dungeonFactory: DungeonFactory,
     private val dungeonInstanceFactory: DungeonInstanceFactory,
     triggerGridFactory: TriggerGridFactory,
@@ -68,7 +67,6 @@ class FinalDungeonImpl @AssistedInject constructor(
         dungeon.chests,
         null,
         null,
-        plugin,
         dungeonFactory,
         dungeonInstanceFactory,
         triggerGridFactory,
@@ -103,12 +101,13 @@ class FinalDungeonImpl @AssistedInject constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     override fun import(at: Vector3i): Boolean {
         if (dungeonManager.getDungeonInstances(this).isNotEmpty()) return false
-        val config = YamlConfiguration()
-        val file = File(plugin.dataFolder, "instances.yml")
-        if (file.exists()) config.load(file)
+        val file = storage.intancesFile
         val inst = dungeonInstanceFactory.create(this, at)
-        storage.save(inst, config.createSection("$id"))
-        launchAsync { config.save(file) }
+        yaml {
+            load(file)
+            edit { storage.save(inst, section("$id")) }
+            launchAsync { save(file) }
+        }
         return true
     }
 }
