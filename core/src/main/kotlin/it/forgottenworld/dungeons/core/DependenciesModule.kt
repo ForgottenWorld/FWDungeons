@@ -30,7 +30,7 @@ import it.forgottenworld.dungeons.core.game.unlockables.UnlockableImpl
 import org.bukkit.plugin.ServicesManager
 
 
-class DIModule(private val plugin: FWDungeonsPlugin) : AbstractModule() {
+class DependenciesModule(private val plugin: FWDungeonsPlugin) : AbstractModule() {
 
     fun createInjector(): Injector = Guice.createInjector(this)
 
@@ -76,4 +76,5 @@ class DIModule(private val plugin: FWDungeonsPlugin) : AbstractModule() {
                 .build(DungeonFactory::class.java)
         )
     }
+
 }

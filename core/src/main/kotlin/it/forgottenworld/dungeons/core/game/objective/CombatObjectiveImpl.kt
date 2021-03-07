@@ -21,10 +21,7 @@ class CombatObjectiveImpl @Inject constructor(
         mobsToKill.remove(uuid)
         combatObjectiveManager.setEntityCombatObjective(uuid, null)
         if (mobsToKill.isNotEmpty()) return
-        if (aborting) {
-            aborting = false
-            return
-        }
+        if (aborting) return
         onAllKilled(instance)
         instance.instanceObjectives.remove(this)
     }

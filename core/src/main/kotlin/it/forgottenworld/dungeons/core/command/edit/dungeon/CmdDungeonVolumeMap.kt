@@ -7,7 +7,7 @@ import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonVolumeMap @Inject constructor(
@@ -18,12 +18,12 @@ class CmdDungeonVolumeMap @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 
         if (!dungeon.hasTestOrigin) {
-            sender.sendFWDMessage(Strings.DUNGEON_BOX_SHOULD_BE_SET_BEFORE_SAVING_VOLUME_MAP)
+            sender.sendPrefixedMessage(Strings.DUNGEON_BOX_SHOULD_BE_SET_BEFORE_SAVING_VOLUME_MAP)
             return true
         }
 
@@ -33,11 +33,11 @@ class CmdDungeonVolumeMap @Inject constructor(
                 .getVolumeMap(configuration.dungeonWorld)
                 .saveToFile(plugin.dataFolder, "${dungeon.id}_volmap")
         ) {
-            sender.sendFWDMessage(Strings.DUNGEON_VOLUME_MAP_COULNDT_BE_SAVED)
+            sender.sendPrefixedMessage(Strings.DUNGEON_VOLUME_MAP_COULNDT_BE_SAVED)
             return true
         }
 
-        sender.sendFWDMessage(Strings.DUNGEON_VOLUME_MAP_SAVED)
+        sender.sendPrefixedMessage(Strings.DUNGEON_VOLUME_MAP_SAVED)
         return true
     }
 }

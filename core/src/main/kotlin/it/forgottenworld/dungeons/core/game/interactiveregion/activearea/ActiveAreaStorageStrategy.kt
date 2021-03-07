@@ -2,8 +2,10 @@ package it.forgottenworld.dungeons.core.game.interactiveregion.activearea
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
-import it.forgottenworld.dungeons.api.math.Box
+import it.forgottenworld.dungeons.api.serialization.edit
+import it.forgottenworld.dungeons.api.serialization.read
 import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 
@@ -11,20 +13,25 @@ class ActiveAreaStorageStrategy @Inject constructor(
     private val activeAreaFactory: ActiveAreaFactory
 ) : Storage.StorageStrategy<ActiveArea> {
 
-    override fun toStorage(obj: ActiveArea, config: ConfigurationSection, storage: Storage) {
-        config.set("id", obj.id)
-        obj.label?.let { l -> config.set("label", l) }
-        config.set("origin", obj.box.origin.toVector())
-        config.set("width", obj.box.width)
-        config.set("height", obj.box.height)
-        config.set("depth", obj.box.depth)
-        config.set("startingMaterial", obj.startingMaterial.name)
+    override fun toStorage(
+        obj: ActiveArea,
+        config: ConfigurationSection,
+        storage: Storage
+    ) {
+        config.edit { 
+            "id" to obj.id
+            obj.label?.let { l -> "label" to l }
+            storage.save(obj.box, section("box"))
+            "startingMaterial" to obj.startingMaterial.name
+        }
     }
 
-    override fun fromStorage(config: ConfigurationSection, storage: Storage) = activeAreaFactory.create(
-        config.getInt("id"),
-        Box.fromConfig(config),
-        Material.getMaterial(config.getString("startingMaterial")!!)!!,
-        config.getString("label")
-    )
+    override fun fromStorage(config: ConfigurationSection, storage: Storage) = config.read {
+        activeAreaFactory.create(
+            get("id")!!,
+            storage.load(section("box")!!),
+            Material.getMaterial(get("startingMaterial")!!)!!,
+            get("label")
+        )
+    }
 }

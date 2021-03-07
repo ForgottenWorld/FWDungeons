@@ -13,22 +13,32 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class FWDungeonsPlugin : JavaPlugin() {
 
-    @Inject private lateinit var vaultUtils: VaultUtils
-    @Inject private lateinit var easyRankingUtils: EasyRankingUtils
-    @Inject private lateinit var fwEchelonUtils: FWEchelonUtils
+    @Inject
+    private lateinit var vaultUtils: VaultUtils
 
-    @Inject private lateinit var fwDungeonsEditCommand: FWDungeonsEditCommand
-    @Inject private lateinit var fWDungeonsPlayCommand: FWDungeonsPlayCommand
+    @Inject
+    private lateinit var easyRankingUtils: EasyRankingUtils
 
-    @Inject private lateinit var configuration: Configuration
+    @Inject
+    private lateinit var fwEchelonUtils: FWEchelonUtils
 
-    @Inject private lateinit var spigotEventDispatcher: SpigotEventDispatcher
+    @Inject
+    private lateinit var fwDungeonsEditCommand: FWDungeonsEditCommand
+
+    @Inject
+    private lateinit var fWDungeonsPlayCommand: FWDungeonsPlayCommand
+
+    @Inject
+    private lateinit var configuration: Configuration
+
+    @Inject
+    private lateinit var bukkitEventListener: BukkitEventListener
 
     override fun onEnable() {
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Injecting dependencies...")
 
-        DIModule(this)
+        DependenciesModule(this)
             .createInjector()
             .injectMembers(this)
 
@@ -45,7 +55,7 @@ class FWDungeonsPlugin : JavaPlugin() {
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Registering events...")
 
-        server.pluginManager.registerEvents(spigotEventDispatcher, this)
+        server.pluginManager.registerEvents(bukkitEventListener, this)
 
         easyRankingUtils.checkEasyRankingIntegration()
         fwEchelonUtils.checkFWEchelonIntegration()

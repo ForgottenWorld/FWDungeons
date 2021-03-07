@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonName @Inject constructor(
@@ -13,24 +13,24 @@ class CmdDungeonName @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
-            sender.sendFWDMessage(Strings.NEA_PROVIDE_NAME)
+            sender.sendPrefixedMessage(Strings.NEA_PROVIDE_NAME)
             return true
         }
 
         val name = args.joinToString(" ")
 
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 
         if (dungeonManager.getAllFinalDungeons().any { it.name.equals(name.trim(), true) }) {
-            sender.sendFWDMessage(Strings.ANOTHER_DUNGEON_WITH_SAME_NAME_EXISTS)
+            sender.sendPrefixedMessage(Strings.ANOTHER_DUNGEON_WITH_SAME_NAME_EXISTS)
             return true
         }
 
         dungeon.name = name
-        sender.sendFWDMessage(Strings.DUNGEON_NAME_CHANGED)
+        sender.sendPrefixedMessage(Strings.DUNGEON_NAME_CHANGED)
 
         return true
     }

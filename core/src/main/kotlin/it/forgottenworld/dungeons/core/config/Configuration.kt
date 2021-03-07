@@ -9,6 +9,7 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.api.serialization.forEachSection
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import org.bukkit.Bukkit
@@ -48,10 +49,14 @@ class Configuration @Inject constructor(
 
     private val dungeonNameRegex = Regex("""[0-9]+\.yml""")
 
-    private fun loadDungeonConfigs(dataFolder: File) {
-        val dir = File(dataFolder, "dungeons").apply {
-            if (isFile || (!exists() && mkdir())) return
-        }
+    private fun getDungeonsDir(): File {
+        val dir = File(plugin.dataFolder, "dungeons")
+        if (!dir.exists()) dir.mkdir()
+        return dir
+    }
+
+    private fun loadDungeonConfigs() {
+        val dir = getDungeonsDir()
         for (file in dir.list()?.filter { it.matches(dungeonNameRegex) } ?: return) {
             try {
                 val config = YamlConfiguration().apply { load(File(dir, file)) }
@@ -66,12 +71,7 @@ class Configuration @Inject constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     fun saveDungeonConfig(dungeon: FinalDungeon) {
         try {
-            val dir = File(
-                plugin.dataFolder,
-                "dungeons"
-            ).apply {
-                if (!exists() && !mkdir()) return
-            }
+            val dir = getDungeonsDir()
             val file = File(dir, "${dungeon.id}.yml")
 
             val existsAlready = file.exists()
@@ -97,8 +97,14 @@ class Configuration @Inject constructor(
         }
 
         for (dungeonId in dungeonManager.finalDungeonIds) {
-            val sec = conf.getConfigurationSection("$dungeonId")!!
-            if (sec.getKeys(false).isEmpty()) {
+            val sec = conf.getConfigurationSection("$dungeonId")
+                ?: conf.createSection("$dungeonId")
+            var any = false
+            sec.forEachSection { _, section ->
+                any = true
+                storage.load<DungeonInstance>(section)
+            }
+            if (!any) {
                 sendConsoleMessage(
                     "${Strings.CONSOLE_PREFIX}Dungeon $dungeonId loaded " +
                         "from config has no instances, create one with " +
@@ -106,9 +112,6 @@ class Configuration @Inject constructor(
                 )
                 dungeonManager.disableDungeon(dungeonId)
                 continue
-            }
-            for (iId in sec.getKeys(false)) {
-                storage.load<DungeonInstance>(sec.getConfigurationSection(iId)!!)
             }
         }
     }
@@ -123,7 +126,7 @@ class Configuration @Inject constructor(
         config = plugin.config
 
         sendConsoleMessage(" -- Loading dungeons...")
-        loadDungeonConfigs(plugin.dataFolder)
+        loadDungeonConfigs()
 
         sendConsoleMessage(" -- Loading instances...")
         loadInstancesFromConfig()

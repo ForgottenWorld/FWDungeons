@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonLeave @Inject constructor(
@@ -14,11 +14,11 @@ class CmdDungeonLeave @Inject constructor(
     override fun command(sender: Player, args: Array<out String>): Boolean {
         dungeonManager.getPlayerInstance(sender.uniqueId)?.let {
             if (it.isInGame) {
-                sender.sendFWDMessage(Strings.INSTANCE_HAS_STARTED_CANT_LEAVE_NOW)
+                sender.sendPrefixedMessage(Strings.INSTANCE_HAS_STARTED_CANT_LEAVE_NOW)
                 return true
             }
             it.onPlayerLeave(sender)
-        } ?: sender.sendFWDMessage(Strings.CURRENTLY_NOT_IN_DUNGEON_PARTY)
+        } ?: sender.sendPrefixedMessage(Strings.CURRENTLY_NOT_IN_DUNGEON_PARTY)
 
         return true
     }

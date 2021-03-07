@@ -6,7 +6,7 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -18,18 +18,18 @@ class CmdDungeonInstanceAdd @Inject constructor(
         val block = sender.getTargetSolidBlock()
 
         if (block.blockData.material == Material.AIR) {
-            sender.sendFWDMessage(Strings.YOU_NEED_TO_BE_TARGETING)
+            sender.sendPrefixedMessage(Strings.YOU_NEED_TO_BE_TARGETING)
             return true
         }
 
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 
         dungeon.finalInstanceLocations.add(Vector3i.ofBlock(block))
 
-        sender.sendFWDMessage(Strings.INSTANCE_ADDED)
+        sender.sendPrefixedMessage(Strings.INSTANCE_ADDED)
 
         return true
     }

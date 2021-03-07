@@ -12,7 +12,6 @@ import it.forgottenworld.dungeons.core.utils.clickEvent
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import org.bukkit.Bukkit
-import kotlin.math.floor
 
 @Singleton
 class DungeonListGuiGenerator @Inject constructor(
@@ -137,9 +136,10 @@ class DungeonListGuiGenerator @Inject constructor(
             append(inst.leader?.let { "  [ ${inst.players.size}/$maxPl ]" } ?: "")
         }
 
-        val paddingLines = 13 - dungeonManager.getDungeonInstances(dng).size - floor(
-            (dng.description.length + 6 + Strings.DESCRIPTION.length) / 55.0
-        ).toInt()
+        val paddingLines = 13 -
+            dungeonManager.getDungeonInstances(dng).size -
+            ((dng.description.length + 6 + Strings.DESCRIPTION.length) / 55)
+
         append("\n".repeat(paddingLines))
         append(paginator(page))
     }

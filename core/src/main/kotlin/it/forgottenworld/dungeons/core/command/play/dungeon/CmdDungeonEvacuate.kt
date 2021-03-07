@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.command.CommandSender
 
 class CmdDungeonEvacuate @Inject constructor(
@@ -13,7 +13,7 @@ class CmdDungeonEvacuate @Inject constructor(
 
     override fun command(sender: CommandSender, args: Array<out String>): Boolean {
         if (args.count() < 2) {
-            sender.sendFWDMessage(Strings.PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID)
+            sender.sendPrefixedMessage(Strings.PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID)
             return true
         }
 
@@ -21,11 +21,11 @@ class CmdDungeonEvacuate @Inject constructor(
         val instanceId = args[1].toIntOrNull()
 
         if (dungeonId == null || instanceId == null) {
-            sender.sendFWDMessage(Strings.DUNGEON_AND_INSTANCE_ID_SHOULD_BE_INT)
+            sender.sendPrefixedMessage(Strings.DUNGEON_AND_INSTANCE_ID_SHOULD_BE_INT)
             return true
         }
 
-        sender.sendFWDMessage(
+        sender.sendPrefixedMessage(
             if (dungeonManager.getFinalDungeonById(dungeonId)
                     ?.let { dungeonManager.getDungeonInstances(it) }
                     ?.get(instanceId)

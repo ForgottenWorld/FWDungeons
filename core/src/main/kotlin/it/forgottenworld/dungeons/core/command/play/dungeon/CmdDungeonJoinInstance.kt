@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonJoinInstance @Inject constructor(
@@ -13,7 +13,7 @@ class CmdDungeonJoinInstance @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.count() < 2) {
-            sender.sendFWDMessage(Strings.PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID)
+            sender.sendPrefixedMessage(Strings.PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID)
             return true
         }
 
@@ -21,34 +21,34 @@ class CmdDungeonJoinInstance @Inject constructor(
         val instanceId = args[1].toIntOrNull()
 
         if (dungeonId == null || instanceId == null) {
-            sender.sendFWDMessage(Strings.DUNGEON_AND_INSTANCE_ID_SHOULD_BE_INT)
+            sender.sendPrefixedMessage(Strings.DUNGEON_AND_INSTANCE_ID_SHOULD_BE_INT)
             return true
         }
 
         val pass = if (args.count() > 2) args[2] else ""
 
         val dungeon = dungeonManager.getFinalDungeonById(dungeonId) ?: run {
-            sender.sendFWDMessage(Strings.INVALID_DUNGEON_ID)
+            sender.sendPrefixedMessage(Strings.INVALID_DUNGEON_ID)
             return true
         }
 
         if (!dungeon.isActive) {
-            sender.sendFWDMessage(Strings.DUNGEON_IS_NOT_DISABLED)
+            sender.sendPrefixedMessage(Strings.DUNGEON_IS_NOT_DISABLED)
             return true
         }
 
         if (dungeonManager.getPlayerInstance(sender.uniqueId) != null) {
-            sender.sendFWDMessage(Strings.ALREADY_IN_PARTY)
+            sender.sendPrefixedMessage(Strings.ALREADY_IN_PARTY)
             return true
         }
 
         val instance = dungeonManager.getDungeonInstances(dungeon)[instanceId] ?: run {
-            sender.sendFWDMessage(Strings.INVALID_INSTANCE_ID)
+            sender.sendPrefixedMessage(Strings.INVALID_INSTANCE_ID)
             return true
         }
 
         if (instance.isLocked && pass != instance.partyKey) {
-            sender.sendFWDMessage(Strings.DUNGEON_PARTY_IS_PRIVATE_YOURE_NOT_INVITED)
+            sender.sendPrefixedMessage(Strings.DUNGEON_PARTY_IS_PRIVATE_YOURE_NOT_INVITED)
             return true
         }
 

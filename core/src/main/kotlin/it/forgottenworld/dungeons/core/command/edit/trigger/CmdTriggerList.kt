@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.cli.InteractiveRegionListGuiGenerator
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import org.bukkit.entity.Player
 
@@ -16,7 +16,7 @@ class CmdTriggerList @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 

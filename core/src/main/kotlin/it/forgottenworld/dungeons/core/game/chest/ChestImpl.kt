@@ -17,11 +17,9 @@ data class ChestImpl(
     override val itemChanceMap: Map<Material, Int> = mapOf()
 ) : Chest {
 
-    override val items: Array<ItemStack>
-
-    init {
+    private fun generateItems(): List<ItemStack> {
         val hay = itemChanceMap.values.sum()
-        items = (0 until Random.nextInt(minItems, maxItems + 1)).map {
+        return (0 until Random.nextInt(minItems, maxItems + 1)).map {
             val rng = Random.nextInt(hay)
             var acc = 0
             itemChanceMap
@@ -32,13 +30,13 @@ data class ChestImpl(
                 }!!
                 .first
                 .let(::ItemStack)
-        }.toTypedArray()
+        }
     }
 
     override fun fillActualChest(world: World, position: Vector3i) {
         val block = position.blockInWorld(world)
         val chest = block.state as? ChestBlock ?: return
-        chest.inventory.contents = items
+        chest.inventory.contents = generateItems().toTypedArray()
     }
 
     override fun clearActualChest(world: World, position: Vector3i) {

@@ -9,7 +9,10 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.*
+import it.forgottenworld.dungeons.core.utils.NamespacedKeys
+import it.forgottenworld.dungeons.core.utils.ParticleSpammer
+import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -37,24 +40,24 @@ class InteractiveRegionCommandHelper @Inject constructor(
         val block = sender.getTargetSolidBlock()
 
         if (block.blockData.material == Material.AIR) {
-            sender.sendFWDMessage(Strings.YOU_NEED_TO_BE_TARGETING)
+            sender.sendPrefixedMessage(Strings.YOU_NEED_TO_BE_TARGETING)
             return
         }
 
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
 
         if (!dungeon.hasTestOrigin) {
-            sender.sendFWDMessage(
+            sender.sendPrefixedMessage(
                 Strings.DUNGEON_BOX_AND_STARTPOS_SHOULD_BE_SET_BEFORE_ADDING_IE.format(type.plural)
             )
             return
         }
 
         if (!dungeon.box!!.containsBlock(block, dungeon.testOrigin)) {
-            sender.sendFWDMessage(Strings.TARGET_NOT_INSIDE_DUNGEON_BOX)
+            sender.sendPrefixedMessage(Strings.TARGET_NOT_INSIDE_DUNGEON_BOX)
             return
         }
 
@@ -72,7 +75,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
 
         val box = builder.build()
         if (box == null) {
-            sender.sendFWDMessage(
+            sender.sendPrefixedMessage(
                 Strings.NTH_POS_SET_PICK_ANOTHER.format(
                     if (posNo == 1) Strings.FIRST else Strings.SECOND,
                     if (type == TRIGGER) "t" else "aa",
@@ -82,21 +85,18 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        launch {
-            val id = dungeon.newInteractiveRegion(type, box)
-            sender.sendFWDMessage(Strings.CREATED_IE_WITH_ID.format(type.singular, id))
-        }
-
+        val id = dungeon.newInteractiveRegion(type, box)
+        sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID.format(type.singular, id))
     }
 
     fun labelInteractiveRegion(sender: Player, label: String, type: Type, id: Int = -1) {
         if (label.isEmpty()) {
-            sender.sendFWDMessage(Strings.NEA_PROVIDE_LABEL)
+            sender.sendPrefixedMessage(Strings.NEA_PROVIDE_LABEL)
             return
         }
 
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
 
@@ -104,58 +104,59 @@ class InteractiveRegionCommandHelper @Inject constructor(
             dungeon.triggers.isEmpty() ||
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
-            sender.sendFWDMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
+            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
             return
         }
 
         dungeon.labelInteractiveRegion(type, label, id)
-        sender.sendFWDMessage(Strings.SET_LABEL.format(label))
+        sender.sendPrefixedMessage(Strings.SET_LABEL.format(label))
     }
 
     fun unMakeInteractiveRegion(sender: Player, type: Type, ieId: Int?) {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
 
         if (type == TRIGGER && dungeon.triggers.isEmpty() ||
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
-            sender.sendFWDMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
+            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
             return
         }
 
         val id = dungeon.unmakeInteractiveRegion(type, ieId)
-        sender.sendFWDMessage(Strings.DELETED_IE_WITH_ID.format(type.plural, id))
+        sender.sendPrefixedMessage(Strings.DELETED_IE_WITH_ID.format(type.plural, id))
     }
 
     fun highlightInteractiveRegion(sender: Player, type: Type, ieId: Int?) {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
         }
 
         if (type == TRIGGER && dungeon.triggers.isEmpty() ||
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
-            sender.sendFWDMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
+            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
             return
         }
 
-        val irs = if (type == TRIGGER) dungeon.triggers else dungeon.activeAreas
+        val regions = if (type == TRIGGER) dungeon.triggers else dungeon.activeAreas
         if (!dungeon.hasTestOrigin) return
-        val ir = irs[ieId] ?: return
+        val region = regions[ieId] ?: return
+
         ParticleSpammer.highlightBox(
-            ir.box.withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin),
+            region.box.withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin),
             configuration.dungeonWorld
         )
 
-        sender.sendFWDMessage(Strings.HIGHLIGHTED_IE_WITH_ID.format(type.plural, ieId))
+        sender.sendPrefixedMessage(Strings.HIGHLIGHTED_IE_WITH_ID.format(type.plural, ieId))
     }
 
     fun grantWandForInteractiveRegion(sender: Player, type: Type) {
         if (sender.inventory.itemInMainHand.type != Material.AIR) {
-            sender.sendFWDMessage(Strings.MAIN_HAND_MUST_BE_EMPTY)
+            sender.sendPrefixedMessage(Strings.MAIN_HAND_MUST_BE_EMPTY)
             return
         }
         val material = if (type == TRIGGER) Material.GOLDEN_HOE else Material.GOLDEN_SHOVEL
@@ -167,6 +168,6 @@ class InteractiveRegionCommandHelper @Inject constructor(
             addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10)
         }
         sender.inventory.setItemInMainHand(itemStack)
-        sender.sendFWDMessage(Strings.NOW_HOLDING_WAND_FOR_MAKING_IE.format(type.plural))
+        sender.sendPrefixedMessage(Strings.NOW_HOLDING_WAND_FOR_MAKING_IE.format(type.plural))
     }
 }

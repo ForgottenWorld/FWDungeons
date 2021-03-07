@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonEdit @Inject constructor(
@@ -13,28 +13,28 @@ class CmdDungeonEdit @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
-            sender.sendFWDMessage(Strings.NEA_PROVIDE_DUNGEON_ID)
+            sender.sendPrefixedMessage(Strings.NEA_PROVIDE_DUNGEON_ID)
             return true
         }
 
         val id = args[0].toIntOrNull()
         if (id == null) {
-            sender.sendFWDMessage(Strings.DUNGEON_ID_SHOULD_BE_INT)
+            sender.sendPrefixedMessage(Strings.DUNGEON_ID_SHOULD_BE_INT)
             return true
         }
 
         if (dungeonManager.getPlayerEditableDungeon(sender.uniqueId) != null) {
-            sender.sendFWDMessage(Strings.ALREADY_EDITING_DUNGEON)
+            sender.sendPrefixedMessage(Strings.ALREADY_EDITING_DUNGEON)
             return true
         }
 
         val dungeon = dungeonManager.getFinalDungeonById(id) ?: run {
-            sender.sendFWDMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
+            sender.sendPrefixedMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
             return true
         }
 
         if (dungeonManager.getDungeonInstances(dungeon).isEmpty()) {
-            sender.sendFWDMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
+            sender.sendPrefixedMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
             return true
         }
 

@@ -1,9 +1,9 @@
 package it.forgottenworld.dungeons.api.math
 
+import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.util.BoundingBox
 import kotlin.math.abs
@@ -13,7 +13,7 @@ data class Box(
     val width: Int,
     val height: Int,
     val depth: Int,
-) {
+) : Storage.Storable {
 
     fun getBoundingBox(origin: Vector3i = this.origin) = BoundingBox.of(
         origin.toBlockVector(),
@@ -212,13 +212,6 @@ data class Box(
     }
 
     companion object {
-
-        fun fromConfig(config: ConfigurationSection) = Box(
-            Vector3i.ofBukkitVector(config.getVector("origin")!!),
-            config.getInt("width"),
-            config.getInt("height"),
-            config.getInt("depth")
-        )
 
         fun between(pos1: Vector3i, pos2: Vector3i): Box {
             val origin = pos1 min pos2

@@ -9,7 +9,7 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.scripting.CodeParser
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class TriggerImpl @Inject constructor(
@@ -30,14 +30,14 @@ class TriggerImpl @Inject constructor(
     override fun containsXYZ(x: Int, y: Int, z: Int) = box.containsXYZ(x, y, z)
 
     override fun debugLogEnter(player: Player) {
-        player.sendFWDMessage(
+        player.sendPrefixedMessage(
             Strings.DEBUG_ENTERED_TRIGGER
                 .format(label?.plus(" ") ?: "", id)
         )
     }
 
     override fun debugLogExit(player: Player) {
-        player.sendFWDMessage(
+        player.sendPrefixedMessage(
             Strings.DEBUG_EXITED_TRIGGER
                 .format(label?.plus(" ") ?: "", id)
         )

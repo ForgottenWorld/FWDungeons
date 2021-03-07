@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonWriteOut @Inject constructor(
@@ -15,19 +15,19 @@ class CmdDungeonWriteOut @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 
         val whatIsMissing = dungeon.whatIsMissingForWriteout()
         if (whatIsMissing.isNotEmpty()) {
-            sender.sendFWDMessage(Strings.CANT_WRITEOUT_YET_MISSING.format(whatIsMissing))
+            sender.sendPrefixedMessage(Strings.CANT_WRITEOUT_YET_MISSING.format(whatIsMissing))
             return true
         }
 
         val finalDungeon = dungeon.finalize()
         configuration.saveDungeonConfig(finalDungeon)
-        sender.sendFWDMessage(Strings.DUNGEON_EXPORTED)
+        sender.sendPrefixedMessage(Strings.DUNGEON_EXPORTED)
 
         return true
     }

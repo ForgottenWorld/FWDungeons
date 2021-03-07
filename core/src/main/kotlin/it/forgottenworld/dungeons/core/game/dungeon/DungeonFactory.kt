@@ -47,7 +47,9 @@ interface DungeonFactory {
         startingLocation: Vector3i,
         triggers: Map<Int, Trigger>,
         activeAreas: Map<Int, ActiveArea>,
-        chests: Map<Int, Chest>
+        chests: Map<Int, Chest>,
+        @Assisted("unlockableSeriesId") unlockableSeriesId: Int? = null,
+        @Assisted("unlockableId") unlockableId: Int? = null
     ): FinalDungeon
 
     fun createFinal(

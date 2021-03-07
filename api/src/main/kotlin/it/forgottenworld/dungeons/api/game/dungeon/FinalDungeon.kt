@@ -15,6 +15,9 @@ interface FinalDungeon : Dungeon {
 
     var isBeingEdited: Boolean
 
+    val unlockableSeriesId: Int?
+    val unlockableId: Int?
+
     val triggerGrid: NestableGrid3iToNi
 
     fun putInEditMode(player: Player): EditableDungeon?

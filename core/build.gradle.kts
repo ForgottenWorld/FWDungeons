@@ -61,8 +61,8 @@ tasks.register("localDeploy") {
     doLast {
         copy {
             from("build/libs")
-            into("/home/giacomo/paper/plugins")
-            include("**/*.jar")
+            into(Config.LOCAL_PLUGINS_DIR)
+            include("**/*-all.jar")
         }
     }
 }

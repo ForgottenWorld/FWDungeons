@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdUnlockablesLookupPlate @Inject constructor(
@@ -18,16 +18,16 @@ class CmdUnlockablesLookupPlate @Inject constructor(
         val block = sender.world.getBlockAt(pos.x, pos.y, pos.z)
 
         if (!UnlockableManager.RECOGNIZED_PRESSURE_PLATE_TYPES.contains(block.type)) {
-            sender.sendFWDMessage(Strings.NO_PRESSURE_PLATE_BELOW_YOU)
+            sender.sendPrefixedMessage(Strings.NO_PRESSURE_PLATE_BELOW_YOU)
             return true
         }
 
         val unlockableData = unlockableManager.lookUpPlate(loc.world.uid, pos) ?: run {
-            sender.sendFWDMessage(Strings.PRESSURE_PLATE_IS_NOT_BOUND)
+            sender.sendPrefixedMessage(Strings.PRESSURE_PLATE_IS_NOT_BOUND)
             return true
         }
 
-        sender.sendFWDMessage(
+        sender.sendPrefixedMessage(
             Strings.PRESSURE_PLATE_IS_BOUND_TO.format(
                 unlockableData.first,
                 unlockableData.second

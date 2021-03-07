@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -19,9 +19,8 @@ class BypassAttemptHandler @Inject constructor(
 ) {
 
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
-
         fun preventTp(because: String) {
-            event.player.sendFWDMessage(because)
+            event.player.sendPrefixedMessage(because)
             event.isCancelled = true
         }
 
@@ -44,7 +43,7 @@ class BypassAttemptHandler @Inject constructor(
             checkedCauses.contains(event.cause) &&
             bannedPotionEffects.contains(event.modifiedType)
         ) {
-            player.sendFWDMessage(Strings.POTION_EFFECT_NOT_ALLOWED)
+            player.sendPrefixedMessage(Strings.POTION_EFFECT_NOT_ALLOWED)
             event.isCancelled = true
         }
     }
@@ -54,7 +53,7 @@ class BypassAttemptHandler @Inject constructor(
             event.item?.type != Material.ENDER_PEARL ||
             !(event.action == Action.RIGHT_CLICK_AIR ||
                 event.action == Action.RIGHT_CLICK_BLOCK)) return
-        event.player.sendFWDMessage(Strings.NO_EPEARLS_IN_THE_DUNGEON)
+        event.player.sendPrefixedMessage(Strings.NO_EPEARLS_IN_THE_DUNGEON)
         event.isCancelled = true
     }
 

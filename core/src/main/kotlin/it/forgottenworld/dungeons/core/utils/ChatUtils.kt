@@ -22,7 +22,7 @@ inline fun Player.sendJsonMessage(build: ComponentBuilder.() -> Unit) = spigot()
 fun Player.sendJsonMessage(chatComponent: Array<BaseComponent>) = spigot()
     .sendMessage(*chatComponent)
 
-fun CommandSender.sendFWDMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
+fun CommandSender.sendPrefixedMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
 
 fun ComponentBuilder.clickEvent(
     action: ClickEvent.Action,

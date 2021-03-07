@@ -16,7 +16,7 @@ import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerGridFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.utils.launchAsync
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
@@ -34,6 +34,8 @@ class FinalDungeonImpl @AssistedInject constructor(
     @Assisted override val triggers: Map<Int, Trigger>,
     @Assisted override val activeAreas: Map<Int, ActiveArea>,
     @Assisted override val chests: Map<Int, Chest>,
+    @Assisted("unlockableSeriesId") override val unlockableSeriesId: Int? = null,
+    @Assisted("unlockableId") override val unlockableId: Int? = null,
     private val plugin: FWDungeonsPlugin,
     private val dungeonFactory: DungeonFactory,
     private val dungeonInstanceFactory: DungeonInstanceFactory,
@@ -64,6 +66,8 @@ class FinalDungeonImpl @AssistedInject constructor(
         dungeon.triggers,
         dungeon.activeAreas,
         dungeon.chests,
+        null,
+        null,
         plugin,
         dungeonFactory,
         dungeonInstanceFactory,
@@ -78,20 +82,21 @@ class FinalDungeonImpl @AssistedInject constructor(
 
     override fun putInEditMode(player: Player): EditableDungeon? {
         if (isActive) {
-            player.sendFWDMessage(Strings.DUNGEON_WITH_ID_NOT_DISABLED.format(id))
+            player.sendPrefixedMessage(Strings.DUNGEON_WITH_ID_NOT_DISABLED.format(id))
             return null
         }
 
         if (isBeingEdited) {
-            player.sendFWDMessage(Strings.DUNGEON_ALREADY_BEING_EDITED)
+            player.sendPrefixedMessage(Strings.DUNGEON_ALREADY_BEING_EDITED)
             return null
         }
         isBeingEdited = true
 
-        player.sendFWDMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
+        player.sendPrefixedMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
 
         return dungeonFactory.createEditable(player, this).also {
             dungeonManager.setPlayerEditableDungeon(player.uniqueId, it)
+            dungeonManager.clearDungeonInstances(this)
         }
     }
 

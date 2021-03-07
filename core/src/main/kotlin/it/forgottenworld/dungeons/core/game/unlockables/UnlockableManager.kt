@@ -7,7 +7,7 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
@@ -78,18 +78,18 @@ class UnlockableManager @Inject constructor(
             0
         }
         val unlockable = unlockableSeries[seriesId]!!.unlockables[unlockableOrder]
-        player.sendFWDMessage(unlockable.message)
+        player.sendPrefixedMessage(unlockable.message)
         if (progress == unlockableOrder) {
-            player.sendFWDMessage(unlockable.printRequirements())
+            player.sendPrefixedMessage(unlockable.printRequirements())
             if (unlockable.executeRequirements(player)) {
-                player.sendFWDMessage(unlockable.unlockedMessage)
+                player.sendPrefixedMessage(unlockable.unlockedMessage)
                 playerUnlockProgress[key] = progress + 1
             } else {
-                player.sendFWDMessage(Strings.REQUIREMENTS_NOT_MET)
+                player.sendPrefixedMessage(Strings.REQUIREMENTS_NOT_MET)
             }
             return
         }
-        player.sendFWDMessage(Strings.YOU_CANT_UNLOCK_YET.format(seriesId, unlockableOrder))
+        player.sendPrefixedMessage(Strings.YOU_CANT_UNLOCK_YET.format(seriesId, unlockableOrder))
     }
 
     companion object {

@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.command.SenderCommand
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.command.CommandSender
 
 class CmdDungeonReload @Inject constructor(
@@ -15,7 +15,7 @@ class CmdDungeonReload @Inject constructor(
 
     override fun command(sender: CommandSender, args: Array<out String>): Boolean {
         if (args.count() == 0 || args[0] != "confirm") {
-            sender.sendFWDMessage(Strings.RELOAD_WARNING)
+            sender.sendPrefixedMessage(Strings.RELOAD_WARNING)
             return true
         }
 
@@ -28,7 +28,7 @@ class CmdDungeonReload @Inject constructor(
 
         configuration.loadData()
 
-        sender.sendFWDMessage(Strings.RELOADING_DUNGEONS_AND_INSTANCES)
+        sender.sendPrefixedMessage(Strings.RELOADING_DUNGEONS_AND_INSTANCES)
 
         return true
     }

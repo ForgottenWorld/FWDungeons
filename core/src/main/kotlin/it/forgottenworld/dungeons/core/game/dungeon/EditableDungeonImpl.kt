@@ -11,6 +11,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
@@ -50,7 +51,8 @@ class EditableDungeonImpl @AssistedInject constructor(
     private val namespacedKeys: NamespacedKeys,
     private val dungeonFactory: DungeonFactory,
     private val dungeonInstanceFactory: DungeonInstanceFactory,
-    private val dungeonManager: DungeonManager
+    private val dungeonManager: DungeonManager,
+    private val storage: Storage
 ) : EditableDungeon {
 
     @AssistedInject
@@ -64,7 +66,8 @@ class EditableDungeonImpl @AssistedInject constructor(
         namespacedKeys: NamespacedKeys,
         dungeonFactory: DungeonFactory,
         dungeonInstanceFactory: DungeonInstanceFactory,
-        dungeonManager: DungeonManager
+        dungeonManager: DungeonManager,
+        storage: Storage
     ) : this(
         editor,
         dungeon.id,
@@ -90,7 +93,8 @@ class EditableDungeonImpl @AssistedInject constructor(
         namespacedKeys,
         dungeonFactory,
         dungeonInstanceFactory,
-        dungeonManager
+        dungeonManager,
+        storage
     )
 
     private val editor = editor.uniqueId
@@ -141,20 +145,13 @@ class EditableDungeonImpl @AssistedInject constructor(
             val file = File(plugin.dataFolder, "instances.yml")
             if (file.exists()) config.load(file)
             val dgConf = config.createSection("$newId")
-            dungeonManager.setDungeonInstances(
-                finalDungeon,
-                finalInstanceLocations.withIndex().associate { (k, v) ->
-                    dgConf.createSection("$k").run {
-                        set("x", v.x)
-                        set("y", v.y)
-                        set("z", v.z)
-                    }
-                    k to dungeonInstanceFactory.create(
-                        finalDungeon,
-                        Vector3i.ofBlock(configuration.dungeonWorld.getBlockAt(v.x, v.y, v.z))
-                    )
-                }
-            )
+            val instances = finalInstanceLocations.withIndex().associate { (k, v) ->
+                val section = dgConf.createSection("$k")
+                val inst = dungeonInstanceFactory.create(finalDungeon, v)
+                storage.save(inst, section)
+                k to inst
+            }
+            dungeonManager.setDungeonInstances(finalDungeon, instances)
             launchAsync { config.save(file) }
         } catch (e: Exception) {
             sendConsoleMessage(e.message ?: e.toString())
@@ -269,7 +266,7 @@ class EditableDungeonImpl @AssistedInject constructor(
         if (restoreFormer) {
             dungeonManager.getFinalDungeonById(id)?.isBeingEdited = false
         }
-        Bukkit.getPlayer(editor)?.sendFWDMessage(Strings.NO_LONGER_EDITING_DUNGEON)
+        Bukkit.getPlayer(editor)?.sendPrefixedMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }
 
     override fun whatIsMissingForWriteout() = StringBuilder().apply {

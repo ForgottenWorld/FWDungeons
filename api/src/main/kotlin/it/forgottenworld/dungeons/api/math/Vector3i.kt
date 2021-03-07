@@ -1,10 +1,10 @@
 package it.forgottenworld.dungeons.api.math
 
+import it.forgottenworld.dungeons.api.storage.Storage
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.util.BlockVector
-import org.bukkit.util.Vector
 import kotlin.math.max
 import kotlin.math.min
 
@@ -12,15 +12,7 @@ data class Vector3i(
     val x: Int,
     val y: Int,
     val z: Int
-) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return x == (other as Vector3i).x && y == other.y && z == other.z
-    }
-
-    override fun hashCode() = 31 * (31 * x + y) + z
+) : Storage.Storable {
 
     fun locationInWorld(world: World) = Location(
         world,
@@ -30,8 +22,6 @@ data class Vector3i(
     )
 
     fun blockInWorld(world: World) = world.getBlockAt(x,y,z)
-
-    fun toVector() = Vector(x, y, z)
 
     fun toBlockVector() = BlockVector(x, y, z)
 
@@ -70,12 +60,6 @@ data class Vector3i(
             location.blockX,
             location.blockY,
             location.blockZ
-        )
-
-        fun ofBukkitVector(vector: Vector) = Vector3i(
-            vector.blockX,
-            vector.blockY,
-            vector.blockZ
         )
 
         fun ofBlock(block: Block) = ofLocation(block.location)

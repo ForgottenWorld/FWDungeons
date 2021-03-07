@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 
-class SpigotEventDispatcher @Inject constructor(
+class BukkitEventListener @Inject constructor(
     private val bypassAttemptHandler: BypassAttemptHandler,
     private val combatObjectiveManager: CombatObjectiveManager,
     private val respawnManager: RespawnManager,
@@ -71,5 +71,4 @@ class SpigotEventDispatcher @Inject constructor(
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
         respawnManager.onPlayerRespawn(event)
     }
-
 }

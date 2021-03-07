@@ -13,16 +13,16 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
+import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.respawn.RespawnData
+import it.forgottenworld.dungeons.core.game.respawn.RespawnData.Companion.currentWarpbackData
+import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.utils.*
-import it.forgottenworld.dungeons.core.game.respawn.RespawnData.Companion.currentWarpbackData
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -81,21 +81,21 @@ class DungeonInstanceImpl @AssistedInject constructor(
     )
 
     init {
-        val curInstances = dungeonManager.getDungeonInstances(dungeon)
-        dungeonManager.setDungeonInstances(dungeon, curInstances + (id to this))
-        for (aa in dungeon.activeAreas.values) {
-            aa.fillWithMaterial(aa.startingMaterial, this)
-        }
+        dungeonManager.registerDungeonInstance(this)
+        resetActiveAreas()
     }
 
     override var leader: UUID? = null
     override var partyKey = ""
     override val instanceObjectives = mutableListOf<CombatObjective>()
     override val players = mutableListOf<UUID>()
+
     override var isLocked = false
         private set
+
     override var isInGame = false
         private set
+
     override var isTpSafe = true
         private set
 
@@ -108,6 +108,12 @@ class DungeonInstanceImpl @AssistedInject constructor(
         .startingLocation
         .withRefSystemOrigin(Vector3i.ZERO, origin)
 
+    private fun resetActiveAreas() {
+        for (aa in dungeon.activeAreas.values) {
+            aa.fillWithMaterial(aa.startingMaterial, this)
+        }
+    }
+
     private fun resetInstance() {
         players.forEach { uuid ->
             playerRespawnData.remove(uuid)
@@ -115,29 +121,36 @@ class DungeonInstanceImpl @AssistedInject constructor(
             dungeonManager.setPlayerInstance(uuid, null)
         }
         players.clear()
+
         unlock()
+
         leader = null
         isTpSafe = true
+
         playerTriggers.clear()
         proccedTriggers.clear()
-        for (aa in dungeon.activeAreas.values) {
-            aa.fillWithMaterial(aa.startingMaterial, this)
-        }
+
+        resetActiveAreas()
+
         for (io in instanceObjectives) {
             io.abort()
         }
+        instanceObjectives.clear()
+
         for (c in dungeon.chests.values) {
             c.clearActualChest(
                 configuration.dungeonWorld,
                 c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
             )
         }
-        instanceObjectives.clear()
+
         val boundingBox = dungeon.box.getBoundingBox(origin)
+
         configuration.dungeonWorld
             .getNearbyEntities(boundingBox)
             .filter { it is LivingEntity && it !is Player }
             .forEach { (it as LivingEntity).health = 0.0 }
+
         launch {
             delay(500)
             configuration.dungeonWorld
@@ -160,17 +173,17 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     override fun onPlayerJoin(player: Player) {
         if (!fwEchelonUtils.isPlayerFree(player)) {
-            player.sendFWDMessage(Strings.YOU_CANNOT_JOIN_A_DUNGEON_RIGHT_NOW)
+            player.sendPrefixedMessage(Strings.YOU_CANNOT_JOIN_A_DUNGEON_RIGHT_NOW)
             return
         }
 
         if (players.size == dungeon.maxPlayers) {
-            player.sendFWDMessage(Strings.DUNGEON_PARTY_IS_FULL)
+            player.sendPrefixedMessage(Strings.DUNGEON_PARTY_IS_FULL)
             return
         }
 
         if (isInGame) {
-            player.sendFWDMessage(Strings.PARTY_HAS_ALREADY_ENTERED_DUNGEON)
+            player.sendPrefixedMessage(Strings.PARTY_HAS_ALREADY_ENTERED_DUNGEON)
             return
         }
 
@@ -183,9 +196,9 @@ class DungeonInstanceImpl @AssistedInject constructor(
                 append(jsonMessageGenerator.lockLink())
             }
         } else {
-            player.sendFWDMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
+            player.sendPrefixedMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
             players.forEach {
-                Bukkit.getPlayer(it)?.sendFWDMessage(
+                Bukkit.getPlayer(it)?.sendPrefixedMessage(
                     Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name)
                 )
             }
@@ -213,7 +226,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         player.gameMode = GameMode.ADVENTURE
         val startingLocation = startingPostion.locationInWorld(configuration.dungeonWorld)
         player.teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
-        player.sendFWDMessage(Strings.GOOD_LUCK_OUT_THERE)
+        player.sendPrefixedMessage(Strings.GOOD_LUCK_OUT_THERE)
     }
 
     private fun onTriggerProc(trigger: Trigger) {
@@ -256,7 +269,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
             resetInstance()
         } else {
             leader = players.first()
-            Bukkit.getPlayer(leader!!)?.sendFWDMessage(Strings.NOW_PARTY_LEADER)
+            Bukkit.getPlayer(leader!!)?.sendPrefixedMessage(Strings.NOW_PARTY_LEADER)
         }
     }
 
@@ -268,17 +281,17 @@ class DungeonInstanceImpl @AssistedInject constructor(
         for (uuid in players) {
             val pl = Bukkit.getPlayer(uuid) ?: continue
             val token = if (player.name == pl.name) Strings.YOU else player.name
-            pl.sendFWDMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(token))
+            pl.sendPrefixedMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(token))
         }
         onPlayerRemoved(player)
     }
 
     override fun onPlayerDeath(player: Player) {
-        player.sendFWDMessage(Strings.YOU_DIED_IN_THE_DUNGEON)
+        player.sendPrefixedMessage(Strings.YOU_DIED_IN_THE_DUNGEON)
         respawnManager.setPlayerRespawnData(player.uniqueId, playerRespawnData[player.uniqueId])
         onPlayerRemoved(player)
         for (uuid in players) {
-            Bukkit.getPlayer(uuid)?.sendFWDMessage(
+            Bukkit.getPlayer(uuid)?.sendPrefixedMessage(
                 Strings.PLAYER_DIED_IN_DUNGEON.format(player.name)
             )
         }
@@ -286,7 +299,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     override fun onFinishTriggered() {
         for (uuid in players) {
-            Bukkit.getPlayer(uuid)?.sendFWDMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS)
+            Bukkit.getPlayer(uuid)?.sendPrefixedMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS)
         }
         launch {
             delay(5000)
@@ -305,7 +318,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
         for (uuid in players) {
             val pl = Bukkit.getPlayer(uuid) ?: continue
-            pl.sendFWDMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
+            pl.sendPrefixedMessage(Strings.CONGRATS_YOU_MADE_IT_OUT)
             playerRespawnData[uuid]?.useWithPlayer(pl)
         }
 

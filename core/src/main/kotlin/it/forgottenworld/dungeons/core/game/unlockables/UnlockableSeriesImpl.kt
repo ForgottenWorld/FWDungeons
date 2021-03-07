@@ -9,6 +9,4 @@ data class UnlockableSeriesImpl(
     override val name: String,
     override val description: String,
     override val unlockables: List<Unlockable>
-) : UnlockableSeries, Storage.Storable {
-
-}
+) : UnlockableSeries, Storage.Storable

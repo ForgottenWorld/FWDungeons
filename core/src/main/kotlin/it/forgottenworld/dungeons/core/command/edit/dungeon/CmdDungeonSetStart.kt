@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonSetStart @Inject constructor(
@@ -14,17 +14,17 @@ class CmdDungeonSetStart @Inject constructor(
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
-            sender.sendFWDMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
+            sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return true
         }
 
         if (dungeon.box == null || !dungeon.hasTestOrigin) {
-            sender.sendFWDMessage(Strings.DUNGEON_BOX_SHOULD_BE_SET_BEFORE_ADDING_STARTPOS)
+            sender.sendPrefixedMessage(Strings.DUNGEON_BOX_SHOULD_BE_SET_BEFORE_ADDING_STARTPOS)
             return true
         }
 
         if (!dungeon.box!!.containsPlayer(sender, dungeon.testOrigin)) {
-            sender.sendFWDMessage(Strings.OUTSIDE_OF_DUNGEON_BOX)
+            sender.sendPrefixedMessage(Strings.OUTSIDE_OF_DUNGEON_BOX)
             return true
         }
 
@@ -32,7 +32,7 @@ class CmdDungeonSetStart @Inject constructor(
             .ofLocation(sender.location)
             .withRefSystemOrigin(dungeon.testOrigin, Vector3i.ZERO)
 
-        sender.sendFWDMessage(Strings.DUNGEON_STARTPOS_SET)
+        sender.sendPrefixedMessage(Strings.DUNGEON_STARTPOS_SET)
 
         return true
     }

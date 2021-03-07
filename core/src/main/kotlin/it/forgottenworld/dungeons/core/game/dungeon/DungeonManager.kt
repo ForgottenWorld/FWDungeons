@@ -13,7 +13,7 @@ class DungeonManager {
 
     private val finalDungeons = mutableMapOf<Int, FinalDungeon>()
     private val playerEditableDungeons = mutableMapOf<UUID, EditableDungeon>()
-    private val dungeonInstances = mutableMapOf<Int, Map<Int, DungeonInstance>>()
+    private val dungeonInstances = mutableMapOf<Int, MutableMap<Int, DungeonInstance>>()
     private val playerInstances = mutableMapOf<UUID, DungeonInstance>()
 
     val finalDungeonIds get() = finalDungeons.keys
@@ -48,13 +48,21 @@ class DungeonManager {
 
     fun getDungeonInstances(dungeon: Dungeon): Map<Int, DungeonInstance> {
         dungeonInstances[dungeon.id]?.let { return it }
-        val newMap = mapOf<Int, DungeonInstance>()
-        dungeonInstances[dungeon.id] = newMap
-        return newMap
+        return mutableMapOf<Int, DungeonInstance>().also {
+            dungeonInstances[dungeon.id] = it
+        }
+    }
+
+    fun registerDungeonInstance(instance: DungeonInstance) {
+        dungeonInstances[instance.dungeon.id]!![instance.id] = instance
+    }
+
+    fun clearDungeonInstances(dungeon: Dungeon) {
+        dungeonInstances.remove(dungeon.id)
     }
 
     fun setDungeonInstances(dungeon: Dungeon, instances: Map<Int, DungeonInstance>) {
-        dungeonInstances[dungeon.id] = instances
+        dungeonInstances[dungeon.id] = instances.toMutableMap()
     }
 
     fun getPlayerEditableDungeon(uuid: UUID) = playerEditableDungeons[uuid]

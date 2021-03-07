@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import it.forgottenworld.echelonapi.FWEchelon
 import it.forgottenworld.echelonapi.mutexactivity.MutexActivity
 import org.bukkit.Bukkit
@@ -72,11 +72,11 @@ class FWEchelonUtils @Inject constructor(
             val insts = dungeonManager.getAllBusyInstances()
             if (reason != null) {
                 for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
-                    pl?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))
+                    pl?.sendPrefixedMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))
                 }
             } else {
                 for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
-                    pl?.sendFWDMessage(Strings.DUNGEON_WILL_BE_EVACUATED)
+                    pl?.sendPrefixedMessage(Strings.DUNGEON_WILL_BE_EVACUATED)
                 }
             }
             insts.forEach {
@@ -87,9 +87,9 @@ class FWEchelonUtils @Inject constructor(
         override fun onPlayerForceRemoved(player: Player, reason: String?) {
             val inst = dungeonManager.getPlayerInstance(player.uniqueId) ?: return
             if (reason != null) {
-                player.sendFWDMessage(Strings.YOU_WILL_BE_EVACUATED_BECAUSE.format(reason))
+                player.sendPrefixedMessage(Strings.YOU_WILL_BE_EVACUATED_BECAUSE.format(reason))
             } else {
-                player.sendFWDMessage(Strings.YOU_WILL_BE_EVACUATED)
+                player.sendPrefixedMessage(Strings.YOU_WILL_BE_EVACUATED)
             }
             inst.rescuePlayer(player)
         }

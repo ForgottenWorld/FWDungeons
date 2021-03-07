@@ -9,6 +9,10 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
+import it.forgottenworld.dungeons.api.math.Box
+import it.forgottenworld.dungeons.api.math.BoxStorageStrategy
+import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.api.math.Vector3iStorageStrategy
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.game.chest.ChestStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonStorageStrategy
@@ -28,7 +32,9 @@ class StorageImpl @Inject constructor(
     chestStorageStrategy: ChestStorageStrategy,
     unlockableStorageStrategy: UnlockableStorageStrategy,
     unlockableSeriesImplStorageStrategy: UnlockableSeriesStorageStrategy,
-    dungeonInstanceStorageStrategy: DungeonInstanceStorageStrategy
+    dungeonInstanceStorageStrategy: DungeonInstanceStorageStrategy,
+    boxStorageStrategy: BoxStorageStrategy,
+    vector3iStorageStrategy: Vector3iStorageStrategy
 ) : Storage {
 
     private val storageStragies = mapOf<KClass<*>, Storage.StorageStrategy<*>>(
@@ -38,7 +44,9 @@ class StorageImpl @Inject constructor(
         Chest::class to chestStorageStrategy,
         Unlockable::class to unlockableStorageStrategy,
         UnlockableSeries::class to unlockableSeriesImplStorageStrategy,
-        DungeonInstance::class to dungeonInstanceStorageStrategy
+        DungeonInstance::class to dungeonInstanceStorageStrategy,
+        Box::class to boxStorageStrategy,
+        Vector3i::class to vector3iStorageStrategy
     )
 
     @Suppress("UNCHECKED_CAST")

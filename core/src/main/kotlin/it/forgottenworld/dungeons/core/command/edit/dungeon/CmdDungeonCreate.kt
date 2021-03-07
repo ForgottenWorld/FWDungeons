@@ -5,7 +5,7 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonFactory
-import it.forgottenworld.dungeons.core.utils.sendFWDMessage
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonCreate @Inject constructor(
@@ -19,7 +19,7 @@ class CmdDungeonCreate @Inject constructor(
             dungeonFactory.createEditable(sender)
         )
 
-        sender.sendFWDMessage(Strings.CREATED_NEW_DUNGEON_NOW_IN_EDIT_MODE)
+        sender.sendPrefixedMessage(Strings.CREATED_NEW_DUNGEON_NOW_IN_EDIT_MODE)
         return true
     }
 }
