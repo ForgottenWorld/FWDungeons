@@ -24,9 +24,18 @@ interface Storage {
 
     fun <T : Storable> load(klass: KClass<T>, config: ConfigurationSection): T
 
-    fun <T : Storable> save(storable: T, config: ConfigurationSection)
+    fun <T : Storable> save(klass: KClass<T>, storable: T, config: ConfigurationSection)
 
     companion object {
-        inline fun <reified T : Storable> Storage.load(config: ConfigurationSection): T = load(T::class, config)
+        inline fun <reified T : Storable> Storage.load(
+            config: ConfigurationSection
+        ): T = load(T::class, config)
+
+        inline fun <reified T : Storable> Storage.save(
+            storable: T,
+            config: ConfigurationSection
+        ) {
+            save(T::class, storable, config)
+        }
     }
 }

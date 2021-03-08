@@ -87,8 +87,8 @@ class StorageImpl @Inject constructor(
             .fromStorage(config, this)
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Storage.Storable> save(storable: T, config: ConfigurationSection) {
-        (storageStragies[storable::class] as Storage.StorageStrategy<T>).toStorage(
+    override fun <T : Storage.Storable> save(klass: KClass<T>, storable: T, config: ConfigurationSection) {
+        (storageStragies[klass] as Storage.StorageStrategy<T>).toStorage(
             storable,
             config,
             this

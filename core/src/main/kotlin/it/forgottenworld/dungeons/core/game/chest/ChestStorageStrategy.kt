@@ -1,10 +1,11 @@
 package it.forgottenworld.dungeons.core.game.chest
 
 import it.forgottenworld.dungeons.api.game.chest.Chest
-import it.forgottenworld.dungeons.api.storage.edit
-import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
+import it.forgottenworld.dungeons.api.storage.edit
+import it.forgottenworld.dungeons.api.storage.read
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 

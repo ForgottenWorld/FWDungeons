@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import it.forgottenworld.echelonapi.FWEchelon
@@ -17,6 +17,8 @@ class FWEchelonUtils @Inject constructor(
     private val configuration: Configuration,
     private val dungeonManager: DungeonManager
 ) {
+
+    private var useFWEchelon = false
 
     fun checkFWEchelonIntegration() {
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Checking for FWEchelon integration...")
@@ -37,14 +39,14 @@ class FWEchelonUtils @Inject constructor(
             .mutexActivityService
             .registerMutexActivity(FWDungeonsMutexActivity())
 
-        configuration.useFWEchelon = true
+        useFWEchelon = true
     }
 
-    fun isPlayerFree(player: Player) = !configuration.useFWEchelon ||
+    fun isPlayerFree(player: Player) = !useFWEchelon ||
         !FWEchelon.api.mutexActivityService.isPlayerInMutexActivity(player)
 
     fun playerIsNoLongerFree(player: Player) {
-        if (!configuration.useFWEchelon) return
+        if (!useFWEchelon) return
         FWEchelon
             .api
             .mutexActivityService
@@ -56,7 +58,7 @@ class FWEchelonUtils @Inject constructor(
     }
 
     fun playerIsNowFree(player: Player) {
-        if (!configuration.useFWEchelon) return
+        if (!useFWEchelon) return
         FWEchelon
             .api
             .mutexActivityService

@@ -33,9 +33,9 @@ class ParticleSpammer(
                 locations.forEach {
                     world.spawnParticle(
                         particle,
-                        it.x + 0.5,
-                        it.y + 0.5,
-                        it.z + 0.5,
+                        it.x,
+                        it.y,
+                        it.z,
                         count
                     )
                 }

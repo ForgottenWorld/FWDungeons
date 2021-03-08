@@ -19,7 +19,8 @@ class Configuration @Inject constructor(
         var value: T?
     }
 
-    private inline fun <reified T : Any> configurationProperty(
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Any> configurationProperty(
         default: T? = null
     ) = object : ConfigurationProperty<T> {
         override var value: T? = null
@@ -27,7 +28,7 @@ class Configuration @Inject constructor(
         override fun getValue(thisRef: Configuration, property: KProperty<*>): T {
             if (value == null) {
                 value = plugin.config.read {
-                    get(property.name)
+                    configurationSection.get(property.name) as T?
                         ?: default
                         ?: error("Value missing from config: ${property.name}")
                 }
@@ -43,17 +44,9 @@ class Configuration @Inject constructor(
 
     val easyRankingIntegration by configurationProperty(false)
 
-    var useEasyRanking = false
-
-
     val fwEchelonIntegration by configurationProperty(false)
 
-    var useFWEchelon = false
-
-
     val vaultIntegration by configurationProperty(false)
-
-    var useVault = false
 
 
     private val dungeonWorldName by configurationProperty<String>()

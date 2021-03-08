@@ -2,13 +2,13 @@ package it.forgottenworld.dungeons.core.command.edit.helpers
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.ACTIVE_AREA
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.TRIGGER
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
@@ -37,9 +37,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
     }
 
     fun setInteractiveRegionPos(sender: Player, posNo: Int, type: Type) {
-        val block = sender.getTargetSolidBlock()
-
-        if (block.blockData.material == Material.AIR) {
+        val block = sender.getTargetSolidBlock() ?: run {
             sender.sendPrefixedMessage(Strings.YOU_NEED_TO_BE_TARGETING)
             return
         }

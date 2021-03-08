@@ -11,13 +11,21 @@ import java.util.*
 interface DungeonInstance : Storage.Storable {
 
     val id: Int
+
     val dungeon: Dungeon
+
     val origin: Vector3i
+
     var leader: UUID?
+
     var partyKey: String
+
     val isLocked: Boolean
+
     val isInGame: Boolean
+
     val players: MutableList<UUID>
+
     val isTpSafe: Boolean
 
     fun attachNewObjective(mobs: List<MobSpawnData>, onAllKilled: (DungeonInstance) -> Unit)
@@ -41,6 +49,8 @@ interface DungeonInstance : Storage.Storable {
     fun rescuePlayer(player: Player)
 
     fun onPlayerMove(player: Player)
+
     fun lock()
+
     fun unlock()
 }

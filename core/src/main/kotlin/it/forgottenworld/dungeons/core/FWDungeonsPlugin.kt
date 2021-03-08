@@ -1,11 +1,11 @@
 package it.forgottenworld.dungeons.core
 
 import com.google.inject.Inject
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.command.edit.FWDungeonsEditCommand
 import it.forgottenworld.dungeons.core.command.play.FWDungeonsPlayCommand
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
@@ -65,16 +65,18 @@ class FWDungeonsPlugin : JavaPlugin() {
 
     override fun onEnable() {
 
-        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Injecting dependencies...")
-
-        DependenciesModule(this)
-            .createInjector()
-            .injectMembers(this)
-
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Saving default config...")
 
         saveDefaultConfig()
 
+        sendConsoleMessage("${Strings.CONSOLE_PREFIX}Injecting dependencies...")
+        try {
+            DependenciesModule(this)
+                .createInjector()
+                .injectMembers(this)
+        } catch (e: Exception) {
+            throw e
+        }
         loadData(false)
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Registering commands...")

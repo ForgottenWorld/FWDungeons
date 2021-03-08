@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.api.math
 
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.edit
 import it.forgottenworld.dungeons.api.storage.read
 import org.bukkit.configuration.ConfigurationSection

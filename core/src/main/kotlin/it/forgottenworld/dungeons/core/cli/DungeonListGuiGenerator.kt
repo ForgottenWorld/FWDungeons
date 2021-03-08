@@ -5,7 +5,7 @@ import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.append
 import it.forgottenworld.dungeons.core.utils.chatComponent
 import it.forgottenworld.dungeons.core.utils.clickEvent

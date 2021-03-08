@@ -4,6 +4,7 @@ import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
@@ -11,15 +12,16 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.edit
 import it.forgottenworld.dungeons.api.storage.yaml
-import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerGridFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
+import javax.annotation.Nullable
 
 class FinalDungeonImpl @AssistedInject constructor(
     @Assisted("id") override val id: Int,
@@ -34,8 +36,8 @@ class FinalDungeonImpl @AssistedInject constructor(
     @Assisted override val triggers: Map<Int, Trigger>,
     @Assisted override val activeAreas: Map<Int, ActiveArea>,
     @Assisted override val chests: Map<Int, Chest>,
-    @Assisted("unlockableSeriesId") override val unlockableSeriesId: Int? = null,
-    @Assisted("unlockableId") override val unlockableId: Int? = null,
+    @Nullable @Assisted("unlockableSeriesId") override val unlockableSeriesId: Int? = null,
+    @Nullable @Assisted("unlockableId") override val unlockableId: Int? = null,
     private val dungeonFactory: DungeonFactory,
     private val dungeonInstanceFactory: DungeonInstanceFactory,
     triggerGridFactory: TriggerGridFactory,
@@ -46,7 +48,6 @@ class FinalDungeonImpl @AssistedInject constructor(
     @AssistedInject
     constructor(
         @Assisted dungeon: Dungeon,
-        plugin: FWDungeonsPlugin,
         dungeonFactory: DungeonFactory,
         dungeonInstanceFactory: DungeonInstanceFactory,
         triggerGridFactory: TriggerGridFactory,

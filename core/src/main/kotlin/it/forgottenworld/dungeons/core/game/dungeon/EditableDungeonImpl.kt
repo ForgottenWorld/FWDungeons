@@ -4,6 +4,7 @@ import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
@@ -12,6 +13,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import it.forgottenworld.dungeons.core.config.Configuration
@@ -28,6 +30,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import java.io.File
+import javax.annotation.Nullable
 
 class EditableDungeonImpl @AssistedInject constructor(
     @Assisted("editor") editor: Player,
@@ -37,8 +40,8 @@ class EditableDungeonImpl @AssistedInject constructor(
     @Assisted override var difficulty: Dungeon.Difficulty = Dungeon.Difficulty.MEDIUM,
     @Assisted("minPlayers") override var minPlayers: Int = 1,
     @Assisted("maxPlayers") override var maxPlayers: Int = 2,
-    @Assisted override var box: Box? = null,
-    @Assisted override var startingLocation: Vector3i? = null,
+    @Nullable @Assisted override var box: Box? = null,
+    @Nullable @Assisted override var startingLocation: Vector3i? = null,
     @Assisted("points") override var points: Int = 0,
     @Assisted override var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
     @Assisted triggers: Map<Int, Trigger> = mutableMapOf(),
@@ -218,7 +221,7 @@ class EditableDungeonImpl @AssistedInject constructor(
         if (aaId == null) {
             activeAreas.keys.last().also { activeAreas = activeAreas.minus(it) }
         } else {
-            activeAreas = activeAreas.minus(aaId)
+            activeAreas = activeAreas - aaId
             aaId
         }
 
@@ -279,7 +282,7 @@ class EditableDungeonImpl @AssistedInject constructor(
 
     private fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
         ParticleSpammer.highlightBox(
-            interactiveRegion.withContainerOrigin(Vector3i.ZERO, testOrigin).box,
+            interactiveRegion.box.withContainerOrigin(Vector3i.ZERO, testOrigin),
             configuration.dungeonWorld
         )
     }

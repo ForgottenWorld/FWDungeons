@@ -6,6 +6,7 @@ import com.google.inject.Injector
 import com.google.inject.Provider
 import com.google.inject.assistedinject.FactoryModuleBuilder
 import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
@@ -15,9 +16,7 @@ import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.config.StorageImpl
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonFactory
-import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeonImpl
-import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonImpl
+import it.forgottenworld.dungeons.core.game.dungeon.*
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
@@ -38,6 +37,7 @@ class DependenciesModule(private val plugin: FWDungeonsPlugin) : AbstractModule(
     override fun configure() {
         bind(FWDungeonsPlugin::class.java).toInstance(plugin)
         bind(Storage::class.java).to(StorageImpl::class.java)
+        bind(DungeonManager::class.java).to(DungeonManagerImpl::class.java)
         bind(ServicesManager::class.java).toProvider(Provider { plugin.server.servicesManager })
         bind(BukkitAPIHelper::class.java).toInstance(BukkitAPIHelper())
 

@@ -3,11 +3,13 @@ package it.forgottenworld.dungeons.core.game.dungeon
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.config.Strings
@@ -17,68 +19,72 @@ import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import java.util.*
 
 @Singleton
-class DungeonManager @Inject constructor(
+class DungeonManagerImpl @Inject constructor(
     private val storage: Storage
-) {
+) : DungeonManager {
 
     private val finalDungeons = mutableMapOf<Int, FinalDungeon>()
     private val playerEditableDungeons = mutableMapOf<UUID, EditableDungeon>()
     private val dungeonInstances = mutableMapOf<Int, MutableMap<Int, DungeonInstance>>()
     private val playerInstances = mutableMapOf<UUID, DungeonInstance>()
 
-    val finalDungeonCount get() = finalDungeons.size
+    override val finalDungeonCount get() = finalDungeons.size
 
-    fun getFirstAvailableFinalDungeonId() = finalDungeons.keys.firstGap()
+    override fun getFirstAvailableFinalDungeonId() = finalDungeons.keys.firstGap()
 
-    fun clearFinalDungeons() {
+    override fun clearFinalDungeons() {
         finalDungeons.clear()
     }
 
-    fun enableDungeon(id: Int) {
+    override fun enableDungeon(id: Int) {
         finalDungeons[id]?.isActive = true
     }
 
-    fun disableDungeon(id: Int): Boolean {
+    override fun disableDungeon(id: Int): Boolean {
         val dungeon = finalDungeons[id] ?: return false
         getDungeonInstances(dungeon).values.forEach { it.evacuate() }
         finalDungeons[id]?.isActive = false
         return true
     }
 
-    fun getAllFinalDungeons() = finalDungeons.values
+    override fun getAllFinalDungeons() = finalDungeons.values
 
-    fun getAllActiveFinalDungeons() = finalDungeons.values.filter { it.isActive }
+    override fun getAllActiveFinalDungeons() = finalDungeons.values.filter { it.isActive }
 
-    fun registerFinalDungeon(dungeon: FinalDungeon) {
+    override fun registerFinalDungeon(dungeon: FinalDungeon) {
         finalDungeons[dungeon.id] = dungeon
     }
 
-    fun getFinalDungeonById(id: Int) = finalDungeons[id]
+    override fun getFinalDungeonById(id: Int) = finalDungeons[id]
 
-    fun getAllBusyInstances() = playerInstances.values.distinct()
+    override fun getAllBusyInstances() = playerInstances.values.distinct()
 
-    fun getDungeonInstances(dungeon: Dungeon): Map<Int, DungeonInstance> {
+    override fun getDungeonInstances(dungeon: Dungeon): Map<Int, DungeonInstance> {
         dungeonInstances[dungeon.id]?.let { return it }
         return mutableMapOf<Int, DungeonInstance>().also {
             dungeonInstances[dungeon.id] = it
         }
     }
 
-    fun registerDungeonInstance(instance: DungeonInstance) {
-        dungeonInstances[instance.dungeon.id]!![instance.id] = instance
+    override fun registerDungeonInstance(instance: DungeonInstance) {
+        val instances = dungeonInstances[instance.dungeon.id]
+            ?: mutableMapOf<Int, DungeonInstance>().also {
+                dungeonInstances[instance.dungeon.id] = it
+            }
+        instances[instance.id] = instance
     }
 
-    fun clearDungeonInstances(dungeon: Dungeon) {
+    override fun clearDungeonInstances(dungeon: Dungeon) {
         dungeonInstances.remove(dungeon.id)
     }
 
-    fun setDungeonInstances(dungeon: Dungeon, instances: Map<Int, DungeonInstance>) {
+    override fun setDungeonInstances(dungeon: Dungeon, instances: Map<Int, DungeonInstance>) {
         dungeonInstances[dungeon.id] = instances.toMutableMap()
     }
 
-    fun getPlayerEditableDungeon(uuid: UUID) = playerEditableDungeons[uuid]
+    override fun getPlayerEditableDungeon(uuid: UUID) = playerEditableDungeons[uuid]
 
-    fun setPlayerEditableDungeon(uuid: UUID, editableDungeon: EditableDungeon?) {
+    override fun setPlayerEditableDungeon(uuid: UUID, editableDungeon: EditableDungeon?) {
         if (editableDungeon != null) {
             playerEditableDungeons[uuid] = editableDungeon
         } else {
@@ -86,9 +92,9 @@ class DungeonManager @Inject constructor(
         }
     }
 
-    fun getPlayerInstance(uuid: UUID) = playerInstances[uuid]
+    override fun getPlayerInstance(uuid: UUID) = playerInstances[uuid]
 
-    fun setPlayerInstance(uuid: UUID, dungeonInstance: DungeonInstance?) {
+    override fun setPlayerInstance(uuid: UUID, dungeonInstance: DungeonInstance?) {
         if (dungeonInstance != null) {
             playerInstances[uuid] = dungeonInstance
         } else {
@@ -96,7 +102,7 @@ class DungeonManager @Inject constructor(
         }
     }
 
-    fun loadDungeonsFromStorage() {
+    override fun loadDungeonsFromStorage() {
         for (file in storage.dungeonFiles) {
             try {
                 registerFinalDungeon(
@@ -110,7 +116,7 @@ class DungeonManager @Inject constructor(
         }
     }
 
-    fun loadInstancesFromStorage() {
+    override fun loadInstancesFromStorage() {
         yaml {
             load(storage.intancesFile)
             read {
@@ -135,10 +141,10 @@ class DungeonManager @Inject constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    fun saveDungeonToStorage(dungeon: FinalDungeon) {
+    override fun saveDungeonToStorage(dungeon: FinalDungeon) {
         try {
             yaml {
-                storage.save(dungeon, this)
+                storage.save<Dungeon>(dungeon, this)
                 launchAsync { save(storage.getFileForDungeon(dungeon)) }
             }
         } catch (e: Exception) {

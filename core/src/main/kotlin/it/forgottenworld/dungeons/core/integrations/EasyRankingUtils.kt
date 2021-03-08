@@ -14,6 +14,8 @@ class EasyRankingUtils @Inject constructor(
     private val configuration: Configuration
 ) {
 
+    private var useEasyRanking = false
+
     fun checkEasyRankingIntegration() {
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Checking for EasyRanking integration...")
         if (!configuration.easyRankingIntegration) {
@@ -28,10 +30,11 @@ class EasyRankingUtils @Inject constructor(
         }
 
         sendConsoleMessage(" -- EasyRanking §2is present")
-        configuration.useEasyRanking = true
+        useEasyRanking = true
     }
 
     fun addScoreToPlayer(uuid: UUID, score: Float) {
+        if (!useEasyRanking) return
         val boardService = ERBoardService.getInstance()
         val board = boardService
             .getBoardById("dungeons")

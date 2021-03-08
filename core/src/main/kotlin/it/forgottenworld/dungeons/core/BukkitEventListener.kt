@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.core
 
 import com.google.inject.Inject
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.detection.BypassAttemptHandler
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager

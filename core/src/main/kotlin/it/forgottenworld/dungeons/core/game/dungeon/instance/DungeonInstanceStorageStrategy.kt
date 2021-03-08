@@ -1,12 +1,13 @@
 package it.forgottenworld.dungeons.core.game.dungeon.instance
 
 import com.google.inject.Inject
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
+import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.edit
 import it.forgottenworld.dungeons.api.storage.read
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import org.bukkit.configuration.ConfigurationSection
 
 class DungeonInstanceStorageStrategy @Inject constructor(

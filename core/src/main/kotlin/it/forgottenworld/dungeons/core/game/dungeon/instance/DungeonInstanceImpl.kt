@@ -3,6 +3,7 @@ package it.forgottenworld.dungeons.core.game.dungeon.instance
 import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
 import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
@@ -14,7 +15,6 @@ import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.respawn.RespawnData
@@ -311,7 +311,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
     }
 
     override fun onInstanceFinish(givePoints: Boolean) {
-        if (configuration.useEasyRanking && givePoints && dungeon.points != 0) {
+        if (givePoints && dungeon.points != 0) {
             for (uuid in players) {
                 easyRankingUtils.addScoreToPlayer(uuid, dungeon.points.toFloat())
             }

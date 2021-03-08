@@ -2,14 +2,13 @@ package it.forgottenworld.dungeons.core.command.edit.chest
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.chest.ChestImpl
 import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
-import org.bukkit.Material
 import org.bukkit.entity.Player
 
 class CmdChestAdd @Inject constructor(
@@ -17,9 +16,7 @@ class CmdChestAdd @Inject constructor(
 ) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
-        val block = sender.getTargetSolidBlock()
-
-        if (block.blockData.material == Material.AIR) {
+        val block = sender.getTargetSolidBlock() ?: run {
             sender.sendPrefixedMessage(Strings.YOU_NEED_TO_BE_TARGETING)
             return true
         }

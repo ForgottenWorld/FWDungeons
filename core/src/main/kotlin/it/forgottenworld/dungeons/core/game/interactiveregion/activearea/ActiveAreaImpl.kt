@@ -11,15 +11,15 @@ import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import org.bukkit.Location
 import org.bukkit.Material
+import javax.annotation.Nullable
 import kotlin.random.Random
 
 class ActiveAreaImpl @Inject constructor(
     @Assisted override val id: Int,
     @Assisted override val box: Box,
     @Assisted override val startingMaterial: Material = Material.AIR,
-    @Assisted override var label: String? = null,
-    private val configuration : Configuration,
-    private val activeAreaFactory: ActiveAreaFactory
+    @Nullable @Assisted override var label: String? = null,
+    private val configuration : Configuration
 ) : ActiveArea, Storage.Storable {
 
     override fun fillWithMaterial(material: Material, instance: DungeonInstance) {
@@ -37,13 +37,4 @@ class ActiveAreaImpl @Inject constructor(
             Random.nextInt(origin.z, origin.z + box.depth) + 0.5
         )
     }
-
-    override fun withContainerOrigin(oldOrigin: Vector3i, newOrigin: Vector3i) = activeAreaFactory.create(
-        id,
-        box.withContainerOrigin(oldOrigin, newOrigin),
-        startingMaterial,
-        label
-    )
-
-    override fun withContainerOriginZero(oldOrigin: Vector3i) = withContainerOrigin(oldOrigin, Vector3i.ZERO)
 }

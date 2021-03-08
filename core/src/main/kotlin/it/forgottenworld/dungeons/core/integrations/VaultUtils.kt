@@ -16,6 +16,8 @@ class VaultUtils @Inject constructor(
     private val servicesManager: ServicesManager
 ) {
 
+    private var useVault = false
+
     fun checkVaultIntegration() {
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Checking for Vault integration...")
         if (!configuration.vaultIntegration) {
@@ -30,11 +32,11 @@ class VaultUtils @Inject constructor(
         }
 
         sendConsoleMessage(" -- Vault §2is present")
-        configuration.useEasyRanking = true
+        useVault = true
     }
 
     fun canPlayerPay(player: Player, amount: Double): Boolean {
-        if (!configuration.useVault) return true
+        if (!useVault) return true
         return servicesManager
             .getRegistration(Economy::class.java)
             ?.provider
@@ -51,7 +53,7 @@ class VaultUtils @Inject constructor(
         ?.let { "$it $amount" }
 
     fun withdrawPlayer(player: Player, amount: Double) {
-        if (!configuration.useVault) return
+        if (!useVault) return
         servicesManager
             .getRegistration(Economy::class.java)
             ?.provider?.withdrawPlayer(Bukkit.getOfflinePlayer(player.uniqueId), amount)

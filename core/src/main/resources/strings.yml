@@ -94,7 +94,7 @@ NO_EPEARLS_OR_CHORUS_FRUIT_ALLOWED: "No ender pearls or chorus fruits in the dun
 NO_LONGER_EDITING_DUNGEON: "§7You're no longer editing a dungeon"
 NO_ONLINE_PLAYER_HAS_THIS_NAME: "No currently online player has this name"
 NO_TRIGGER_WITH_SUCH_ID: "No trigger with such id"
-NTH_POS_SET_PICK_ANOTHER: "%s position set, now pick another with /fwde $s pos%d"
+NTH_POS_SET_PICK_ANOTHER: "%s position set, now pick another with /fwde %s pos%d"
 NUMBER_OF_PLAYERS_CHANGED: "Number of players changed"
 ONLY_LEADER_MAY_CLOSE_PARTY: "Only the dungeon party leader may make the party private"
 ONLY_LEADER_MAY_INVITE: "Only the dungeon party leader may invite others to join"
