@@ -126,17 +126,16 @@ data class Box(
     }
 
     fun getBlockIterator(
-        world: World,
-        containerOrigin: Vector3i = Vector3i.ZERO
+        world: World
     ) = iterator {
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until depth) {
                     yield(
                         world.getBlockAt(
-                            containerOrigin.x + origin.x + x,
-                            containerOrigin.y + origin.y + y,
-                            containerOrigin.z + origin.z + z
+                            origin.x + x,
+                            origin.y + y,
+                            origin.z + z
                         )
                     )
                 }

@@ -40,10 +40,10 @@ class CodeParser {
                     if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
                     mobs.add(
                         MobSpawnData(
-                        currentActiveArea,
-                        code.removePrefix(Consts.PREFIX_MYTHIC_MOB),
-                        true
-                    )
+                            currentActiveArea,
+                            code.removePrefix(Consts.PREFIX_MYTHIC_MOB),
+                            true
+                        )
                     )
                 }
                 code.startsWith(Consts.PREFIX_VANILLA_MOB) -> {

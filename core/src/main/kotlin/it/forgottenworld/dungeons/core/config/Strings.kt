@@ -208,5 +208,6 @@ object Strings {
     val PRESSURE_PLATE_IS_BOUND_TO by resourceString()
     val REQUIREMENTS_NOT_MET by resourceString()
     val YOU_CANT_UNLOCK_YET by resourceString()
+    val YOU_HAVENT_UNLOCKED_THIS_YET by resourceString()
     val PRESSURE_PLATE_HAS_BEEN_UNBOUND by resourceString()
 }

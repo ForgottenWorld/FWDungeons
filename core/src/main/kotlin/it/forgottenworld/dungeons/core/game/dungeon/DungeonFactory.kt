@@ -10,7 +10,6 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import org.bukkit.entity.Player
-import javax.annotation.Nullable
 
 interface DungeonFactory {
     
@@ -49,8 +48,8 @@ interface DungeonFactory {
         triggers: Map<Int, Trigger>,
         activeAreas: Map<Int, ActiveArea>,
         chests: Map<Int, Chest>,
-        @Nullable @Assisted("unlockableSeriesId") unlockableSeriesId: Int? = null,
-        @Nullable @Assisted("unlockableId") unlockableId: Int? = null
+        @Assisted("unlockableSeriesId") unlockableSeriesId: Int? = null,
+        @Assisted("unlockableId") unlockableId: Int? = null
     ): FinalDungeon
 
     fun createFinal(

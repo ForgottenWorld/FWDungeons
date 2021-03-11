@@ -70,13 +70,16 @@ class FWDungeonsPlugin : JavaPlugin() {
         saveDefaultConfig()
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Injecting dependencies...")
+
         try {
             DependenciesModule(this)
                 .createInjector()
                 .injectMembers(this)
         } catch (e: Exception) {
+            e.printStackTrace()
             throw e
         }
+
         loadData(false)
 
         sendConsoleMessage("${Strings.CONSOLE_PREFIX}Registering commands...")

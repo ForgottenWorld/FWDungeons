@@ -70,7 +70,7 @@ class ParticleSpammer(
             world: World
         ) {
             launch {
-                for (i in 0 until iterations) {
+                repeat(iterations) {
                     delay(500)
                     locations.forEach {
                         world.spawnParticle(particle, it.x, it.y, it.z, 1)

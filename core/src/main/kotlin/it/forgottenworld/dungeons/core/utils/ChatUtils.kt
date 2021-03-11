@@ -12,12 +12,12 @@ import net.md_5.bungee.api.chat.hover.content.Content
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-inline fun chatComponent(build: ComponentBuilder.() -> Unit): Array<BaseComponent> = ComponentBuilder()
+inline fun jsonMessage(build: ComponentBuilder.() -> Unit): Array<BaseComponent> = ComponentBuilder()
     .apply(build)
     .create()
 
 inline fun Player.sendJsonMessage(build: ComponentBuilder.() -> Unit) = spigot()
-    .sendMessage(*chatComponent(build))
+    .sendMessage(*jsonMessage(build))
 
 fun Player.sendJsonMessage(chatComponent: Array<BaseComponent>) = spigot()
     .sendMessage(*chatComponent)
@@ -39,7 +39,4 @@ fun ComponentBuilder.hoverEvent(
     content: Iterable<Content>
 ): ComponentBuilder = event(HoverEvent(action, content.toList()))
 
-fun ComponentBuilder.append(
-    text: String,
-    color: ChatColor
-): ComponentBuilder = append(text).color(color)
+infix fun ComponentBuilder.color(color: ChatColor): ComponentBuilder = color(color)

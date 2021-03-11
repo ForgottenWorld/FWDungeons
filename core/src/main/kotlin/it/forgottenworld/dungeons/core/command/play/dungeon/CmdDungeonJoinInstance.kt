@@ -2,13 +2,15 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdDungeonJoinInstance @Inject constructor(
-    private val dungeonManager: DungeonManager
+    private val dungeonManager: DungeonManager,
+    private val unlockableManager: UnlockableManager
 ) : PlayerCommand() {
 
     override fun command(sender: Player, args: Array<out String>): Boolean {
@@ -39,6 +41,14 @@ class CmdDungeonJoinInstance @Inject constructor(
 
         if (dungeonManager.getPlayerInstance(sender.uniqueId) != null) {
             sender.sendPrefixedMessage(Strings.ALREADY_IN_PARTY)
+            return true
+        }
+
+        val seriesId = dungeon.unlockableSeriesId
+        val unlockableId = dungeon.unlockableId
+        val isUnlockable = seriesId != null && unlockableId != null
+        if (isUnlockable && !unlockableManager.hasPlayerUnlocked(sender, seriesId!!, unlockableId!!)) {
+            sender.sendPrefixedMessage(Strings.YOU_HAVENT_UNLOCKED_THIS_YET)
             return true
         }
 

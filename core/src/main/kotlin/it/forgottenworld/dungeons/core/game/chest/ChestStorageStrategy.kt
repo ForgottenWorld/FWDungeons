@@ -21,7 +21,7 @@ class ChestStorageStrategy : Storage.StorageStrategy<Chest> {
             "minItems" to obj.minItems
             "maxItems" to obj.maxItems
             section("chances") {
-                for ((k,v) in obj.itemChanceMap.entries) {
+                for ((k,v) in obj.itemChanceMap) {
                     "$k" to v
                 }
             }

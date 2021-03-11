@@ -155,3 +155,4 @@ PRESSURE_PLATE_IS_BOUND_TO: "The pressure plate below you is bound to unlockable
 PRESSURE_PLATE_HAS_BEEN_UNBOUND: "The pressure plate below you has been unbound"
 REQUIREMENTS_NOT_MET: "§4You haven't fulfilled all the requisites yet"
 YOU_CANT_UNLOCK_YET: "§4You can't unlock this yet! §f(%d out of %d)"
+YOU_HAVENT_UNLOCKED_THIS_YET: "§4You haven't unlocked this yet"

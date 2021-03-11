@@ -155,3 +155,4 @@ PRESSURE_PLATE_IS_BOUND_TO: "La pressure plate sotto di te è associata allo sbl
 PRESSURE_PLATE_HAS_BEEN_UNBOUND: "La pressure plate sotto di te è stata disassociata"
 REQUIREMENTS_NOT_MET: "§4No hai ancora soddisfatto tutti i requisiti"
 YOU_CANT_UNLOCK_YET: "§4Non puoi ancora sbloccare questo elemento! §f(%d di %d)"
+YOU_HAVENT_UNLOCKED_THIS_YET: "§4Non hai ancora sbloccato questo elemento"

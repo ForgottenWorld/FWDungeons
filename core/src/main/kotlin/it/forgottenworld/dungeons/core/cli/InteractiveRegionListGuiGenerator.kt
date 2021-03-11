@@ -1,13 +1,13 @@
 package it.forgottenworld.dungeons.core.cli
 
 import com.google.inject.Singleton
+import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
-import it.forgottenworld.dungeons.core.utils.append
-import it.forgottenworld.dungeons.core.utils.chatComponent
 import it.forgottenworld.dungeons.core.utils.clickEvent
+import it.forgottenworld.dungeons.core.utils.color
+import it.forgottenworld.dungeons.core.utils.jsonMessage
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import kotlin.math.floor
@@ -15,66 +15,56 @@ import kotlin.math.floor
 @Singleton
 class InteractiveRegionListGuiGenerator {
 
-    private fun clickables(interactiveEl: InteractiveRegion, type: String) = chatComponent {
-        append("  [", ChatColor.WHITE)
-        append(" HL ", ChatColor.GREEN)
+    private fun clickables(interactiveEl: InteractiveRegion, type: String) = jsonMessage {
+        append("  §f[")
+        append(" §aHL ")
         clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type hl ${interactiveEl.id}")
-        append("] [", ChatColor.WHITE)
-        append(" X ", ChatColor.RED)
+        append("§f] [")
+        append(" §cX ")
         clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${interactiveEl.id}")
-        append("]", ChatColor.WHITE)
+        append("§f]")
         if (interactiveEl is Trigger) {
-            append(" [", ChatColor.WHITE)
+            append(" §f[")
             if (interactiveEl.effectCode.isEmpty()) {
-                append(" NO CODE ", ChatColor.GRAY)
+                append(" §7NO CODE ")
             } else {
-                append(" SHOW CODE ", ChatColor.LIGHT_PURPLE)
+                append(" §dSHOW CODE ")
                 clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde trigger code ${interactiveEl.id}")
             }
-            append("]", ChatColor.WHITE)
+            append("§f]")
         }
         append("\n")
     }
 
-    private fun pageClickable(text: String, page: Int, type: String) = chatComponent {
-        append(text, ChatColor.AQUA)
+    private fun pageClickable(text: String, page: Int, type: String) = jsonMessage {
+        append(text) color ChatColor.AQUA
         clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeonsedit $type list $page")
     }
 
-    private fun paginator(page: Int, maxPage: Int, type: String) = chatComponent {
-
+    private fun paginator(page: Int, maxPage: Int, type: String) = jsonMessage {
         if (page > 0) {
-            append("=[ ", ChatColor.DARK_GRAY)
+            append("=[ ") color ChatColor.DARK_GRAY
             append(pageClickable("<<<<", page - 1, type))
-            append(" ]=", ChatColor.DARK_GRAY)
+            append(" ]=") color ChatColor.DARK_GRAY
         } else {
-            append("=======", ChatColor.DARK_GRAY)
+            append("=======") color ChatColor.DARK_GRAY
         }
 
-        append("=====================================", ChatColor.DARK_GRAY)
+        append("=====================================") color ChatColor.DARK_GRAY
 
         if (page < maxPage) {
-            append("=[ ")
-            color(ChatColor.DARK_GRAY)
+            append("§8=[ ")
             append(pageClickable(">>>>", page + 1, type))
-            append(" ]=")
-            color(ChatColor.DARK_GRAY)
+            append("§8 ]=")
         } else {
             append("=======")
             color(ChatColor.DARK_GRAY)
         }
     }
 
-    fun showActiveAreas(dungeon: EditableDungeon, page: Int) = chatComponent {
-
-        append("====================[ ", ChatColor.DARK_GRAY)
-        append(Strings.CHAT_PREFIX_NO_SPACE)
-        append("ungeons ", ChatColor.GRAY)
-        append("]====================\n", ChatColor.DARK_GRAY)
-
-        append("====================[ ", ChatColor.DARK_GRAY)
-        append("Active Areas", ChatColor.GREEN)
-        append(" ]===================\n\n", ChatColor.DARK_GRAY)
+    fun showActiveAreas(dungeon: EditableDungeon, page: Int) = jsonMessage {
+        append("§8====================[ ${Strings.CHAT_PREFIX_NO_SPACE}§7ungeons §8]====================\n")
+        append("§8=====================[ §aActive Areas §8]=====================\n\n")
 
         for ((k, v) in dungeon
             .activeAreas
@@ -82,10 +72,9 @@ class InteractiveRegionListGuiGenerator {
             .toList()
             .slice(page * ITEMS_PER_PAGE..((page + 1) * ITEMS_PER_PAGE - 1)
                 .coerceAtMost(dungeon.activeAreas.size - 1)
-            )) {
-            append(">>> ", ChatColor.GRAY)
-            append("#$k: ", ChatColor.DARK_AQUA)
-            append(v.label ?: "NO LABEL", ChatColor.WHITE)
+            )
+        ) {
+            append("§7>>> §3#$k: §f${v.label ?: "NO LABEL"}" )
             clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde aa label id:${v.id} ")
             append(clickables(v, "aa"))
         }
@@ -94,18 +83,11 @@ class InteractiveRegionListGuiGenerator {
         append(paginator(page, floor(dungeon.activeAreas.size / ITEMS_PER_PAGE.toDouble()).toInt(), "aa"))
     }
 
-    fun showTriggers(dungeon: EditableDungeon, page: Int) = chatComponent {
+    fun showTriggers(dungeon: EditableDungeon, page: Int) = jsonMessage {
+        append("§8====================[ ${Strings.CHAT_PREFIX_NO_SPACE}§7ungeons §8]====================\n")
+        append("§8=====================[ §9Triggers §8]=====================\n\n")
 
-        append("====================[ ", ChatColor.DARK_GRAY)
-        append(Strings.CHAT_PREFIX_NO_SPACE)
-        append("ungeons ", ChatColor.GRAY)
-        append("]====================\n", ChatColor.DARK_GRAY)
-
-        append("=====================[ ", ChatColor.DARK_GRAY)
-        append("Triggers", ChatColor.BLUE)
-        append(" ]=====================\n\n", ChatColor.DARK_GRAY)
-
-        for ((k, v) in dungeon
+        for ((k,v) in dungeon
             .triggers
             .entries
             .toList()
@@ -114,15 +96,13 @@ class InteractiveRegionListGuiGenerator {
                     .coerceAtMost(dungeon.triggers.size - 1)
             )
         ) {
-            append(">>> ", ChatColor.GRAY)
-            append("#$k: ", ChatColor.DARK_AQUA)
-            append(v.label ?: "NO LABEL", ChatColor.WHITE)
+            append("§7>>> §3#$k: §f${v.label ?: "NO LABEL"}" )
             clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde t label id:${v.id} ")
             append(clickables(v, "t"))
         }
 
         append("\n".repeat(ITEMS_PER_PAGE - dungeon.triggers.size))
-        append(paginator(page, floor(dungeon.triggers.size / ITEMS_PER_PAGE.toDouble()).toInt(), "t"))
+        append(paginator(page, dungeon.triggers.size / ITEMS_PER_PAGE, "t"))
     }
 
     companion object {

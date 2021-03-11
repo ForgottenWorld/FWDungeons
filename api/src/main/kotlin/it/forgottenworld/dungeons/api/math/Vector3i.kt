@@ -14,7 +14,7 @@ data class Vector3i(
     val z: Int
 ) : Storage.Storable {
 
-    fun locationInWorld(world: World) = Location(
+    fun locationInWorld(world: World?) = Location(
         world,
         x.toDouble(),
         y.toDouble(),

@@ -187,10 +187,8 @@ class EditableDungeonImpl @AssistedInject constructor(
         var prevalentMaterial = Material.AIR
         var prevalentCount = 0
         var runnerUpCount = 0
-        for ((i,block) in box.getBlockIterator(
-            configuration.dungeonWorld,
-            testOrigin
-        ).withIndex()) {
+        val blockIterator = box.getBlockIterator(configuration.dungeonWorld)
+        for ((i,block) in blockIterator.withIndex()) {
             val count = (materialCounts[block.type] ?: 0) + 1
             materialCounts[block.type] = count
             if (count > prevalentCount) {
@@ -204,7 +202,7 @@ class EditableDungeonImpl @AssistedInject constructor(
             }
             if (volume - i - 1 < prevalentCount - runnerUpCount) break
         }
-        
+
         val activeArea = activeAreaFactory.create(
             id,
             box.withContainerOriginZero(testOrigin),
