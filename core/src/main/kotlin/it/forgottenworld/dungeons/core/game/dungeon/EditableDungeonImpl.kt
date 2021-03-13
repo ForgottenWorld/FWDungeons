@@ -82,7 +82,8 @@ class EditableDungeonImpl @AssistedInject constructor(
         dungeon.box!!.copy(),
         dungeon.startingLocation!!.copy(),
         dungeon.points,
-        dungeonManager.getDungeonInstances(dungeon)
+        dungeonManager
+            .getDungeonInstances(dungeon)
             .values
             .map { it.origin }
             .toMutableList(),
@@ -103,6 +104,8 @@ class EditableDungeonImpl @AssistedInject constructor(
     private val editor = editor.uniqueId
 
     override lateinit var testOrigin: Vector3i
+
+    private var editedFromExisting = id != EditableDungeon.NEW_DUNGEON_TEMP_ID
 
     init {
         if (finalInstanceLocations.isNotEmpty()) setupTestBox()
@@ -135,6 +138,7 @@ class EditableDungeonImpl @AssistedInject constructor(
             id = dungeonManager.getFirstAvailableFinalDungeonId()
         }
         val finalDungeon = dungeonFactory.createFinal(this)
+        if (!editedFromExisting) finalDungeon.isActive = false
         dungeonManager.registerFinalDungeon(finalDungeon)
         saveToConfigAndCreateInstances(id, finalDungeon)
         onDestroy()
@@ -181,12 +185,13 @@ class EditableDungeonImpl @AssistedInject constructor(
 
     private fun newActiveArea(box: Box): Int {
         val id = activeAreas.keys.lastOrNull()?.plus(1) ?: 0
-        
         val volume = box.width * box.height * box.depth
         val materialCounts = mutableMapOf<Material, Int>()
+
         var prevalentMaterial = Material.AIR
         var prevalentCount = 0
         var runnerUpCount = 0
+
         val blockIterator = box.getBlockIterator(configuration.dungeonWorld)
         for ((i,block) in blockIterator.withIndex()) {
             val count = (materialCounts[block.type] ?: 0) + 1
@@ -209,7 +214,11 @@ class EditableDungeonImpl @AssistedInject constructor(
             prevalentMaterial,
             null
         )
-        
+
+        Bukkit.getPlayer(editor)?.sendPrefixedMessage(
+            Strings.PREVALENT_MATERIAL_IN_REGION_IS.format(prevalentMaterial.name)
+        )
+
         activeAreas = activeAreas.plus(id to activeArea)
         highlightNewInteractiveRegion(activeArea)
         return id
@@ -266,7 +275,13 @@ class EditableDungeonImpl @AssistedInject constructor(
         activeAreaBoxBuilder.clear()
         dungeonManager.setPlayerEditableDungeon(editor, null)
         if (restoreFormer) {
-            dungeonManager.getFinalDungeonById(id)?.isBeingEdited = false
+            dungeonManager.getFinalDungeonById(id)?.run {
+                isBeingEdited = false
+                val instances = finalInstanceLocations.withIndex().associate { (k, v) ->
+                    k to dungeonInstanceFactory.create(this, v)
+                }
+                dungeonManager.setDungeonInstances(this, instances)
+            }
         }
         Bukkit.getPlayer(editor)?.sendPrefixedMessage(Strings.NO_LONGER_EDITING_DUNGEON)
     }
@@ -337,6 +352,12 @@ class EditableDungeonImpl @AssistedInject constructor(
     }
 
     override fun onPlayerInteract(event: PlayerInteractEvent) {
+        val posNo = when (event.action) {
+            Action.LEFT_CLICK_BLOCK -> 1
+            Action.RIGHT_CLICK_BLOCK -> 2
+            else -> return
+        }
+
         val persistentDataContainer = event.item?.itemMeta?.persistentDataContainer ?: return
 
         val isTriggerWand = persistentDataContainer
@@ -349,12 +370,6 @@ class EditableDungeonImpl @AssistedInject constructor(
 
         if (!isTriggerWand && !isActiveAreaWand) return
         event.isCancelled = true
-
-        val posNo = when (event.action) {
-            Action.LEFT_CLICK_BLOCK -> 1
-            Action.RIGHT_CLICK_BLOCK -> 2
-            else -> return
-        }
 
         val cmd = "fwde ${if (isTriggerWand) "trigger" else "activearea"} pos$posNo"
 

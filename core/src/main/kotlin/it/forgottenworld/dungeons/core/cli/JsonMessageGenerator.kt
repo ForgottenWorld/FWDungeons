@@ -2,8 +2,6 @@ package it.forgottenworld.dungeons.core.cli
 
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.utils.clickEvent
-import it.forgottenworld.dungeons.core.utils.color
 import it.forgottenworld.dungeons.core.utils.jsonMessage
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
@@ -17,22 +15,30 @@ class JsonMessageGenerator {
         instanceId: Int,
         partyKey: String
     ) = jsonMessage {
-        append("${Strings.CHAT_PREFIX}${Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(senderName)} ")
-        append(Strings.HERE) color ChatColor.GREEN
-        clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons join $dungeonId $instanceId $partyKey")
-        append(" ${Strings.TO_ACCEPT}") color ChatColor.WHITE
+        +"${Strings.CHAT_PREFIX}${Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(senderName)} "
+        +Strings.HERE
+        +ChatColor.GREEN
+        +ClickEvent(
+            ClickEvent.Action.RUN_COMMAND,
+            "/fwdungeons join $dungeonId $instanceId $partyKey"
+        )
+        +" §f${Strings.TO_ACCEPT}"
     }
 
-    fun lockLink() = jsonMessage {
-        append(Strings.HERE)
-        color(ChatColor.GOLD)
-        clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons lock")
+    val lockLink by lazy {
+        jsonMessage {
+            +Strings.HERE
+            +ChatColor.GOLD
+            +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons lock")
+        }
     }
 
-    fun unlockLink() = jsonMessage {
-        append(Strings.HERE)
-        color(ChatColor.GREEN)
-        clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons unlock")
+    val unlockLink by lazy {
+        jsonMessage {
+            +Strings.HERE
+            +ChatColor.GREEN
+            +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons unlock")
+        }
     }
 
 }

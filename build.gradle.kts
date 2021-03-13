@@ -13,10 +13,10 @@ dependencies {
 plugins {
     maven
     kotlin("jvm") version Versions.kotlin
+    id("com.github.ben-manes.versions") version "0.38.0"
 }
 
 subprojects {
-
     group = "it.forgottenworld.fwdungeons"
     version = Versions.plugin
 
@@ -41,5 +41,4 @@ subprojects {
             jvmTarget = "1.8"
         }
     }
-
 }

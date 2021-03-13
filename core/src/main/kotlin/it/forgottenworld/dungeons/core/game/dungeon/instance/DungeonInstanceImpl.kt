@@ -195,8 +195,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         if (players.isEmpty()) {
             leader = player.uniqueId
             player.sendJsonMessage {
-                append("${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} ")
-                append(jsonMessageGenerator.lockLink())
+                +"${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} "
+                +jsonMessageGenerator.lockLink
             }
         } else {
             player.sendPrefixedMessage(Strings.YOU_JOINED_DUNGEON_PARTY)

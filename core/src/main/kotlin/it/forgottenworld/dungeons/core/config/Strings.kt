@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.core.config
 
+import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
 import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.io.InputStreamReader
 import kotlin.properties.ReadOnlyProperty
@@ -13,8 +13,10 @@ object Strings {
     private lateinit var stringResourceMap: Map<String, String>
     private val loadedResourceStrings = mutableSetOf<ResourceString>()
 
-    private interface ResourceString : ReadOnlyProperty<Strings, String> { var value: String? }
-    
+    private interface ResourceString : ReadOnlyProperty<Strings, String> {
+        var value: String?
+    }
+
     private fun resourceString() = object : ResourceString {
         override var value: String? = null
 
@@ -26,31 +28,32 @@ object Strings {
         }
     }
 
-    fun load(plugin: FWDungeonsPlugin) {
+    fun setup(plugin: FWDungeonsPlugin) {
         val stringsFile = File(plugin.dataFolder, "strings.yml")
-        val conf = YamlConfiguration()
-        if (!stringsFile.exists()) {
-            YamlConfiguration().run {
-                load(InputStreamReader(plugin.getResource("strings.it.yml")!!))
-                save(File(plugin.dataFolder, "strings.it.yml"))
+        val conf = yaml {
+            if (!stringsFile.exists()) {
+                yaml {
+                    load(InputStreamReader(plugin.getResource("strings.it.yml")!!))
+                    save(File(plugin.dataFolder, "strings.it.yml"))
+                }
+                load(InputStreamReader(plugin.getResource("strings.yml")!!))
+                save(stringsFile)
+            } else {
+                load(stringsFile)
             }
-            conf.load(InputStreamReader(plugin.getResource("strings.yml")!!))
-            conf.save(stringsFile)
-        } else {
-            conf.load(stringsFile)
         }
-        loadFromRes(conf)
+        loadFromResources(conf)
     }
 
-    private fun loadFromRes(conf: FileConfiguration) {
+    private fun loadFromResources(conf: FileConfiguration) {
         for (rs in loadedResourceStrings) rs.value = null
         loadedResourceStrings.clear()
         stringResourceMap = conf.getKeys(false).associateWith { conf.getString(it) ?: "STRING_$it" }
     }
 
     const val CHAT_PREFIX = "§4F§6W§eD§f "
-    const val CHAT_PREFIX_NO_SPACE = "§4F§6W§eD§f"
     const val CONSOLE_PREFIX = "§f[§4F§6W§eD§fungeons] "
+    const val CHAT_HEADER = "§8====================[ §4F§6W§eD§f§7ungeons §8]====================\n"
 
     val ACTIVE_AREAS by resourceString()
     val ADVENTURERS_BROUGHT_BACK_TO_SAFETY_INST_RESET by resourceString()
@@ -58,6 +61,7 @@ object Strings {
     val ALREADY_IN_PARTY by resourceString()
     val ANOTHER_DUNGEON_WITH_SAME_NAME_EXISTS by resourceString()
     val CANT_WRITEOUT_YET_MISSING by resourceString()
+    val CHEST_ADDED_SUCCESFULLY by resourceString()
     val CHEST_REMOVED_SUCCESFULLY by resourceString()
     val CONGRATS_YOU_MADE_IT_OUT by resourceString()
     val COULDNT_FIND_DUNGEON_TEST_INSTANCE by resourceString()
@@ -136,9 +140,9 @@ object Strings {
     val NEA_PROVIDE_NAME by resourceString()
     val NOT_EDITING_ANY_DUNGEONS by resourceString()
     val NOT_ENOUGH_PLAYERS_FOR_DUNGEON by resourceString()
-    val NOW_PARTY_LEADER by resourceString()
     val NOW_EDITING_DUNGEON_WITH_ID by resourceString()
     val NOW_HOLDING_WAND_FOR_MAKING_IE by resourceString()
+    val NOW_PARTY_LEADER by resourceString()
     val NO_ACTIVE_AREA_WITH_SUCH_ID by resourceString()
     val NO_CHESTS_YET by resourceString()
     val NO_CHEST_WITH_SUCH_ID by resourceString()
@@ -147,6 +151,7 @@ object Strings {
     val NO_EPEARLS_OR_CHORUS_FRUIT_ALLOWED by resourceString()
     val NO_LONGER_EDITING_DUNGEON by resourceString()
     val NO_ONLINE_PLAYER_HAS_THIS_NAME by resourceString()
+    val NO_PRESSURE_PLATE_BELOW_YOU by resourceString()
     val NO_TRIGGER_WITH_SUCH_ID by resourceString()
     val NTH_POS_SET_PICK_ANOTHER by resourceString()
     val NUMBER_OF_PLAYERS_CHANGED by resourceString()
@@ -165,6 +170,11 @@ object Strings {
     val PLAYER_LEFT_DUNGEON_PARTY by resourceString()
     val PLAYER_NOT_FOUND by resourceString()
     val POTION_EFFECT_NOT_ALLOWED by resourceString()
+    val PRESSURE_PLATE_HAS_BEEN_UNBOUND by resourceString()
+    val PRESSURE_PLATE_IS_BOUND_TO by resourceString()
+    val PRESSURE_PLATE_IS_NOT_BOUND by resourceString()
+    val PRESSURE_PLATE_IS_NOW_BOUND by resourceString()
+    val PREVALENT_MATERIAL_IN_REGION_IS by resourceString()
     val PRIVATE by resourceString()
     val PROVIDE_BOTH_DUNGEON_AND_INSTANCE_ID by resourceString()
     val PROVIDE_DUNGEON_ID by resourceString()
@@ -173,9 +183,12 @@ object Strings {
     val PROVIDE_PLAYER_NAME by resourceString()
     val PROVIDE_VALID_ACTIVE_AREA_ID by resourceString()
     val PROVIDE_VALID_TRIGGER_ID by resourceString()
+    val PROVIDE_VALID_UNLOCKABLE_ID by resourceString()
+    val PROVIDE_VALID_UNLOCKABLE_SERIES_ID by resourceString()
     val RELOADING_DUNGEONS_AND_INSTANCES by resourceString()
     val RELOAD_WARNING by resourceString()
     val REMOVED_INSTANCE_AT_INDEX by resourceString()
+    val REQUIREMENTS_NOT_MET by resourceString()
     val ROOM by resourceString()
     val SECOND by resourceString()
     val SET_LABEL by resourceString()
@@ -192,7 +205,9 @@ object Strings {
     val WIM_STARTING_LOCATION by resourceString()
     val YOU by resourceString()
     val YOU_CANNOT_JOIN_A_DUNGEON_RIGHT_NOW by resourceString()
+    val YOU_CANT_UNLOCK_YET by resourceString()
     val YOU_DIED_IN_THE_DUNGEON by resourceString()
+    val YOU_HAVENT_UNLOCKED_THIS_YET by resourceString()
     val YOU_JOINED_DUNGEON_PARTY by resourceString()
     val YOU_NEED_TO_BE_TARGETING by resourceString()
     val YOU_WILL_BE_EVACUATED by resourceString()
@@ -200,14 +215,4 @@ object Strings {
     val YOU_WILL_BE_TPED_SHORTLY by resourceString()
     val YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS by resourceString()
     val YOU_WISH_YOU_COULD by resourceString()
-    val PROVIDE_VALID_UNLOCKABLE_SERIES_ID by resourceString()
-    val PROVIDE_VALID_UNLOCKABLE_ID by resourceString()
-    val NO_PRESSURE_PLATE_BELOW_YOU by resourceString()
-    val PRESSURE_PLATE_IS_NOT_BOUND by resourceString()
-    val PRESSURE_PLATE_IS_NOW_BOUND by resourceString()
-    val PRESSURE_PLATE_IS_BOUND_TO by resourceString()
-    val REQUIREMENTS_NOT_MET by resourceString()
-    val YOU_CANT_UNLOCK_YET by resourceString()
-    val YOU_HAVENT_UNLOCKED_THIS_YET by resourceString()
-    val PRESSURE_PLATE_HAS_BEEN_UNBOUND by resourceString()
 }

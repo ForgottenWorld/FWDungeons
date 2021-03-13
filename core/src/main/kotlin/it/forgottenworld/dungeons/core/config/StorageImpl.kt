@@ -41,8 +41,6 @@ class StorageImpl @Inject constructor(
     private val plugin: FWDungeonsPlugin
 ) : Storage {
 
-    private val dungeonNameRegex = """[0-9]+\.yml""".toRegex()
-
     private val storageStragies = mapOf<KClass<*>, Storage.StorageStrategy<*>>(
         Dungeon::class to finalDungeonStorageStrategy,
         ActiveArea::class to activeAreaStorageStrategy,
@@ -55,10 +53,12 @@ class StorageImpl @Inject constructor(
         Vector3i::class to vector3iStorageStrategy
     )
 
-    private val dungeonsFolder get() =
-        File(plugin.dataFolder, "dungeons").apply {
-            if (!exists()) mkdir()
-        }
+    private val dungeonsDirectory get() = File(
+        plugin.dataFolder,
+        "dungeons"
+    ).apply {
+        if (!exists()) mkdir()
+    }
 
     override val intancesFile get() = File(
         plugin.dataFolder,
@@ -74,12 +74,12 @@ class StorageImpl @Inject constructor(
         if (!exists()) createNewFile()
     }
 
-    override val dungeonFiles get() = dungeonsFolder
+    override val dungeonFiles get() = dungeonsDirectory
         .listFiles()!!
-        .filter { it.name.matches(dungeonNameRegex) }
+        .filter { it.extension == "yml" }
 
     override fun getFileForDungeon(dungeon: FinalDungeon) =
-        File(dungeonsFolder,"${dungeon.id}.yml")
+        File(dungeonsDirectory,"${dungeon.id}.yml")
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Storage.Storable> load(klass: KClass<T>, config: ConfigurationSection): T =

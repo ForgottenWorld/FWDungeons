@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package it.forgottenworld.dungeons.core.utils
 
 import it.forgottenworld.dungeons.core.config.Strings
@@ -7,36 +5,39 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.HoverEvent
-import net.md_5.bungee.api.chat.hover.content.Content
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-inline fun jsonMessage(build: ComponentBuilder.() -> Unit): Array<BaseComponent> = ComponentBuilder()
-    .apply(build)
-    .create()
-
-inline fun Player.sendJsonMessage(build: ComponentBuilder.() -> Unit) = spigot()
+inline fun Player.sendJsonMessage(build: ComponentBuilderScope.() -> Unit) = spigot()
     .sendMessage(*jsonMessage(build))
 
-fun Player.sendJsonMessage(chatComponent: Array<BaseComponent>) = spigot()
+fun Player.sendJsonMessage(chatComponent: Array<out BaseComponent>) = spigot()
     .sendMessage(*chatComponent)
 
+inline fun jsonMessage(build: ComponentBuilderScope.() -> Unit): Array<BaseComponent> {
+    val builder = ComponentBuilder()
+    ComponentBuilderScope(builder).build()
+    return builder.create()
+}
+
+class ComponentBuilderScope(
+    private val componentBuilder: ComponentBuilder
+) {
+    operator fun ClickEvent.unaryPlus() {
+        componentBuilder.event(this)
+    }
+
+    operator fun ChatColor.unaryPlus() {
+        componentBuilder.color(this)
+    }
+
+    operator fun String.unaryPlus() {
+        componentBuilder.append(this)
+    }
+
+    operator fun Array<out BaseComponent>.unaryPlus() {
+        componentBuilder.append(this)
+    }
+}
+
 fun CommandSender.sendPrefixedMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
-
-fun ComponentBuilder.clickEvent(
-    action: ClickEvent.Action,
-    value: String
-): ComponentBuilder = event(ClickEvent(action, value))
-
-fun ComponentBuilder.hoverEvent(
-    action: HoverEvent.Action,
-    vararg content: Content
-): ComponentBuilder = event(HoverEvent(action, *content))
-
-fun ComponentBuilder.hoverEvent(
-    action: HoverEvent.Action,
-    content: Iterable<Content>
-): ComponentBuilder = event(HoverEvent(action, content.toList()))
-
-infix fun ComponentBuilder.color(color: ChatColor): ComponentBuilder = color(color)

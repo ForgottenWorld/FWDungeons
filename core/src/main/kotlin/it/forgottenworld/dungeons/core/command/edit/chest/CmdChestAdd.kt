@@ -28,6 +28,7 @@ class CmdChestAdd @Inject constructor(
 
         val id = dungeon.chests.keys.firstGap()
         dungeon.chests[id] = ChestImpl(id, Vector3i.ofLocation(block.location))
+        sender.sendPrefixedMessage(Strings.CHEST_ADDED_SUCCESFULLY)
         return true
     }
 }

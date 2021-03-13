@@ -6,8 +6,6 @@ import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.core.utils.clickEvent
-import it.forgottenworld.dungeons.core.utils.color
 import it.forgottenworld.dungeons.core.utils.jsonMessage
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
@@ -24,110 +22,96 @@ class DungeonListGuiGenerator @Inject constructor(
         val full = instance.players.size == instance.dungeon.maxPlayers
         val inGame = instance.isInGame
 
-        append("  [ ") color ChatColor.WHITE
-        append(
-            when {
-                leader -> Strings.CREATE
-                locked -> Strings.PRIVATE
-                full -> Strings.FULL
-                inGame -> Strings.IN_DUNGEON
-                else -> Strings.JOIN
-            }
-        )
-        color(
-            when {
-                locked -> ChatColor.GOLD
-                full || inGame -> ChatColor.RED
-                else -> ChatColor.GREEN
-            }
-        )
+        +"  §f[ "
+        +when {
+            leader -> Strings.CREATE
+            locked -> Strings.PRIVATE
+            full -> Strings.FULL
+            inGame -> Strings.IN_DUNGEON
+            else -> Strings.JOIN
+        }
+        +when {
+            locked -> ChatColor.GOLD
+            full || inGame -> ChatColor.RED
+            else -> ChatColor.GREEN
+        }
         if (!full && !locked && !inGame) {
-            clickEvent(
+            +ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
                 "/fwdungeons join ${instance.dungeon.id} ${instance.id}"
             )
         }
-        append(" ]") color ChatColor.WHITE
+        +" §f]"
     }
 
     private fun pageClickable(text: String, page: Int) = jsonMessage {
-        append(text) color ChatColor.AQUA
-        clickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons list $page")
+        +text
+        +ChatColor.AQUA
+        +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons list $page")
     }
 
     private fun paginator(page: Int) = jsonMessage {
         if (page > 0) {
-            append("=[ ") color ChatColor.DARK_GRAY
-            append(pageClickable("<<<<", page - 1))
-            append(" ]=") color ChatColor.DARK_GRAY
+            +"§8=[ "
+            +pageClickable("<<<<", page - 1)
+            +" §8]="
         } else {
-            append("=======") color ChatColor.DARK_GRAY
+            +"§8======="
         }
-
-        append("=====================================") color ChatColor.DARK_GRAY
-
+        +"§8====================================="
         if (page < dungeonManager.finalDungeonCount - 1) {
-            append("=[ ") color(ChatColor.DARK_GRAY)
-            append(pageClickable(">>>>", page + 1))
-            append(" ]=") color(ChatColor.DARK_GRAY)
+            +"§8=[ "
+            +pageClickable(">>>>", page + 1)
+            +" §8]="
         } else {
-            append("=======")
-            color(ChatColor.DARK_GRAY)
+            +"§8======="
         }
     }
 
-    private fun chevrons(count: Int) = "${ChatColor.GRAY}${">".repeat(count)} "
+    private fun chevrons(count: Int) = "§7${">".repeat(count)} "
 
     private fun coloredDifficulty(difficulty: Dungeon.Difficulty) = jsonMessage {
-        append(difficulty.toString().toUpperCase())
-        color(
-            when (difficulty) {
-                Dungeon.Difficulty.EASY -> ChatColor.DARK_GREEN
-                Dungeon.Difficulty.MEDIUM -> ChatColor.GOLD
-                Dungeon.Difficulty.HARD -> ChatColor.DARK_RED
-            }
-        )
+        +difficulty.toString().toUpperCase()
+        +when (difficulty) {
+            Dungeon.Difficulty.EASY -> ChatColor.DARK_GREEN
+            Dungeon.Difficulty.MEDIUM -> ChatColor.GOLD
+            Dungeon.Difficulty.HARD -> ChatColor.DARK_RED
+        }
     }
 
     private fun dungeonDetails(dungeon: Dungeon) = jsonMessage {
-        append(chevrons(3))
-        append("DUNGEON: ") color ChatColor.DARK_AQUA
-        append("${dungeon.name}\n") color ChatColor.WHITE
+        +chevrons(3)
+        +"§3DUNGEON: §f${dungeon.name}\n"
 
-        append(chevrons(3))
-        append("${Strings.DESCRIPTION}: ") color ChatColor.DARK_AQUA
-        append("${dungeon.description}\n") color ChatColor.WHITE
+        +chevrons(3)
+        +"§3${Strings.DESCRIPTION}: §f${dungeon.description}\n"
 
-        append(chevrons(3))
-        append("${Strings.DIFFICULTY}: ") color ChatColor.DARK_AQUA
-        append(coloredDifficulty(dungeon.difficulty))
-        append("\n")
+        +chevrons(3)
+        +"§3${Strings.DIFFICULTY}: "
+        +coloredDifficulty(dungeon.difficulty)
+        +"\n"
 
-        append(chevrons(3))
-        append("${Strings.PLAYERS}: ") color ChatColor.DARK_AQUA
+        +chevrons(3)
+        +"§3${Strings.PLAYERS}: "
         val minPl = dungeon.minPlayers
         val maxPl = dungeon.maxPlayers
-        append("$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n") color ChatColor.WHITE
+        +"§f$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n"
 
-        instanceDetails(dungeon)
+        +instanceDetails(dungeon)
     }
 
     private fun instanceDetails(dungeon: Dungeon) = jsonMessage {
         val instances = dungeonManager.getDungeonInstances(dungeon)
-        for((i, inst) in instances.values.withIndex()) {
-            append(chevrons(1))
-            append("${Strings.ROOM} ${i + 1} ")
-            append("| ") color ChatColor.DARK_GRAY
-            append("Leader: ") color ChatColor.GRAY
-            inst.leader?.let {
-                val pl = Bukkit.getPlayer(it) ?: return@let
-                append(pl.name) color ChatColor.LIGHT_PURPLE
-            } ?: append("none") color ChatColor.DARK_GRAY
-            append(joinClickable(inst))
-            append(inst.leader?.let { "  [ ${inst.players.size}/${dungeon.maxPlayers} ]" } ?: "")
+        for ((i, inst) in instances.values.withIndex()) {
+            val leader = inst.leader?.let(Bukkit::getPlayer)
+            val leaderName = leader?.let { "§d${it.name}" } ?: "§8none"
+            +chevrons(1)
+            +"${Strings.ROOM} ${i + 1} §8| §7Leader: $leaderName"
+            +joinClickable(inst)
+            +(inst.leader?.let { "  [ ${inst.players.size}/${dungeon.maxPlayers} ]" } ?: "")
         }
         val paddingLines = 13 - instances.size - (dungeon.description.length + 6 + Strings.DESCRIPTION.length) / 55
-        append("\n".repeat(paddingLines))
+        +"\n".repeat(paddingLines)
     }
 
     fun showPage(page: Int) = jsonMessage {
@@ -135,8 +119,9 @@ class DungeonListGuiGenerator @Inject constructor(
         val dungeon = dungeonManager
             .getAllActiveFinalDungeons()
             .getOrNull(page) ?: return@jsonMessage
-        append("§8====================[ ${Strings.CHAT_PREFIX_NO_SPACE}§7ungeons §8]====================\n\n")
-        append(dungeonDetails(dungeon))
-        append(paginator(page))
+        +Strings.CHAT_HEADER
+        +"\n"
+        +dungeonDetails(dungeon)
+        +paginator(page)
     }
 }

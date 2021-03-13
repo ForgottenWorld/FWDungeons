@@ -7,8 +7,8 @@ import org.bukkit.NamespacedKey
 
 @Singleton
 class NamespacedKeys @Inject constructor(
-    private val plugin: FWDungeonsPlugin
+    plugin: FWDungeonsPlugin
 ) {
-    val triggerTool by lazy { NamespacedKey(plugin, "FWD_TRIGGER_WAND") }
-    val activeAreaTool by lazy { NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND") }
+    val triggerTool = NamespacedKey(plugin, "FWD_TRIGGER_WAND")
+    val activeAreaTool = NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND")
 }

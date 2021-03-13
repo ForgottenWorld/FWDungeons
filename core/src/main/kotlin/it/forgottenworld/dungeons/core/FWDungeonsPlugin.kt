@@ -51,7 +51,7 @@ class FWDungeonsPlugin : JavaPlugin() {
         }
 
         sendConsoleMessage(" -- Loading strings...")
-        Strings.load(this)
+        Strings.setup(this)
 
         sendConsoleMessage(" -- Loading unlockables...")
         unlockableManager.loadUnlockablesFromStorage()

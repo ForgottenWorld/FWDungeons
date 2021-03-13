@@ -36,7 +36,11 @@ class InteractiveRegionCommandHelper @Inject constructor(
         TRIGGER -> Strings.TRIGGERS
     }
 
-    fun setInteractiveRegionPos(sender: Player, posNo: Int, type: Type) {
+    fun setInteractiveRegionPos(
+        sender: Player,
+        posNo: Int,
+        type: Type
+    ) {
         val block = sender.getTargetSolidBlock() ?: run {
             sender.sendPrefixedMessage(Strings.YOU_NEED_TO_BE_TARGETING)
             return
@@ -87,7 +91,12 @@ class InteractiveRegionCommandHelper @Inject constructor(
         sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID.format(type.singular, id))
     }
 
-    fun labelInteractiveRegion(sender: Player, label: String, type: Type, id: Int = -1) {
+    fun labelInteractiveRegion(
+        sender: Player,
+        label: String,
+        type: Type,
+        id: Int = -1
+    ) {
         if (label.isEmpty()) {
             sender.sendPrefixedMessage(Strings.NEA_PROVIDE_LABEL)
             return
@@ -110,7 +119,11 @@ class InteractiveRegionCommandHelper @Inject constructor(
         sender.sendPrefixedMessage(Strings.SET_LABEL.format(label))
     }
 
-    fun unMakeInteractiveRegion(sender: Player, type: Type, ieId: Int?) {
+    fun unMakeInteractiveRegion(
+        sender: Player,
+        type: Type,
+        ieId: Int?
+    ) {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
@@ -127,7 +140,11 @@ class InteractiveRegionCommandHelper @Inject constructor(
         sender.sendPrefixedMessage(Strings.DELETED_IE_WITH_ID.format(type.plural, id))
     }
 
-    fun highlightInteractiveRegion(sender: Player, type: Type, ieId: Int?) {
+    fun highlightInteractiveRegion(
+        sender: Player,
+        type: Type,
+        ieId: Int?
+    ) {
         val dungeon = dungeonManager.getPlayerEditableDungeon(sender.uniqueId) ?: run {
             sender.sendPrefixedMessage(Strings.NOT_EDITING_ANY_DUNGEONS)
             return
@@ -152,7 +169,10 @@ class InteractiveRegionCommandHelper @Inject constructor(
         sender.sendPrefixedMessage(Strings.HIGHLIGHTED_IE_WITH_ID.format(type.plural, ieId))
     }
 
-    fun grantWandForInteractiveRegion(sender: Player, type: Type) {
+    fun grantWandForInteractiveRegion(
+        sender: Player,
+        type: Type
+    ) {
         if (sender.inventory.itemInMainHand.type != Material.AIR) {
             sender.sendPrefixedMessage(Strings.MAIN_HAND_MUST_BE_EMPTY)
             return

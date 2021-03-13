@@ -89,6 +89,7 @@ class FinalDungeonImpl @AssistedInject constructor(
             player.sendPrefixedMessage(Strings.DUNGEON_ALREADY_BEING_EDITED)
             return null
         }
+
         isBeingEdited = true
 
         player.sendPrefixedMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
