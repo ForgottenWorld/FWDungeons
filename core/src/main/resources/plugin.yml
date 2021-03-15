@@ -1,0 +1,176 @@
+name: FWDungeons
+version: "0.14.0"
+api-version: "1.16"
+description: Create multi-instance scriptable co-op dungeons in your Minecraft server
+author: Shivs (OhMeMuffin)
+main: it.forgottenworld.dungeons.core.FWDungeonsPlugin
+softdepend:
+  - Easyranking
+  - FWEchelon
+  - Vault
+depend:
+  - FWKotlinDeps
+  - MythicMobs
+commands:
+  fwdungeons:
+    description: Access FWDungeons functions.
+    usage: /fwdungeons [ list | join | invite | leave | start | lock | unlock | evacuate | lookup | enable | disable | reload ]
+    aliases: [ fwdungeons,fwd ]
+  fwdungeonsedit:
+    description: Access FWDungeons functions.
+    usage: >
+      /fwdungeonsedit [
+      dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes | import | volmap ] |
+      trigger [ pos1 | pos2 | label | unmake | wand | list | hl | code ] |
+      activearea [ pos1 | pos2 | label | unmake | wand | list | hl ] |
+      chest [ add | label | remove ] |
+      unlockables [ bindplate | unbindplate | lookup ] ]
+    aliases: [ fwdungeonsedit,fwde ]
+permissions:
+  fwdungeonsedit.dungeon.create:
+    description: Allows the player to use /fwdungeonsedit dungeon create
+    default: op
+  fwdungeonsedit.dungeon.edit:
+    description: Allows the player to use /fwdungeonsedit dungeon edit
+    default: op
+  fwdungeonsedit.dungeon.pos1:
+    description: Allows the player to use /fwdungeonsedit dungeon pos1
+    default: op
+  fwdungeonsedit.dungeon.pos2:
+    description: Allows the player to use /fwdungeonsedit dungeon pos2
+    default: op
+  fwdungeonsedit.dungeon.setstart:
+    description: Allows the player to use /fwdungeonsedit dungeon setstart
+    default: op
+  fwdungeonsedit.dungeon.difficulty:
+    description: Allows the player to use /fwdungeonsedit dungeon difficulty
+    default: op
+  fwdungeonsedit.dungeon.points:
+    description: Allows the player to use /fwdungeonsedit dungeon points
+    default: op
+  fwdungeonsedit.dungeon.description:
+    description: Allows the player to use /fwdungeonsedit dungeon description
+    default: op
+  fwdungeonsedit.dungeon.players:
+    description: Allows the player to use /fwdungeonsedit dungeon players
+    default: op
+  fwdungeonsedit.dungeon.name:
+    description: Allows the player to use /fwdungeonsedit dungeon name
+    default: op
+  fwdungeonsedit.dungeon.hlframes:
+    description: Allows the player to use /fwdungeonsedit dungeon hlframes
+    default: op
+  fwdungeonsedit.dungeon.volmap:
+    description: Allows the player to use /fwdungeonsedit dungeon volmap
+    default: op
+  fwdungeonsedit.dungeon.instadd:
+    description: Allows the player to use /fwdungeonsedit dungeon instadd
+    default: op
+  fwdungeonsedit.dungeon.instremove:
+    description: Allows the player to use /fwdungeonsedit dungeon instremove
+    default: op
+  fwdungeonsedit.dungeon.writeout:
+    description: Allows the player to use /fwdungeonsedit dungeon writeout
+    default: op
+  fwdungeonsedit.dungeon.save:
+    description: Allows the player to use /fwdungeonsedit dungeon save
+    default: op
+  fwdungeonsedit.dungeon.discard:
+    description: Allows the player to use /fwdungeonsedit dungeon discard
+    default: op
+  fwdungeonsedit.trigger.pos1:
+    description: Allows the player to use /fwdungeonsedit trigger pos1
+    default: op
+  fwdungeonsedit.trigger.pos2:
+    description: Allows the player to use /fwdungeonsedit trigger pos2
+    default: op
+  fwdungeonsedit.trigger.label:
+    description: Allows the player to use /fwdungeonsedit trigger label
+    default: op
+  fwdungeonsedit.trigger.unmake:
+    description: Allows the player to use /fwdungeonsedit trigger unmake
+    default: op
+  fwdungeonsedit.trigger.wand:
+    description: Allows the player to use /fwdungeonsedit trigger wand
+    default: op
+  fwdungeonsedit.trigger.list:
+    description: Allows the player to use /fwdungeonsedit trigger list
+    default: op
+  fwdungeonsedit.trigger.hl:
+    description: Allows the player to use /fwdungeonsedit trigger hl
+    default: op
+  fwdungeonsedit.activearea.pos1:
+    description: Allows the player to use /fwdungeonsedit activearea pos1
+    default: op
+  fwdungeonsedit.activearea.pos2:
+    description: Allows the player to use /fwdungeonsedit activearea pos2
+    default: op
+  fwdungeonsedit.activearea.label:
+    description: Allows the player to use /fwdungeonsedit activearea label
+    default: op
+  fwdungeonsedit.chest.add:
+    description: Allows the player to use /fwdungeonsedit chest add
+    default: op
+  fwdungeonsedit.chest.remove:
+    description: Allows the player to use /fwdungeonsedit chest remove
+    default: op
+  fwdungeonsedit.chest.label:
+    description: Allows the player to use /fwdungeonsedit chest label
+    default: op
+  fwdungeonsedit.activearea.unmake:
+    description: Allows the player to use /fwdungeonsedit activearea unmake
+    default: op
+  fwdungeonsedit.activearea.wand:
+    description: Allows the player to use /fwdungeonsedit activearea wand
+    default: op
+  fwdungeonsedit.activearea.list:
+    description: Allows the player to use /fwdungeonsedit activearea list
+    default: op
+  fwdungeonsedit.activearea.hl:
+    description: Allows the player to use /fwdungeonsedit activearea hl
+    default: op
+  fwdungeonsedit.unlockables.bindplate:
+    description: Allows the player to use /fwdungeonsedit unlockables bindplate
+    default: op
+  fwdungeonsedit.unlockables.unbindplate:
+    description: Allows the player to use /fwdungeonsedit unlockables unbindplate
+    default: op
+  fwdungeonsedit.unlockables.lookupplate:
+    description: Allows the player to use /fwdungeonsedit unlockables lookupplate
+    default: op
+  fwdungeons.list:
+    description: Allows the player to use /fwdungeons list
+    default: true
+  fwdungeons.join:
+    description: Allows the player to use /fwdungeons join
+    default: true
+  fwdungeons.invite:
+    description: Allows the player to use /fwdungeons list
+    default: true
+  fwdungeons.leave:
+    description: Allows the player to use /fwdungeons leave
+    default: true
+  fwdungeons.start:
+    description: Allows the player to use /fwdungeons start
+    default: true
+  fwdungeons.lock:
+    description: Allows the player to use /fwdungeons lock
+    default: true
+  fwdungeons.unlock:
+    description: Allows the player to use /fwdungeons unlock
+    default: true
+  fwdungeons.evacuate:
+    description: Allows the player to use /fwdungeons evacuate
+    default: op
+  fwdungeons.lookup:
+    description: Allows the player to use /fwdungeons lookup
+    default: op
+  fwdungeons.enable:
+    description: Allows the player to use /fwdungeons enable
+    default: op
+  fwdungeons.disable:
+    description: Allows the player to use /fwdungeons disable
+    default: op
+  fwdungeons.reload:
+    description: Allows the player to use /fwdungeons reload
+    default: op

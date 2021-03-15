@@ -1,0 +1,15 @@
+
+# name of the world hosting the dungeons
+dungeonWorldName: "world"
+
+# activates debug mode
+debugMode: true
+
+# enables integration with the EasyRanking plugin
+easyRankingIntegration: true
+
+# enables integration with FWEchelon for the mutual exclusive activity service
+fwEchelonIntegration: true
+
+# enables integration with Vault for economy based unlockable requirements
+vaultIntegration: true
