@@ -105,11 +105,7 @@ class DungeonManagerImpl @Inject constructor(
     override fun loadDungeonsFromStorage() {
         for (file in storage.dungeonFiles) {
             try {
-                registerFinalDungeon(
-                    storage.load<Dungeon>(
-                        yaml { load(file) }
-                    ) as FinalDungeon
-                )
+                registerFinalDungeon(storage.load(yaml { load(file) }))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -144,7 +140,7 @@ class DungeonManagerImpl @Inject constructor(
     override fun saveDungeonToStorage(dungeon: FinalDungeon) {
         try {
             yaml {
-                storage.save<Dungeon>(dungeon, this)
+                storage.save(dungeon, this)
                 launchAsync { save(storage.getFileForDungeon(dungeon)) }
             }
         } catch (e: Exception) {

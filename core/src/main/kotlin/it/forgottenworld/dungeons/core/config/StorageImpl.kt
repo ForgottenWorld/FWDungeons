@@ -3,7 +3,6 @@ package it.forgottenworld.dungeons.core.config
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.chest.Chest
-import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
@@ -42,7 +41,7 @@ class StorageImpl @Inject constructor(
 ) : Storage {
 
     private val storageStragies = mapOf<KClass<*>, Storage.StorageStrategy<*>>(
-        Dungeon::class to finalDungeonStorageStrategy,
+        FinalDungeon::class to finalDungeonStorageStrategy,
         ActiveArea::class to activeAreaStorageStrategy,
         Trigger::class to triggerStorageStrategy,
         Chest::class to chestStorageStrategy,
