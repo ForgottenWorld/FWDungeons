@@ -31,7 +31,7 @@ class CmdDungeonImport @Inject constructor(
         }
 
         val dungeon = dungeonManager.getFinalDungeonById(id) ?: run {
-            sender.sendPrefixedMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
+            sender.sendPrefixedMessage(Strings.NO_DUNGEON_FOUND_WITH_ID, id)
             return true
         }
 

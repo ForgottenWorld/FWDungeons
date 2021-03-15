@@ -1,8 +1,8 @@
 package it.forgottenworld.dungeons.core.command.play
 
 import com.google.inject.Inject
-import it.forgottenworld.dungeons.api.command.BranchingCommand
 import it.forgottenworld.dungeons.api.command.TreeCommand
+import it.forgottenworld.dungeons.api.command.branchingCommand
 import it.forgottenworld.dungeons.core.command.play.dungeon.*
 
 class FWDungeonsPlayCommand @Inject constructor(
@@ -20,20 +20,18 @@ class FWDungeonsPlayCommand @Inject constructor(
     cmdDungeonReload: CmdDungeonReload
 ) : TreeCommand(
     "fwdungeons",
-    BranchingCommand(
-        mapOf(
-            "join" to cmdDungeonJoinInstance,
-            "list" to cmdDungeonList,
-            "invite" to cmdDungeonInvite,
-            "leave" to cmdDungeonLeave,
-            "lock" to cmdDungeonLockParty,
-            "unlock" to cmdDungeonUnlockParty,
-            "start" to cmdDungeonStart,
-            "evacuate" to cmdDungeonEvacuate,
-            "lookup" to cmdDungeonLookup,
-            "enable" to cmdDungeonEnable,
-            "disable" to cmdDungeonDisable,
-            "reload" to cmdDungeonReload
-        )
-    )
+    branchingCommand {
+        "join" += cmdDungeonJoinInstance
+        "list" += cmdDungeonList
+        "invite" += cmdDungeonInvite
+        "leave" += cmdDungeonLeave
+        "lock" += cmdDungeonLockParty
+        "unlock" += cmdDungeonUnlockParty
+        "start" += cmdDungeonStart
+        "evacuate" += cmdDungeonEvacuate
+        "lookup" += cmdDungeonLookup
+        "enable" += cmdDungeonEnable
+        "disable" += cmdDungeonDisable
+        "reload" += cmdDungeonReload
+    }
 )

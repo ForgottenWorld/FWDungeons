@@ -26,15 +26,17 @@ class InteractiveRegionCommandHelper @Inject constructor(
     private val dungeonManager: DungeonManager
 ) {
 
-    private val Type.singular get() = when(this) {
-        ACTIVE_AREA -> "active area"
-        TRIGGER -> "trigger"
-    }
+    private val Type.singular
+        get() = when (this) {
+            ACTIVE_AREA -> "active area"
+            TRIGGER -> "trigger"
+        }
 
-    private val Type.plural get() = when(this) {
-        ACTIVE_AREA -> Strings.ACTIVE_AREAS
-        TRIGGER -> Strings.TRIGGERS
-    }
+    private val Type.plural
+        get() = when (this) {
+            ACTIVE_AREA -> Strings.ACTIVE_AREAS
+            TRIGGER -> Strings.TRIGGERS
+        }
 
     fun setInteractiveRegionPos(
         sender: Player,
@@ -53,7 +55,8 @@ class InteractiveRegionCommandHelper @Inject constructor(
 
         if (!dungeon.hasTestOrigin) {
             sender.sendPrefixedMessage(
-                Strings.DUNGEON_BOX_AND_STARTPOS_SHOULD_BE_SET_BEFORE_ADDING_IE.format(type.plural)
+                Strings.DUNGEON_BOX_AND_STARTPOS_SHOULD_BE_SET_BEFORE_ADDING_IE,
+                type.plural
             )
             return
         }
@@ -78,17 +81,16 @@ class InteractiveRegionCommandHelper @Inject constructor(
         val box = builder.build()
         if (box == null) {
             sender.sendPrefixedMessage(
-                Strings.NTH_POS_SET_PICK_ANOTHER.format(
-                    if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                    if (type == TRIGGER) "t" else "aa",
-                    if (posNo == 1) 2 else 1
-                )
+                Strings.NTH_POS_SET_PICK_ANOTHER,
+                if (posNo == 1) Strings.FIRST else Strings.SECOND,
+                if (type == TRIGGER) "t" else "aa",
+                if (posNo == 1) 2 else 1
             )
             return
         }
 
         val id = dungeon.newInteractiveRegion(type, box)
-        sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID.format(type.singular, id))
+        sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID, type.singular, id)
     }
 
     fun labelInteractiveRegion(
@@ -111,12 +113,12 @@ class InteractiveRegionCommandHelper @Inject constructor(
             dungeon.triggers.isEmpty() ||
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
-            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
+            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
             return
         }
 
         dungeon.labelInteractiveRegion(type, label, id)
-        sender.sendPrefixedMessage(Strings.SET_LABEL.format(label))
+        sender.sendPrefixedMessage(Strings.SET_LABEL, label)
     }
 
     fun unMakeInteractiveRegion(
@@ -132,12 +134,12 @@ class InteractiveRegionCommandHelper @Inject constructor(
         if (type == TRIGGER && dungeon.triggers.isEmpty() ||
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
-            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
+            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
             return
         }
 
         val id = dungeon.unmakeInteractiveRegion(type, ieId)
-        sender.sendPrefixedMessage(Strings.DELETED_IE_WITH_ID.format(type.plural, id))
+        sender.sendPrefixedMessage(Strings.DELETED_IE_WITH_ID, type.plural, id)
     }
 
     fun highlightInteractiveRegion(
@@ -153,7 +155,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
         if (type == TRIGGER && dungeon.triggers.isEmpty() ||
             type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
         ) {
-            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET.format(type.plural))
+            sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
             return
         }
 
@@ -166,7 +168,7 @@ class InteractiveRegionCommandHelper @Inject constructor(
             configuration.dungeonWorld
         )
 
-        sender.sendPrefixedMessage(Strings.HIGHLIGHTED_IE_WITH_ID.format(type.plural, ieId))
+        sender.sendPrefixedMessage(Strings.HIGHLIGHTED_IE_WITH_ID, type.plural, ieId)
     }
 
     fun grantWandForInteractiveRegion(
@@ -186,6 +188,6 @@ class InteractiveRegionCommandHelper @Inject constructor(
             addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10)
         }
         sender.inventory.setItemInMainHand(itemStack)
-        sender.sendPrefixedMessage(Strings.NOW_HOLDING_WAND_FOR_MAKING_IE.format(type.plural))
+        sender.sendPrefixedMessage(Strings.NOW_HOLDING_WAND_FOR_MAKING_IE, type.plural)
     }
 }

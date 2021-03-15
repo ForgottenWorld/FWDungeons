@@ -31,15 +31,17 @@ class TriggerImpl @Inject constructor(
 
     override fun debugLogEnter(player: Player) {
         player.sendPrefixedMessage(
-            Strings.DEBUG_ENTERED_TRIGGER
-                .format(label?.plus(" ") ?: "", id)
+            Strings.DEBUG_ENTERED_TRIGGER,
+            label?.plus(" ") ?: "",
+            id
         )
     }
 
     override fun debugLogExit(player: Player) {
         player.sendPrefixedMessage(
-            Strings.DEBUG_EXITED_TRIGGER
-                .format(label?.plus(" ") ?: "", id)
+            Strings.DEBUG_EXITED_TRIGGER,
+            label?.plus(" ") ?: "",
+            id
         )
     }
 

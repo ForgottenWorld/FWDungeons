@@ -216,7 +216,8 @@ class EditableDungeonImpl @AssistedInject constructor(
         )
 
         Bukkit.getPlayer(editor)?.sendPrefixedMessage(
-            Strings.PREVALENT_MATERIAL_IN_REGION_IS.format(prevalentMaterial.name)
+            Strings.PREVALENT_MATERIAL_IN_REGION_IS,
+            prevalentMaterial.name
         )
 
         activeAreas = activeAreas.plus(id to activeArea)

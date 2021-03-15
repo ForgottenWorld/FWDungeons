@@ -1,11 +1,12 @@
 package it.forgottenworld.dungeons.core.command.edit
 
 import com.google.inject.Inject
-import it.forgottenworld.dungeons.api.command.BranchingCommand
 import it.forgottenworld.dungeons.api.command.TreeCommand
+import it.forgottenworld.dungeons.api.command.branchingCommand
 import it.forgottenworld.dungeons.core.command.edit.activearea.*
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestAdd
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestLabel
+import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestList
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestRemove
 import it.forgottenworld.dungeons.core.command.edit.dungeon.*
 import it.forgottenworld.dungeons.core.command.edit.trigger.*
@@ -32,6 +33,7 @@ class FWDungeonsEditCommand @Inject constructor(
     cmdChestAdd: CmdChestAdd,
     cmdChestRemove: CmdChestRemove,
     cmdChestLabel: CmdChestLabel,
+    cmdChestList: CmdChestList,
     cmdDungeonCreate: CmdDungeonCreate,
     cmdDungeonEdit: CmdDungeonEdit,
     cmdDungeonName: CmdDungeonName,
@@ -55,92 +57,60 @@ class FWDungeonsEditCommand @Inject constructor(
     cmdUnlockablesUnbindPlate: CmdUnlockablesUnbindPlate
 ) : TreeCommand(
     "fwdungeonsedit",
-    BranchingCommand(
-        mapOf(
-            *(BranchingCommand(
-                mapOf(
-                    "pos1" to cmdActiveAreaPos1,
-                    "pos2" to cmdActiveAreaPos2,
-                    "unmake" to cmdActiveAreaUnmake,
-                    "label" to cmdActiveAreaLabel,
-                    "wand" to cmdActiveAreaWand,
-                    "list" to cmdActiveAreaList,
-                    "hl" to cmdActiveAreaHl
-                )
-            ).let {
-                arrayOf(
-                    "activearea" to it,
-                    "aa" to it
-                )
-            }),
-            *(BranchingCommand(
-                mapOf(
-                    "pos1" to cmdTriggerPos1,
-                    "pos2" to cmdTriggerPos2,
-                    "unmake" to cmdTriggerUnmake,
-                    "label" to cmdTriggerLabel,
-                    "wand" to cmdTriggerWand,
-                    "list" to cmdTriggerList,
-                    "hl" to cmdTriggerHl,
-                    "code" to cmdTriggerCode
-                )
-            ).let {
-                arrayOf(
-                    "trigger" to it,
-                    "t" to it
-                )
-            }),
-            *(BranchingCommand(
-                mapOf(
-                    "add" to cmdChestAdd,
-                    "remove" to cmdChestRemove,
-                    "label" to cmdChestLabel
-                )
-            ).let {
-                arrayOf(
-                    "chest" to it,
-                    "c" to it
-                )
-            }),
-            *(BranchingCommand(
-                mapOf(
-                    "create" to cmdDungeonCreate,
-                    "edit" to cmdDungeonEdit,
-                    "name" to cmdDungeonName,
-                    "pos1" to cmdDungeonPos1,
-                    "pos2" to cmdDungeonPos2,
-                    "instadd" to cmdDungeonInstanceAdd,
-                    "instremove" to cmdDungeonInstanceRemove,
-                    "writeout" to cmdDungeonWriteOut,
-                    "setstart" to cmdDungeonSetStart,
-                    "discard" to cmdDungeonDiscard,
-                    "difficulty" to cmdDungeonDifficulty,
-                    "description" to cmdDungeonDescription,
-                    "players" to cmdDungeonNumberOfPlayers,
-                    "save" to cmdDungeonSave,
-                    "points" to cmdDungeonPoints,
-                    "hlframes" to cmdDungeonHlFrames,
-                    "volmap" to cmdDungeonVolumeMap,
-                    "import" to cmdDungeonImport
-                )
-            ).let {
-                arrayOf(
-                    "dungeon" to it,
-                    "d" to it
-                )
-            }),
-            *(BranchingCommand(
-                mapOf(
-                    "bindplate" to cmdUnlockablesBindPlate,
-                    "lookupplate" to cmdUnlockablesLookupPlate,
-                    "unbindplate" to cmdUnlockablesUnbindPlate
-                )
-            ).let {
-                arrayOf(
-                    "unlockables" to it,
-                    "unl" to it
-                )
-            }),
-        )
-    )
+    branchingCommand {
+        branchingCommand {
+            "pos1" += cmdActiveAreaPos1
+            "pos2" += cmdActiveAreaPos2
+            "unmake" += cmdActiveAreaUnmake
+            "label" += cmdActiveAreaLabel
+            "wand" += cmdActiveAreaWand
+            "list" += cmdActiveAreaList
+            "hl" += cmdActiveAreaHl
+        }.bindTo("activearea", "aa")
+
+        branchingCommand {
+            "pos1" += cmdTriggerPos1
+            "pos2" += cmdTriggerPos2
+            "unmake" += cmdTriggerUnmake
+            "label" += cmdTriggerLabel
+            "wand" += cmdTriggerWand
+            "list" += cmdTriggerList
+            "hl" += cmdTriggerHl
+            "code" += cmdTriggerCode
+        }.bindTo("trigger", "t")
+
+        branchingCommand {
+            "add" += cmdChestAdd
+            "remove" += cmdChestRemove
+            "label" += cmdChestLabel
+            "list" += cmdChestList
+        }.bindTo("chest", "c")
+
+        branchingCommand {
+            "create" += cmdDungeonCreate
+            "edit" += cmdDungeonEdit
+            "name" += cmdDungeonName
+            "pos1" += cmdDungeonPos1
+            "pos2" += cmdDungeonPos2
+            "instadd" += cmdDungeonInstanceAdd
+            "instremove" += cmdDungeonInstanceRemove
+            "writeout" += cmdDungeonWriteOut
+            "setstart" += cmdDungeonSetStart
+            "discard" += cmdDungeonDiscard
+            "difficulty" += cmdDungeonDifficulty
+            "description" += cmdDungeonDescription
+            "players" += cmdDungeonNumberOfPlayers
+            "save" += cmdDungeonSave
+            "points" += cmdDungeonPoints
+            "hlframes" += cmdDungeonHlFrames
+            "volmap" += cmdDungeonVolumeMap
+            "import" += cmdDungeonImport
+        }.bindTo("dungeon", "d")
+
+        branchingCommand {
+            "bindplate" += cmdUnlockablesBindPlate
+            "lookupplate" += cmdUnlockablesLookupPlate
+            "unbindplate" += cmdUnlockablesUnbindPlate
+        }.bindTo("unlockables", "unl")
+    }
 )

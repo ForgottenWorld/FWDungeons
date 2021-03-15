@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.command.CommandSender
 
@@ -26,14 +26,12 @@ class CmdDungeonDisable @Inject constructor(
 
         val res = dungeonManager.disableDungeon(dungeonId)
 
-        sender.sendPrefixedMessage(
-            if (res) {
-                Strings.DUNGEON_WITH_ID_WAS_DISABLED.format(dungeonId)
-            } else {
-                Strings.NO_DUNGEON_FOUND_WITH_ID.format(dungeonId)
-            }
-        )
-
+        val message = if (res) {
+            Strings.DUNGEON_WITH_ID_WAS_DISABLED
+        } else {
+            Strings.NO_DUNGEON_FOUND_WITH_ID
+        }
+        sender.sendPrefixedMessage(message, dungeonId)
         return true
     }
 }

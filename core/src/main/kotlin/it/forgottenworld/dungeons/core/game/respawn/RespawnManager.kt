@@ -32,5 +32,4 @@ class RespawnManager {
             setPlayerRespawnData(event.player.uniqueId, null)
         }
     }
-
 }

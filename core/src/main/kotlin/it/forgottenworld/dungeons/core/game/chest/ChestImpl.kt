@@ -14,7 +14,7 @@ data class ChestImpl(
     override var label: String? = null,
     override val minItems: Int = 1,
     override val maxItems: Int = 4,
-    override val itemChanceMap: Map<Material, Int> = mapOf()
+    override val itemChanceMap: Map<Material, Int> = mapOf(Material.COBBLESTONE to 10)
 ) : Chest {
 
     private fun generateItems(): List<ItemStack> {

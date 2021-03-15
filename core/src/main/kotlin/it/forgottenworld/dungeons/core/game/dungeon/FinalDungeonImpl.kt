@@ -81,7 +81,7 @@ class FinalDungeonImpl @AssistedInject constructor(
 
     override fun putInEditMode(player: Player): EditableDungeon? {
         if (isActive) {
-            player.sendPrefixedMessage(Strings.DUNGEON_WITH_ID_NOT_DISABLED.format(id))
+            player.sendPrefixedMessage(Strings.DUNGEON_WITH_ID_NOT_DISABLED, id)
             return null
         }
 
@@ -92,7 +92,7 @@ class FinalDungeonImpl @AssistedInject constructor(
 
         isBeingEdited = true
 
-        player.sendPrefixedMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID.format(id))
+        player.sendPrefixedMessage(Strings.NOW_EDITING_DUNGEON_WITH_ID, id)
 
         return dungeonFactory.createEditable(player, this).also {
             dungeonManager.setPlayerEditableDungeon(player.uniqueId, it)

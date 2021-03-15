@@ -2,9 +2,9 @@ package it.forgottenworld.dungeons.core.integrations
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.config.Configuration
 import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import it.forgottenworld.echelonapi.FWEchelon
@@ -76,7 +76,7 @@ class FWEchelonUtils @Inject constructor(
             val insts = dungeonManager.getAllBusyInstances()
             if (reason != null) {
                 for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
-                    pl?.sendPrefixedMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE.format(reason))
+                    pl?.sendPrefixedMessage(Strings.DUNGEON_WILL_BE_EVACUATED_BECAUSE, reason)
                 }
             } else {
                 for (pl in insts.flatMap { inst -> inst.players.map { Bukkit.getPlayer(it) } }) {
@@ -91,7 +91,7 @@ class FWEchelonUtils @Inject constructor(
         override fun onPlayerForceRemoved(player: Player, reason: String?) {
             val inst = dungeonManager.getPlayerInstance(player.uniqueId) ?: return
             if (reason != null) {
-                player.sendPrefixedMessage(Strings.YOU_WILL_BE_EVACUATED_BECAUSE.format(reason))
+                player.sendPrefixedMessage(Strings.YOU_WILL_BE_EVACUATED_BECAUSE, reason)
             } else {
                 player.sendPrefixedMessage(Strings.YOU_WILL_BE_EVACUATED)
             }

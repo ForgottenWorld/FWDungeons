@@ -28,10 +28,9 @@ class CmdUnlockablesLookupPlate @Inject constructor(
         }
 
         sender.sendPrefixedMessage(
-            Strings.PRESSURE_PLATE_IS_BOUND_TO.format(
-                unlockableData.first,
-                unlockableData.second
-            )
+            Strings.PRESSURE_PLATE_IS_BOUND_TO,
+            unlockableData.first,
+            unlockableData.second
         )
         return true
     }

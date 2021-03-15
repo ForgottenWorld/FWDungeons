@@ -36,7 +36,7 @@ class CmdDungeonInstanceRemove @Inject constructor(
 
         dungeon.finalInstanceLocations.removeAt(instToRemove)
 
-        sender.sendPrefixedMessage(Strings.REMOVED_INSTANCE_AT_INDEX.format(instToRemove))
+        sender.sendPrefixedMessage(Strings.REMOVED_INSTANCE_AT_INDEX, instToRemove)
 
         return true
     }

@@ -12,12 +12,16 @@ fun launch(f: suspend CoroutineScope.() -> Unit) = CoroutineScope(BukkitDispatch
 fun launchAsync(f: suspend CoroutineScope.() -> Unit) = CoroutineScope(BukkitDispatchers.async).launch(block = f)
 
 object BukkitDispatchers {
-    val minecraft: CoroutineContext get() = BukkitDispatcher(
-        JavaPlugin.getPlugin(FWDungeonsPlugin::class.java)
-    )
+    val minecraft: CoroutineContext by lazy {
+        BukkitDispatcher(
+            JavaPlugin.getPlugin(FWDungeonsPlugin::class.java)
+        )
+    }
 
-    val async: CoroutineContext get() = BukkitDispatcher(
-        JavaPlugin.getPlugin(FWDungeonsPlugin::class.java),
-        true
-    )
+    val async: CoroutineContext by lazy {
+        BukkitDispatcher(
+            JavaPlugin.getPlugin(FWDungeonsPlugin::class.java),
+            true
+        )
+    }
 }

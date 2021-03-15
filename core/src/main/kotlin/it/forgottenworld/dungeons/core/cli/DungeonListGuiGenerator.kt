@@ -45,24 +45,22 @@ class DungeonListGuiGenerator @Inject constructor(
     }
 
     private fun pageClickable(text: String, page: Int) = jsonMessage {
+        +"§8=[ "
         +text
         +ChatColor.AQUA
         +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons list $page")
+        +" §8]="
     }
 
     private fun paginator(page: Int) = jsonMessage {
         if (page > 0) {
-            +"§8=[ "
             +pageClickable("<<<<", page - 1)
-            +" §8]="
         } else {
             +"§8======="
         }
         +"§8====================================="
         if (page < dungeonManager.finalDungeonCount - 1) {
-            +"§8=[ "
             +pageClickable(">>>>", page + 1)
-            +" §8]="
         } else {
             +"§8======="
         }
@@ -93,9 +91,9 @@ class DungeonListGuiGenerator @Inject constructor(
 
         +chevrons(3)
         +"§3${Strings.PLAYERS}: "
-        val minPl = dungeon.minPlayers
-        val maxPl = dungeon.maxPlayers
-        +"§f$minPl${if (maxPl != minPl) "-$maxPl" else ""}\n\n"
+        +"§f${dungeon.minPlayers}${
+            if (dungeon.maxPlayers != dungeon.minPlayers) "-${dungeon.maxPlayers}" else ""
+        }\n\n"
 
         +instanceDetails(dungeon)
     }

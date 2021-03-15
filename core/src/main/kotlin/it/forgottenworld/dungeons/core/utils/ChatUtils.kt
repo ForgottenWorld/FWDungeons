@@ -5,22 +5,25 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-inline fun Player.sendJsonMessage(build: ComponentBuilderScope.() -> Unit) = spigot()
-    .sendMessage(*jsonMessage(build))
+inline fun Player.sendJsonMessage(build: BaseComponentBuilderScope.() -> Unit) {
+    spigot().sendMessage(*jsonMessage(build))
+}
 
-fun Player.sendJsonMessage(chatComponent: Array<out BaseComponent>) = spigot()
-    .sendMessage(*chatComponent)
+fun Player.sendJsonMessage(chatComponent: Array<out BaseComponent>) {
+    spigot().sendMessage(*chatComponent)
+}
 
-inline fun jsonMessage(build: ComponentBuilderScope.() -> Unit): Array<BaseComponent> {
+inline fun jsonMessage(build: BaseComponentBuilderScope.() -> Unit): Array<BaseComponent> {
     val builder = ComponentBuilder()
-    ComponentBuilderScope(builder).build()
+    BaseComponentBuilderScope(builder).build()
     return builder.create()
 }
 
-class ComponentBuilderScope(
+class BaseComponentBuilderScope(
     private val componentBuilder: ComponentBuilder
 ) {
     operator fun ClickEvent.unaryPlus() {
@@ -40,4 +43,14 @@ class ComponentBuilderScope(
     }
 }
 
-fun CommandSender.sendPrefixedMessage(message: String) = sendMessage("${Strings.CHAT_PREFIX}$message")
+fun CommandSender.sendPrefixedMessage(message: String) {
+    sendMessage("${Strings.CHAT_PREFIX}$message")
+}
+
+fun CommandSender.sendPrefixedMessage(message: String, vararg params: Any?) {
+    sendMessage("${Strings.CHAT_PREFIX}${message.format(*params)}")
+}
+
+fun sendConsoleMessage(message: String) {
+    Bukkit.getServer().consoleSender.sendMessage(message)
+}

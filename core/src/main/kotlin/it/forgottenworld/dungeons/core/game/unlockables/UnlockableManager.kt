@@ -95,7 +95,7 @@ class UnlockableManager @Inject constructor(
             }
             return
         }
-        player.sendPrefixedMessage(Strings.YOU_CANT_UNLOCK_YET.format(seriesId, unlockableOrder))
+        player.sendPrefixedMessage(Strings.YOU_CANT_UNLOCK_YET, seriesId, unlockableOrder)
     }
 
     companion object {

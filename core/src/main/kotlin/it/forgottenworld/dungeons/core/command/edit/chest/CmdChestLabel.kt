@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.command.edit.chest
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
@@ -41,7 +41,7 @@ class CmdChestLabel @Inject constructor(
 
         val label = args.joinToString(" ").trim()
         chest.label = label
-        sender.sendPrefixedMessage(Strings.SET_LABEL.format(label))
+        sender.sendPrefixedMessage(Strings.SET_LABEL, label)
         return true
     }
 }

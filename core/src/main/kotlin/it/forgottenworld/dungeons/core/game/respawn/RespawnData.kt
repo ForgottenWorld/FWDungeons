@@ -20,10 +20,14 @@ data class RespawnData(
     }
 
     companion object {
-        val Player.currentWarpbackData get() = RespawnData(
-            gameMode,
-            location.world.uid,
-            Vector3i.ofLocation(location)
-        )
+        val Player.currentWarpbackData: RespawnData
+            get() {
+                val loc = location
+                return RespawnData(
+                    gameMode,
+                    loc.world.uid,
+                    Vector3i.ofLocation(loc)
+                )
+            }
     }
 }

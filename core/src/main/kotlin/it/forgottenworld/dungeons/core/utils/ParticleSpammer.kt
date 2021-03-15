@@ -71,9 +71,9 @@ class ParticleSpammer(
         ) {
             launch {
                 repeat(iterations) {
-                    delay(500)
                     locations.forEach {
                         world.spawnParticle(particle, it.x, it.y, it.z, 1)
+                        delay(500)
                     }
                 }
             }

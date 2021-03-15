@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.command.edit.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
@@ -29,12 +29,12 @@ class CmdDungeonEdit @Inject constructor(
         }
 
         val dungeon = dungeonManager.getFinalDungeonById(id) ?: run {
-            sender.sendPrefixedMessage(Strings.NO_DUNGEON_FOUND_WITH_ID.format(id))
+            sender.sendPrefixedMessage(Strings.NO_DUNGEON_FOUND_WITH_ID, id)
             return true
         }
 
         if (dungeonManager.getDungeonInstances(dungeon).isEmpty()) {
-            sender.sendPrefixedMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT.format(id, id))
+            sender.sendPrefixedMessage(Strings.DUNGEON_WITH_ID_HAS_NO_INSTANCES_IMPORT_IT, id, id)
             return true
         }
 

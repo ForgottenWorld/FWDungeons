@@ -202,7 +202,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
             player.sendPrefixedMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
             players.forEach {
                 Bukkit.getPlayer(it)?.sendPrefixedMessage(
-                    Strings.PLAYER_JOINED_DUNGEON_PARTY.format(player.name)
+                    Strings.PLAYER_JOINED_DUNGEON_PARTY,
+                    player.name
                 )
             }
         }
@@ -284,7 +285,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         for (uuid in players) {
             val pl = Bukkit.getPlayer(uuid) ?: continue
             val token = if (player.name == pl.name) Strings.YOU else player.name
-            pl.sendPrefixedMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY.format(token))
+            pl.sendPrefixedMessage(Strings.PLAYER_LEFT_DUNGEON_PARTY, token)
         }
         onPlayerRemoved(player)
     }
@@ -295,7 +296,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         onPlayerRemoved(player)
         for (uuid in players) {
             Bukkit.getPlayer(uuid)?.sendPrefixedMessage(
-                Strings.PLAYER_DIED_IN_DUNGEON.format(player.name)
+                Strings.PLAYER_DIED_IN_DUNGEON,
+                player.name
             )
         }
     }

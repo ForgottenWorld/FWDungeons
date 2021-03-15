@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.SenderCommand
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -30,7 +30,7 @@ class CmdDungeonLookup @Inject constructor(
                 return true
             }
 
-        sender.sendPrefixedMessage(Strings.LOOKUP_RESULT.format(args[0], instance.dungeon.id, instance.id))
+        sender.sendPrefixedMessage(Strings.LOOKUP_RESULT, args[0], instance.dungeon.id, instance.id)
 
         return true
     }

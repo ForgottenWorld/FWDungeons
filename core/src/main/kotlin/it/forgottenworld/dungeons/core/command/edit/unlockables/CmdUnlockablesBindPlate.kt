@@ -34,7 +34,7 @@ class CmdUnlockablesBindPlate @Inject constructor(
 
         unlockableManager.bindPlateToUnlockable(seriesId, unlockableId, loc.world.uid, pos)
 
-        sender.sendPrefixedMessage(Strings.PRESSURE_PLATE_IS_NOW_BOUND.format(seriesId, unlockableId))
+        sender.sendPrefixedMessage(Strings.PRESSURE_PLATE_IS_NOW_BOUND, seriesId, unlockableId)
         return true
     }
 }

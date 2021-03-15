@@ -11,9 +11,9 @@ import net.md_5.bungee.api.chat.ClickEvent
 import kotlin.math.floor
 
 @Singleton
-class InteractiveRegionListGuiGenerator {
+class DungeonElementGuiGenerator {
 
-    private fun clickables(
+    private fun interactiveRegionClickables(
         interactiveEl: InteractiveRegion,
         type: String
     ) = jsonMessage {
@@ -57,7 +57,7 @@ class InteractiveRegionListGuiGenerator {
             +pageClickable("<<<<", page - 1, type)
             +"§8 ]="
         } else {
-            +"§8======="
+            +"§8========"
         }
 
         +"====================================="
@@ -92,7 +92,37 @@ class InteractiveRegionListGuiGenerator {
         for ((k, v) in activeAreas) {
             +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
             +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde aa label id:${v.id} ")
-            +clickables(v, "aa")
+            +interactiveRegionClickables(v, "aa")
+        }
+
+        +"\n".repeat(ITEMS_PER_PAGE - dungeon.activeAreas.size)
+        +paginator(page, floor(dungeon.activeAreas.size / ITEMS_PER_PAGE.toDouble()).toInt(), "aa")
+    }
+
+    fun showChests(
+        dungeon: EditableDungeon,
+        page: Int
+    ) = jsonMessage {
+        +Strings.CHAT_HEADER
+        +"§8======================[ §aChests §8]======================\n\n"
+
+        val from = page * ITEMS_PER_PAGE
+        val to = (page + 1) * ITEMS_PER_PAGE - 1
+        val indices = from..to.coerceAtMost(dungeon.chests.size - 1)
+
+        val chests = dungeon
+            .chests
+            .toList()
+            .slice(indices)
+
+        for ((k, v) in chests) {
+            +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
+            +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde c label id:${v.id} ")
+            +"§f  ["
+            +"§c X "
+            +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde c remove ${v.id}")
+            +"§f]"
+            +"\n"
         }
 
         +"\n".repeat(ITEMS_PER_PAGE - dungeon.activeAreas.size)
@@ -118,7 +148,7 @@ class InteractiveRegionListGuiGenerator {
         for ((k, v) in triggers) {
             +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
             +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde t label id:${v.id} ")
-            +clickables(v, "t")
+            +interactiveRegionClickables(v, "t")
         }
 
         +"\n".repeat(ITEMS_PER_PAGE - dungeon.triggers.size)

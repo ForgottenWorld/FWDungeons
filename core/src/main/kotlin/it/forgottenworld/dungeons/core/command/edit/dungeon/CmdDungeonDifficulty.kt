@@ -20,7 +20,7 @@ class CmdDungeonDifficulty @Inject constructor(
 
         Dungeon.Difficulty.values().map { it.toString() }.let {
             if (!it.contains(args[0].toLowerCase())) {
-                sender.sendPrefixedMessage(Strings.INVALID_ARG_POSSIBLE_ARGS.format(it.joinToString(", ")))
+                sender.sendPrefixedMessage(Strings.INVALID_ARG_POSSIBLE_ARGS, it.joinToString(", "))
                 return true
             }
 

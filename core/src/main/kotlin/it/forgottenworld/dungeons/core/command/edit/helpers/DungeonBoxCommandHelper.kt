@@ -36,10 +36,9 @@ class DungeonBoxCommandHelper @Inject constructor(
         val box = builder.build()
         if (box == null) {
             sender.sendPrefixedMessage(
-                Strings.DUNGEON_BOX_POS_SET.format(
-                    if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                    if (posNo == 1) 2 else 1
-                )
+                Strings.DUNGEON_BOX_POS_SET,
+                if (posNo == 1) Strings.FIRST else Strings.SECOND,
+                if (posNo == 1) 2 else 1
             )
             return
         }
