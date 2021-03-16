@@ -266,8 +266,16 @@ class EditableDungeonImpl @AssistedInject constructor(
             IntArray(box.depth) { z ->
                 var found = -1
                 for (y in 0..box.height) {
-                    if (world.getBlockAt(x, box.origin.y + y, z).isPassable &&
-                        world.getBlockAt(x, box.origin.y + y + 1, z).isPassable) {
+                    if (world.getBlockAt(
+                            box.origin.x + x,
+                            box.origin.y + y,
+                            box.origin.z + z
+                        ).isPassable &&
+                        world.getBlockAt(
+                            box.origin.x + x,
+                            box.origin.y + y + 1,
+                            box.origin.z + z
+                        ).isPassable) {
                         found = y
                         break
                     }
@@ -275,11 +283,13 @@ class EditableDungeonImpl @AssistedInject constructor(
                 found
             }
         }
+
         val spawnArea = spawnAreaFactory.create(
             id,
             box.withContainerOriginZero(testOrigin),
             heightMap
         )
+
         highlightNewInteractiveRegion(spawnArea)
         spawnAreas = spawnAreas.plus(id to spawnArea)
         return id
