@@ -5,6 +5,7 @@ import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -47,6 +48,11 @@ class FinalDungeonStorageStrategy @Inject constructor(
                     storage.save(it, section("${it.id}"))
                 }
             }
+            section("spawnAreas") {
+                obj.spawnAreas.values.forEach {
+                    storage.save(it, section("${it.id}"))
+                }
+            }
             section("chests") {
                 obj.chests.values.forEach {
                     storage.save(it, section("${it.id}"))
@@ -68,6 +74,12 @@ class FinalDungeonStorageStrategy @Inject constructor(
         val activeAreas = section("activeAreas") {
             associateSections { path, aa ->
                 path.toInt() to storage.load<ActiveArea>(aa)
+            }
+        } ?: mapOf()
+
+        val spawnAreas = section("spawnAreas") {
+            associateSections { path, sa ->
+                path.toInt() to storage.load<SpawnArea>(sa)
             }
         } ?: mapOf()
 
@@ -94,6 +106,7 @@ class FinalDungeonStorageStrategy @Inject constructor(
             startingLocation = storage.load(section("startingLocation")!!),
             triggers = triggers,
             activeAreas = activeAreas,
+            spawnAreas = spawnAreas,
             chests = chests,
             unlockableSeriesId = get("unlockableSeriesId"),
             unlockableId = get("unlockableId")
