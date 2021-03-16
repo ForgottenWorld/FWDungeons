@@ -5,7 +5,6 @@ import com.google.inject.assistedinject.Assisted
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
-import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.scripting.CodeParser
@@ -23,9 +22,6 @@ class TriggerImpl @Inject constructor(
 ) : Trigger, Storage.Storable {
 
     private val effect = codeParser.parseScript(effectCode)
-
-    override val origin: Vector3i
-        get() = box.origin
 
     override fun containsXYZ(x: Int, y: Int, z: Int) = box.containsXYZ(x, y, z)
 

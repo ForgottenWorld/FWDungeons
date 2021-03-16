@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
@@ -19,6 +20,7 @@ import it.forgottenworld.dungeons.core.game.chest.ChestStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceStorageStrategy
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaStorageStrategy
+import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaStorageStrategy
 import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerStorageStrategy
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableSeriesStorageStrategy
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableStorageStrategy
@@ -37,12 +39,14 @@ class StorageImpl @Inject constructor(
     dungeonInstanceStorageStrategy: DungeonInstanceStorageStrategy,
     boxStorageStrategy: BoxStorageStrategy,
     vector3iStorageStrategy: Vector3iStorageStrategy,
+    spawnAreaStorageStrategy: SpawnAreaStorageStrategy,
     private val plugin: FWDungeonsPlugin
 ) : Storage {
 
     private val storageStragies = mapOf<KClass<*>, Storage.StorageStrategy<*>>(
         FinalDungeon::class to finalDungeonStorageStrategy,
         ActiveArea::class to activeAreaStorageStrategy,
+        SpawnArea::class to spawnAreaStorageStrategy,
         Trigger::class to triggerStorageStrategy,
         Chest::class to chestStorageStrategy,
         Unlockable::class to unlockableStorageStrategy,

@@ -8,6 +8,7 @@ import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -35,6 +36,7 @@ class FinalDungeonImpl @AssistedInject constructor(
     @Assisted override val startingLocation: Vector3i,
     @Assisted override val triggers: Map<Int, Trigger>,
     @Assisted override val activeAreas: Map<Int, ActiveArea>,
+    @Assisted override val spawnAreas: Map<Int, SpawnArea>,
     @Assisted override val chests: Map<Int, Chest>,
     @Nullable @Assisted("unlockableSeriesId") override val unlockableSeriesId: Int? = null,
     @Nullable @Assisted("unlockableId") override val unlockableId: Int? = null,
@@ -65,6 +67,7 @@ class FinalDungeonImpl @AssistedInject constructor(
         dungeon.startingLocation!!.copy(),
         dungeon.triggers,
         dungeon.activeAreas,
+        dungeon.spawnAreas,
         dungeon.chests,
         null,
         null,

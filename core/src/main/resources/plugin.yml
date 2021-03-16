@@ -1,5 +1,5 @@
 name: FWDungeons
-version: "0.14.0"
+version: "0.15.0"
 api-version: "1.16"
 description: Create multi-instance scriptable co-op dungeons in your Minecraft server
 author: Shivs (OhMeMuffin)
@@ -23,6 +23,7 @@ commands:
       dungeon [ create | edit | name | description | setstart | difficulty | players | points | pos1 | pos2 | writeout | save | discard | instadd | instremove | hlframes | import | volmap ] |
       trigger [ pos1 | pos2 | label | unmake | wand | list | hl | code ] |
       activearea [ pos1 | pos2 | label | unmake | wand | list | hl ] |
+      spawnarea [ pos1 | pos2 | label | unmake | wand | list | hl ] |
       chest [ add | label | remove ] |
       unlockables [ bindplate | unbindplate | lookup ] ]
     aliases: [ fwdungeonsedit,fwde ]
@@ -108,15 +109,6 @@ permissions:
   fwdungeonsedit.activearea.label:
     description: Allows the player to use /fwdungeonsedit activearea label
     default: op
-  fwdungeonsedit.chest.add:
-    description: Allows the player to use /fwdungeonsedit chest add
-    default: op
-  fwdungeonsedit.chest.remove:
-    description: Allows the player to use /fwdungeonsedit chest remove
-    default: op
-  fwdungeonsedit.chest.label:
-    description: Allows the player to use /fwdungeonsedit chest label
-    default: op
   fwdungeonsedit.activearea.unmake:
     description: Allows the player to use /fwdungeonsedit activearea unmake
     default: op
@@ -128,6 +120,33 @@ permissions:
     default: op
   fwdungeonsedit.activearea.hl:
     description: Allows the player to use /fwdungeonsedit activearea hl
+    default: op
+  fwdungeonsedit.spawnarea.pos1:
+    description: Allows the player to use /fwdungeonsedit spawnarea pos1
+    default: op
+  fwdungeonsedit.spawnarea.pos2:
+    description: Allows the player to use /fwdungeonsedit spawnarea pos2
+    default: op
+  fwdungeonsedit.spawnarea.unmake:
+    description: Allows the player to use /fwdungeonsedit spawnarea unmake
+    default: op
+  fwdungeonsedit.spawnarea.wand:
+    description: Allows the player to use /fwdungeonsedit spawnarea wand
+    default: op
+  fwdungeonsedit.spawnarea.list:
+    description: Allows the player to use /fwdungeonsedit spawnarea list
+    default: op
+  fwdungeonsedit.spawnarea.hl:
+    description: Allows the player to use /fwdungeonsedit spawnarea hl
+    default: op
+  fwdungeonsedit.chest.add:
+    description: Allows the player to use /fwdungeonsedit chest add
+    default: op
+  fwdungeonsedit.chest.remove:
+    description: Allows the player to use /fwdungeonsedit chest remove
+    default: op
+  fwdungeonsedit.chest.label:
+    description: Allows the player to use /fwdungeonsedit chest label
     default: op
   fwdungeonsedit.unlockables.bindplate:
     description: Allows the player to use /fwdungeonsedit unlockables bindplate

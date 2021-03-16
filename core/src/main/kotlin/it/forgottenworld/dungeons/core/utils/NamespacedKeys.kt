@@ -11,4 +11,5 @@ class NamespacedKeys @Inject constructor(
 ) {
     val triggerTool = NamespacedKey(plugin, "FWD_TRIGGER_WAND")
     val activeAreaTool = NamespacedKey(plugin, "FWD_ACTIVE_AREA_WAND")
+    val spawnAreaTool = NamespacedKey(plugin, "FWD_SPAWN_AREA_WAND")
 }

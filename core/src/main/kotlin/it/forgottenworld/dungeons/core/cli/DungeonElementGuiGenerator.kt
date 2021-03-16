@@ -99,6 +99,32 @@ class DungeonElementGuiGenerator {
         +paginator(page, floor(dungeon.activeAreas.size / ITEMS_PER_PAGE.toDouble()).toInt(), "aa")
     }
 
+    fun showSpawnAreas(
+        dungeon: EditableDungeon,
+        page: Int
+    ) = jsonMessage {
+        +Strings.CHAT_HEADER
+        +"§8====================[ §aSpawn Areas §8]===================\n\n"
+
+        val from = page * ITEMS_PER_PAGE
+        val to = (page + 1) * ITEMS_PER_PAGE - 1
+        val indices = from..to.coerceAtMost(dungeon.spawnAreas.size - 1)
+
+        val spawnAreas = dungeon
+            .spawnAreas
+            .toList()
+            .slice(indices)
+
+        for ((k, v) in spawnAreas) {
+            +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
+            +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde sa label id:${v.id} ")
+            +interactiveRegionClickables(v, "sa")
+        }
+
+        +"\n".repeat(ITEMS_PER_PAGE - dungeon.spawnAreas.size)
+        +paginator(page, floor(dungeon.spawnAreas.size / ITEMS_PER_PAGE.toDouble()).toInt(), "sa")
+    }
+
     fun showChests(
         dungeon: EditableDungeon,
         page: Int

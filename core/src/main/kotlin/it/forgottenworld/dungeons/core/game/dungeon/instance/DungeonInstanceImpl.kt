@@ -89,8 +89,11 @@ class DungeonInstanceImpl @AssistedInject constructor(
     }
 
     override var leader: UUID? = null
+
     override var partyKey = ""
+
     override val instanceObjectives = mutableListOf<CombatObjective>()
+
     override val players = mutableListOf<UUID>()
 
     override var isLocked = false
@@ -103,6 +106,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         private set
 
     private val playerTriggers = mutableMapOf<UUID, Int>()
+
     private val proccedTriggers = mutableSetOf<Int>()
 
     private val playerRespawnData = mutableMapOf<UUID, RespawnData>()
@@ -384,8 +388,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         onAllKilled: (DungeonInstance) -> Unit
     ) {
         val mobUuids = mobs.mapNotNull {
-            val aa = dungeon.activeAreas[it.activeAreaId] ?: error("Active area not found")
-            spawnMob(it.isMythic, it.mob, aa.getRandomLocationOnFloor(this))
+            val sa = dungeon.spawnAreas[it.spawnAreaId] ?: error("Active area not found")
+            spawnMob(it.isMythic, it.mob, sa.getRandomLocationOnFloor(this))
         }.toMutableList()
         val obj = combatObjectiveFactory.create(this, mobUuids, onAllKilled)
         mobUuids.forEach {

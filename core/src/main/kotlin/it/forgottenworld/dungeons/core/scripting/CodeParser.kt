@@ -17,7 +17,7 @@ class CodeParser {
         const val CODE_BREAK = "break"
         const val PREFIX_MYTHIC_MOB = "MM"
         const val PREFIX_VANILLA_MOB = "VNL"
-        const val PREFIX_ACTIVE_AREA = "AA"
+        const val PREFIX_SPAWN_AREA = "SA"
     }
 
     fun cleanupCode(rawCode: String) = rawCode
@@ -31,33 +31,33 @@ class CodeParser {
     private fun parseCombatObjective(
         codeIterator: Iterator<String>
     ): (DungeonInstance) -> Unit {
-        var currentActiveArea: Int? = null
+        var currentSpawnArea: Int? = null
         val mobs = mutableListOf<MobSpawnData>()
         while (codeIterator.hasNext()) {
             val code = codeIterator.next()
             when {
                 code.startsWith(Consts.PREFIX_MYTHIC_MOB) -> {
-                    if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
+                    if (currentSpawnArea == null) throw ScriptingException("Target spawn area not yet set")
                     mobs.add(
                         MobSpawnData(
-                            currentActiveArea,
+                            currentSpawnArea,
                             code.removePrefix(Consts.PREFIX_MYTHIC_MOB),
                             true
                         )
                     )
                 }
                 code.startsWith(Consts.PREFIX_VANILLA_MOB) -> {
-                    if (currentActiveArea == null) throw ScriptingException("Target active area not yet set")
+                    if (currentSpawnArea == null) throw ScriptingException("Target spawn area not yet set")
                     mobs.add(
                         MobSpawnData(
-                            currentActiveArea,
+                            currentSpawnArea,
                             code.removePrefix(Consts.PREFIX_VANILLA_MOB),
                             false
                         )
                     )
                 }
-                code.startsWith(Consts.PREFIX_ACTIVE_AREA) -> {
-                    currentActiveArea = code.removePrefix(Consts.PREFIX_ACTIVE_AREA).toInt()
+                code.startsWith(Consts.PREFIX_SPAWN_AREA) -> {
+                    currentSpawnArea = code.removePrefix(Consts.PREFIX_SPAWN_AREA).toInt()
                 }
                 code == Consts.CODE_WHEN_DONE -> {
                     val whenDone = parseTokens(codeIterator)
@@ -113,8 +113,8 @@ class CodeParser {
             Consts.CODE_FINISH,
             "${ChatColor.RED}${Consts.CODE_FINISH}${ChatColor.WHITE}"
         ).replace(
-            Consts.PREFIX_ACTIVE_AREA,
-            "${ChatColor.GREEN}${Consts.PREFIX_ACTIVE_AREA}${ChatColor.WHITE}"
+            Consts.PREFIX_SPAWN_AREA,
+            "${ChatColor.GREEN}${Consts.PREFIX_SPAWN_AREA}${ChatColor.WHITE}"
         ).replace(
             Consts.PREFIX_MYTHIC_MOB,
             "${ChatColor.of("#ffa500")}${Consts.PREFIX_MYTHIC_MOB}${ChatColor.WHITE}"

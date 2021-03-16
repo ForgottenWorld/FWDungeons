@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -47,6 +48,7 @@ interface DungeonFactory {
         startingLocation: Vector3i,
         triggers: Map<Int, Trigger>,
         activeAreas: Map<Int, ActiveArea>,
+        spawnAreas: Map<Int, SpawnArea>,
         chests: Map<Int, Chest>,
         @Assisted("unlockableSeriesId") unlockableSeriesId: Int? = null,
         @Assisted("unlockableId") unlockableId: Int? = null
