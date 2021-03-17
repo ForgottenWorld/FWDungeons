@@ -68,8 +68,7 @@ class DungeonElementGuiGenerator {
             +pageClickable(">>>>", page + 1, type)
             +"§8 ]="
         } else {
-            +"======="
-            +ChatColor.DARK_GRAY
+            +"§8======="
         }
     }
 

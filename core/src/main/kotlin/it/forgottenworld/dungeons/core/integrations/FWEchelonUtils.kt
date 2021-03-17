@@ -35,7 +35,8 @@ class FWEchelonUtils @Inject constructor(
 
         sendConsoleMessage(" -- FWEchelon §2is present")
 
-        FWEchelon.api
+        FWEchelon
+            .api
             .mutexActivityService
             .registerMutexActivity(FWDungeonsMutexActivity())
 
