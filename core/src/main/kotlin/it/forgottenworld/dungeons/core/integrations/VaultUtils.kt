@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.integrations
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit

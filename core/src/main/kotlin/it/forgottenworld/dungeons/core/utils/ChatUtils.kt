@@ -1,6 +1,6 @@
 package it.forgottenworld.dungeons.core.utils
 
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Strings
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent

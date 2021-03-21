@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.game.respawn
 
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.launch
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import kotlinx.coroutines.delay

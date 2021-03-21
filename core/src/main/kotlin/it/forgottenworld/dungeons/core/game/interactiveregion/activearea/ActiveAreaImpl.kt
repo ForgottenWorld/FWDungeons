@@ -6,7 +6,7 @@ import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import org.bukkit.Material
 import javax.annotation.Nullable

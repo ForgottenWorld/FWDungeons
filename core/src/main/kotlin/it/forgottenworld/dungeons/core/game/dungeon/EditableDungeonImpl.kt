@@ -17,8 +17,8 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaFactory
@@ -264,7 +264,6 @@ class EditableDungeonImpl @AssistedInject constructor(
         val world = configuration.dungeonWorld
         val heightMap = Array(box.width) { x ->
             IntArray(box.depth) { z ->
-                var found = -1
                 for (y in 0..box.height) {
                     if (world.getBlockAt(
                             box.origin.x + x,
@@ -275,12 +274,10 @@ class EditableDungeonImpl @AssistedInject constructor(
                             box.origin.x + x,
                             box.origin.y + y + 1,
                             box.origin.z + z
-                        ).isPassable) {
-                        found = y
-                        break
-                    }
+                        ).isPassable
+                    ) return@IntArray y
                 }
-                found
+                -1
             }
         }
 

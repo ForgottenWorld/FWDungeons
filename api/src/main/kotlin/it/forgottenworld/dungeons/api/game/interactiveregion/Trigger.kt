@@ -6,7 +6,11 @@ import org.bukkit.entity.Player
 
 interface Trigger : InteractiveRegion, Storage.Storable {
 
-    val effectCode: List<String>
+    fun interface Effect {
+        fun execute(dungeonInstance: DungeonInstance)
+    }
+
+    var effect: Effect?
 
     val requiresWholeParty: Boolean
 

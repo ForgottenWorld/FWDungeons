@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.config
+package it.forgottenworld.dungeons.core.storage
 
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
@@ -201,7 +201,7 @@ object Strings {
     val TOGGLED_HIGHLIGHTED_FRAMES by resourceString()
     val TO_ACCEPT by resourceString()
     val TRIGGERS by resourceString()
-    val TRIGGER_NOT_FOUND by resourceString()
+    // val TRIGGER_NOT_FOUND by resourceString()
     val WIM_AT_LEAST_ONE_SPAWN_AREA by resourceString()
     val WIM_AT_LEAST_ONE_ACTIVE_AREA by resourceString()
     val WIM_AT_LEAST_ONE_TRIGGER by resourceString()

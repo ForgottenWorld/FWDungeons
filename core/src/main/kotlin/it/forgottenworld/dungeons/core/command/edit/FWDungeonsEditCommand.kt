@@ -37,7 +37,7 @@ class FWDungeonsEditCommand @Inject constructor(
     cmdTriggerWand: CmdTriggerWand,
     cmdTriggerList: CmdTriggerList,
     cmdTriggerHl: CmdTriggerHl,
-    cmdTriggerCode: CmdTriggerCode,
+    // cmdTriggerCode: CmdTriggerCode,
     cmdChestAdd: CmdChestAdd,
     cmdChestRemove: CmdChestRemove,
     cmdChestLabel: CmdChestLabel,
@@ -94,7 +94,7 @@ class FWDungeonsEditCommand @Inject constructor(
             "wand" += cmdTriggerWand
             "list" += cmdTriggerList
             "hl" += cmdTriggerHl
-            "code" += cmdTriggerCode
+            // "code" += cmdTriggerCode
         }.bindTo("trigger", "t")
 
         branchingCommand {

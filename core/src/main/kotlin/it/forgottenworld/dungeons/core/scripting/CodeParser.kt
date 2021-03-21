@@ -1,3 +1,4 @@
+/*
 package it.forgottenworld.dungeons.core.scripting
 
 import com.google.inject.Singleton
@@ -9,7 +10,7 @@ import org.bukkit.Material
 @Singleton
 class CodeParser {
 
-    private object Consts {
+    private object Keywords {
         const val CODE_FILL_ACTIVE_AREA = "fill"
         const val CODE_COMBAT_OBJECTIVE = "combatObjective"
         const val CODE_WHEN_DONE = "whenDone"
@@ -36,30 +37,30 @@ class CodeParser {
         while (codeIterator.hasNext()) {
             val code = codeIterator.next()
             when {
-                code.startsWith(Consts.PREFIX_MYTHIC_MOB) -> {
+                code.startsWith(Keywords.PREFIX_MYTHIC_MOB) -> {
                     if (currentSpawnArea == null) throw ScriptingException("Target spawn area not yet set")
                     mobs.add(
                         MobSpawnData(
                             currentSpawnArea,
-                            code.removePrefix(Consts.PREFIX_MYTHIC_MOB),
+                            code.removePrefix(Keywords.PREFIX_MYTHIC_MOB),
                             true
                         )
                     )
                 }
-                code.startsWith(Consts.PREFIX_VANILLA_MOB) -> {
+                code.startsWith(Keywords.PREFIX_VANILLA_MOB) -> {
                     if (currentSpawnArea == null) throw ScriptingException("Target spawn area not yet set")
                     mobs.add(
                         MobSpawnData(
                             currentSpawnArea,
-                            code.removePrefix(Consts.PREFIX_VANILLA_MOB),
+                            code.removePrefix(Keywords.PREFIX_VANILLA_MOB),
                             false
                         )
                     )
                 }
-                code.startsWith(Consts.PREFIX_SPAWN_AREA) -> {
-                    currentSpawnArea = code.removePrefix(Consts.PREFIX_SPAWN_AREA).toInt()
+                code.startsWith(Keywords.PREFIX_SPAWN_AREA) -> {
+                    currentSpawnArea = code.removePrefix(Keywords.PREFIX_SPAWN_AREA).toInt()
                 }
-                code == Consts.CODE_WHEN_DONE -> {
+                code == Keywords.CODE_WHEN_DONE -> {
                     val whenDone = parseTokens(codeIterator)
                     return { it.attachNewObjective(mobs, whenDone) }
                 }
@@ -73,11 +74,11 @@ class CodeParser {
         val parsed = mutableListOf<(DungeonInstance) -> Unit>()
         while (codeIterator.hasNext()) {
             when (val code = codeIterator.next()) {
-                Consts.CODE_COMBAT_OBJECTIVE -> {
+                Keywords.CODE_COMBAT_OBJECTIVE -> {
                     val combatObjective = parseCombatObjective(codeIterator)
                     parsed.add { combatObjective(it) }
                 }
-                Consts.CODE_FILL_ACTIVE_AREA -> {
+                Keywords.CODE_FILL_ACTIVE_AREA -> {
                     val aaId = codeIterator.next().toInt()
                     val material = Material.getMaterial(codeIterator.next(), false)!!
                     parsed.add {
@@ -86,11 +87,11 @@ class CodeParser {
                         aa.fillWithMaterial(material, it)
                     }
                 }
-                Consts.CODE_FINISH -> parsed.add {
+                Keywords.CODE_FINISH -> parsed.add {
                     it.onFinishTriggered()
                 }
-                Consts.CODE_BREAK -> return { for (f in parsed) f(it) }
-                Consts.CODE_WHEN_DONE -> {
+                Keywords.CODE_BREAK -> return { for (f in parsed) f(it) }
+                Keywords.CODE_WHEN_DONE -> {
                     throw ScriptingException("whenDone used outside of combatObjective statement")
                 }
                 else -> throw ScriptingException("Unrecognized code $code")
@@ -101,28 +102,28 @@ class CodeParser {
 
     fun beautify(raw: List<String>) = raw.joinToString(";\n") {
         it.replace(
-            Consts.CODE_FILL_ACTIVE_AREA,
-            "${ChatColor.of("#bfff00")}${Consts.CODE_FILL_ACTIVE_AREA}${ChatColor.WHITE}"
+            Keywords.CODE_FILL_ACTIVE_AREA,
+            "${ChatColor.of("#bfff00")}${Keywords.CODE_FILL_ACTIVE_AREA}${ChatColor.WHITE}"
         ).replace(
-            Consts.CODE_COMBAT_OBJECTIVE,
-            "${ChatColor.AQUA}${Consts.CODE_COMBAT_OBJECTIVE}${ChatColor.WHITE}"
+            Keywords.CODE_COMBAT_OBJECTIVE,
+            "${ChatColor.AQUA}${Keywords.CODE_COMBAT_OBJECTIVE}${ChatColor.WHITE}"
         ).replace(
-            Consts.CODE_WHEN_DONE,
-            "${ChatColor.LIGHT_PURPLE}${Consts.CODE_WHEN_DONE}${ChatColor.WHITE}"
+            Keywords.CODE_WHEN_DONE,
+            "${ChatColor.LIGHT_PURPLE}${Keywords.CODE_WHEN_DONE}${ChatColor.WHITE}"
         ).replace(
-            Consts.CODE_FINISH,
-            "${ChatColor.RED}${Consts.CODE_FINISH}${ChatColor.WHITE}"
+            Keywords.CODE_FINISH,
+            "${ChatColor.RED}${Keywords.CODE_FINISH}${ChatColor.WHITE}"
         ).replace(
-            Consts.PREFIX_SPAWN_AREA,
-            "${ChatColor.GREEN}${Consts.PREFIX_SPAWN_AREA}${ChatColor.WHITE}"
+            Keywords.PREFIX_SPAWN_AREA,
+            "${ChatColor.GREEN}${Keywords.PREFIX_SPAWN_AREA}${ChatColor.WHITE}"
         ).replace(
-            Consts.PREFIX_MYTHIC_MOB,
-            "${ChatColor.of("#ffa500")}${Consts.PREFIX_MYTHIC_MOB}${ChatColor.WHITE}"
+            Keywords.PREFIX_MYTHIC_MOB,
+            "${ChatColor.of("#ffa500")}${Keywords.PREFIX_MYTHIC_MOB}${ChatColor.WHITE}"
         ).replace(
-            Consts.PREFIX_VANILLA_MOB,
-            "${ChatColor.GRAY}${Consts.PREFIX_VANILLA_MOB}${ChatColor.WHITE}"
+            Keywords.PREFIX_VANILLA_MOB,
+            "${ChatColor.GRAY}${Keywords.PREFIX_VANILLA_MOB}${ChatColor.WHITE}"
         ).trim()
     }
 
     fun parseScript(lines: List<String>) = parseTokens(lines.iterator())
-}
+}*/

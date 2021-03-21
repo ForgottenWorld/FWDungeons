@@ -16,9 +16,10 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.edit
 import it.forgottenworld.dungeons.api.storage.yaml
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerGridFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
+import it.forgottenworld.dungeons.core.scripting.ScriptParser
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
@@ -44,7 +45,8 @@ class FinalDungeonImpl @AssistedInject constructor(
     private val dungeonInstanceFactory: DungeonInstanceFactory,
     triggerGridFactory: TriggerGridFactory,
     private val storage: Storage,
-    private val dungeonManager: DungeonManager
+    private val dungeonManager: DungeonManager,
+    scriptParser: ScriptParser
 ) : Storage.Storable, FinalDungeon {
 
     @AssistedInject
@@ -54,7 +56,8 @@ class FinalDungeonImpl @AssistedInject constructor(
         dungeonInstanceFactory: DungeonInstanceFactory,
         triggerGridFactory: TriggerGridFactory,
         storage: Storage,
-        dungeonManager: DungeonManager
+        dungeonManager: DungeonManager,
+        scriptParser: ScriptParser
     ) : this(
         dungeon.id,
         dungeon.name,
@@ -75,12 +78,25 @@ class FinalDungeonImpl @AssistedInject constructor(
         dungeonInstanceFactory,
         triggerGridFactory,
         storage,
-        dungeonManager
+        dungeonManager,
+        scriptParser
     )
 
     override var isActive = true
     override var isBeingEdited = false
     override val triggerGrid = triggerGridFactory.createFinalDungeonGrid(this@FinalDungeonImpl)
+
+    init {
+        val scriptContents = storage
+            .getScriptFilesForDungeon(this)
+            .joinToString("") { it.readText() }
+
+        if (scriptContents.isNotEmpty()) {
+            scriptParser.parseScript(this, scriptContents).forEach { (k, v) ->
+                triggers[k]?.effect = v
+            }
+        }
+    }
 
     override fun putInEditMode(player: Player): EditableDungeon? {
         if (isActive) {

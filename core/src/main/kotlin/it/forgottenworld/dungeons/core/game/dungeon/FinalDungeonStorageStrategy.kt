@@ -20,7 +20,11 @@ class FinalDungeonStorageStrategy @Inject constructor(
     private val dungeonFactory: DungeonFactory
 ): Storage.StorageStrategy<FinalDungeon> {
 
-    override fun toStorage(obj: FinalDungeon, config: ConfigurationSection, storage: Storage) {
+    override fun toStorage(
+        obj: FinalDungeon,
+        config: ConfigurationSection,
+        storage: Storage
+    ) {
         config.edit {
             "id" to obj.id
             "name" to obj.name
@@ -65,6 +69,7 @@ class FinalDungeonStorageStrategy @Inject constructor(
         config: ConfigurationSection,
         storage: Storage
     ) = config.read {
+
         val triggers = section("triggers") {
             associateSections { path, tr ->
                 path.toInt() to storage.load<Trigger>(tr)

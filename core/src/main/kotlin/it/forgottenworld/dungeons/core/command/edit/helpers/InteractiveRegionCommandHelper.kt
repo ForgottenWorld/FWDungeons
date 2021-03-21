@@ -6,8 +6,8 @@ import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.*
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock

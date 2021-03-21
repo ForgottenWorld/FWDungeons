@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player

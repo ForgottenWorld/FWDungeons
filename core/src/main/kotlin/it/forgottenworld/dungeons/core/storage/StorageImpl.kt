@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.config
+package it.forgottenworld.dungeons.core.storage
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -77,12 +77,43 @@ class StorageImpl @Inject constructor(
         if (!exists()) createNewFile()
     }
 
-    override val dungeonFiles get() = dungeonsDirectory
-        .listFiles()!!
-        .filter { it.extension == "yml" }
+    private var _dungeonDataFolders: Map<Int, File>? = null
 
-    override fun getFileForDungeon(dungeon: FinalDungeon) =
-        File(dungeonsDirectory,"${dungeon.id}.yml")
+    override fun resetDungeonFolders() {
+        _dungeonDataFolders = null
+    }
+
+    override val dungeonDataFolders: Map<Int, File>
+        get() {
+            _dungeonDataFolders?.let { return it }
+            _dungeonDataFolders = dungeonsDirectory
+                .listFiles()!!
+                .filter { file -> file.isDirectory &&
+                    file.startsWith("dungeon_") &&
+                    file.listFiles()?.all {
+                        it.name == "config.yml" ||
+                            it.extension == "dgs"
+                    } == true
+                }.associateBy {
+                    it.name.removePrefix("dungeon_").toInt()
+                }
+            return _dungeonDataFolders!!
+        }
+
+    override fun getConfigFileForDungeon(dungeon: FinalDungeon): File {
+        val folder = dungeonDataFolders[dungeon.id] ?: run {
+            val newFolder = File(dungeonsDirectory, "dungeon_${dungeon.id}")
+            newFolder.mkdir()
+            resetDungeonFolders()
+            newFolder
+        }
+        return File(folder,"${dungeon.id}.yml")
+    }
+
+    override fun getScriptFilesForDungeon(dungeon: FinalDungeon) = dungeonDataFolders[dungeon.id]
+        ?.listFiles()
+        ?.filter { it.extension == "dgs" }
+        ?: listOf()
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Storage.Storable> load(klass: KClass<T>, config: ConfigurationSection): T =

@@ -16,7 +16,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.config.StorageImpl
+import it.forgottenworld.dungeons.core.storage.StorageImpl
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonFactory
 import it.forgottenworld.dungeons.core.game.dungeon.DungeonManagerImpl
 import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeonImpl

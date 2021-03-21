@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.config
+package it.forgottenworld.dungeons.core.storage
 
 import com.google.inject.Inject
 import com.google.inject.Singleton

@@ -3,8 +3,7 @@ package it.forgottenworld.dungeons.core.cli
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.jsonMessage
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
@@ -24,6 +23,7 @@ class DungeonElementGuiGenerator {
         +"§c X "
         +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${interactiveEl.id}")
         +"§f]"
+        /*
         if (interactiveEl is Trigger) {
             +" §f["
             if (interactiveEl.effectCode.isEmpty()) {
@@ -34,6 +34,7 @@ class DungeonElementGuiGenerator {
             }
             +"§f]"
         }
+        */
         +"\n"
     }
 
@@ -60,8 +61,7 @@ class DungeonElementGuiGenerator {
             +"§8========"
         }
 
-        +"====================================="
-        +ChatColor.DARK_GRAY
+        +"§8====================================="
 
         if (page < maxPage) {
             +"§8=[ "
@@ -77,7 +77,7 @@ class DungeonElementGuiGenerator {
         page: Int
     ) = jsonMessage {
         +Strings.CHAT_HEADER
-        +"§8===================[ §aActive Areas §8]===================\n\n"
+        +"§8===================[ §dActive Areas §8]===================\n\n"
 
         val from = page * ITEMS_PER_PAGE
         val to = (page + 1) * ITEMS_PER_PAGE - 1
@@ -103,7 +103,7 @@ class DungeonElementGuiGenerator {
         page: Int
     ) = jsonMessage {
         +Strings.CHAT_HEADER
-        +"§8====================[ §aSpawn Areas §8]===================\n\n"
+        +"§8====================[ §cSpawn Areas §8]===================\n\n"
 
         val from = page * ITEMS_PER_PAGE
         val to = (page + 1) * ITEMS_PER_PAGE - 1

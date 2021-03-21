@@ -13,9 +13,11 @@ interface Storage {
 
     val unlockablesFile: File
 
-    val dungeonFiles: List<File>
+    val dungeonDataFolders: Map<Int, File>
 
-    fun getFileForDungeon(dungeon: FinalDungeon): File
+    fun getConfigFileForDungeon(dungeon: FinalDungeon): File
+
+    fun getScriptFilesForDungeon(dungeon: FinalDungeon): List<File>
 
     interface StorageStrategy<T : Storable> {
         fun toStorage(obj: T, config: ConfigurationSection, storage: Storage)
@@ -38,4 +40,6 @@ interface Storage {
             save(T::class, storable, config)
         }
     }
+
+    fun resetDungeonFolders()
 }

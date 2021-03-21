@@ -12,10 +12,11 @@ import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.yaml
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
+import java.io.File
 import java.util.*
 
 @Singleton
@@ -103,9 +104,16 @@ class DungeonManagerImpl @Inject constructor(
     }
 
     override fun loadDungeonsFromStorage() {
-        for (file in storage.dungeonFiles) {
+        storage.resetDungeonFolders()
+        for (file in storage.dungeonDataFolders.values) {
             try {
-                registerFinalDungeon(storage.load(yaml { load(file) }))
+                registerFinalDungeon(
+                    storage.load(
+                        yaml {
+                            load(File(file, "config.yml"))
+                        }
+                    )
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -141,7 +149,7 @@ class DungeonManagerImpl @Inject constructor(
         try {
             yaml {
                 storage.save(dungeon, this)
-                launchAsync { save(storage.getFileForDungeon(dungeon)) }
+                launchAsync { save(storage.getConfigFileForDungeon(dungeon)) }
             }
         } catch (e: Exception) {
             e.printStackTrace()

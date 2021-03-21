@@ -7,7 +7,7 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3d
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.config.Configuration
+import it.forgottenworld.dungeons.core.storage.Configuration
 import org.bukkit.Location
 import javax.annotation.Nullable
 

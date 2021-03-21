@@ -29,7 +29,7 @@ interface DungeonFactory {
         triggers: Map<Int, Trigger> = mutableMapOf(),
         activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
         spawnAreas: Map<Int, SpawnArea> = mutableMapOf(),
-        chests: MutableMap<Int, Chest> = mutableMapOf(),
+        chests: MutableMap<Int, Chest> = mutableMapOf()
     ): EditableDungeon
     
     fun createEditable(
