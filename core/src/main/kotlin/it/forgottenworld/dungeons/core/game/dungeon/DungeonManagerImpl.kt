@@ -106,17 +106,13 @@ class DungeonManagerImpl @Inject constructor(
     override fun loadDungeonsFromStorage() {
         storage.resetDungeonFolders()
         for (file in storage.dungeonDataFolders.values) {
-            try {
-                registerFinalDungeon(
-                    storage.load(
-                        yaml {
-                            load(File(file, "config.yml"))
-                        }
-                    )
+            registerFinalDungeon(
+                storage.load(
+                    yaml {
+                        load(File(file, "config.yml"))
+                    }
                 )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            )
         }
     }
 

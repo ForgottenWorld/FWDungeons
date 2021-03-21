@@ -79,26 +79,25 @@ class StorageImpl @Inject constructor(
 
     private var _dungeonDataFolders: Map<Int, File>? = null
 
-    override fun resetDungeonFolders() {
-        _dungeonDataFolders = null
-    }
-
     override val dungeonDataFolders: Map<Int, File>
         get() {
             _dungeonDataFolders?.let { return it }
             _dungeonDataFolders = dungeonsDirectory
                 .listFiles()!!
                 .filter { file -> file.isDirectory &&
-                    file.startsWith("dungeon_") &&
+                    file.name.startsWith("dungeon_") &&
                     file.listFiles()?.all {
-                        it.name == "config.yml" ||
-                            it.extension == "dgs"
+                        it.name == "config.yml" || it.extension == "dgs"
                     } == true
                 }.associateBy {
                     it.name.removePrefix("dungeon_").toInt()
                 }
             return _dungeonDataFolders!!
         }
+
+    override fun resetDungeonFolders() {
+        _dungeonDataFolders = null
+    }
 
     override fun getConfigFileForDungeon(dungeon: FinalDungeon): File {
         val folder = dungeonDataFolders[dungeon.id] ?: run {
@@ -107,7 +106,7 @@ class StorageImpl @Inject constructor(
             resetDungeonFolders()
             newFolder
         }
-        return File(folder,"${dungeon.id}.yml")
+        return File(folder,"config.yml")
     }
 
     override fun getScriptFilesForDungeon(dungeon: FinalDungeon) = dungeonDataFolders[dungeon.id]

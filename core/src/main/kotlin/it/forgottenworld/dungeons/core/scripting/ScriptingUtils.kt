@@ -54,6 +54,7 @@ object ScriptingUtils {
             }
             parsed.append(c)
         }
+        if (parsed.isNotEmpty()) result.add(parsed.toString())
         return result.toTypedArray()
     }
 

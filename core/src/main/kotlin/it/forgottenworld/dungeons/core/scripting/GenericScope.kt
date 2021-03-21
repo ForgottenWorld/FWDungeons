@@ -31,7 +31,7 @@ class GenericScope(val dungeon: FinalDungeon) {
                 Keywords.CODE_FILL_ACTIVE_AREA -> {
                     val args = ScriptingUtils.parseArguments(code)
                     ScriptingUtils.eatSemicolon(code)
-                    if (args.size != 1 || args.size != 2) {
+                    if (args.size != 1 && args.size != 2) {
                         throw ScriptingException("Expected active area ID (or label) and optional material")
                     }
                     val aaId = if (args[0].startsWith('"')) {
@@ -65,7 +65,7 @@ class GenericScope(val dungeon: FinalDungeon) {
                 Keywords.CODE_BREAK -> {
                     return { for (f in parsed) f(it) }
                 }
-                else -> throw ScriptingException("Unrecognized code $code")
+                else -> return { for (f in parsed) f(it) }
             }
         }
         return { for (f in parsed) f(it) }

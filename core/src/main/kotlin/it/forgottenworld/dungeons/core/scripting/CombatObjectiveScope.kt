@@ -30,7 +30,7 @@ class CombatObjectiveScope(val dungeon: FinalDungeon) {
                     Keywords.CODE_VANILLA_MOB -> {
                         val args = ScriptingUtils.parseArguments(code)
                         ScriptingUtils.eatSemicolon(code)
-                        if (args.size != 1 || args.size != 2) {
+                        if (args.size != 1 && args.size != 2) {
                             throw ScriptingException("Expected mob type and optional amount (default 1)")
                         }
                         if (!args[0].startsWith('"')) {
@@ -92,9 +92,9 @@ class CombatObjectiveScope(val dungeon: FinalDungeon) {
                     val whenDone = GenericScope(dungeon).parse(block)
                     return { it.attachNewObjective(mobs, whenDone) }
                 }
-                else -> throw ScriptingException("Unexpected end of block")
+                else -> return { it.attachNewObjective(mobs) {} }
             }
         }
-        throw ScriptingException("Unexpected end of block")
+        return { it.attachNewObjective(mobs) {} }
     }
 }
