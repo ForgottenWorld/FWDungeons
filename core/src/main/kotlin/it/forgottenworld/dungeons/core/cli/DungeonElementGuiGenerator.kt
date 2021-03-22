@@ -77,7 +77,7 @@ class DungeonElementGuiGenerator {
         page: Int
     ) = jsonMessage {
         +Strings.CHAT_HEADER
-        +"§8===================[ §dActive Areas §8]===================\n\n"
+        +"§8===================[ §9Active Areas §8]===================\n\n"
 
         val from = page * ITEMS_PER_PAGE
         val to = (page + 1) * ITEMS_PER_PAGE - 1
@@ -103,7 +103,7 @@ class DungeonElementGuiGenerator {
         page: Int
     ) = jsonMessage {
         +Strings.CHAT_HEADER
-        +"§8====================[ §cSpawn Areas §8]===================\n\n"
+        +"§8====================[ §dSpawn Areas §8]===================\n\n"
 
         val from = page * ITEMS_PER_PAGE
         val to = (page + 1) * ITEMS_PER_PAGE - 1
@@ -159,7 +159,7 @@ class DungeonElementGuiGenerator {
         page: Int
     ) = jsonMessage {
         +Strings.CHAT_HEADER
-        +"§8=====================[ §9Triggers §8]=====================\n\n"
+        +"§8=====================[ §6Triggers §8]=====================\n\n"
 
         val from = page * ITEMS_PER_PAGE
         val to = (page + 1) * ITEMS_PER_PAGE - 1
