@@ -38,6 +38,8 @@ interface EditableDungeon : Dungeon {
 
     val activeAreaBoxBuilder: Box.Builder
 
+    val spawnAreaBoxBuilder: Box.Builder
+
     var testOrigin: Vector3i
 
     fun finalize(): FinalDungeon

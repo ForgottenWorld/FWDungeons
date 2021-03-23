@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -27,7 +28,8 @@ interface DungeonFactory {
         finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
         triggers: Map<Int, Trigger> = mutableMapOf(),
         activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
-        chests: MutableMap<Int, Chest> = mutableMapOf(),
+        spawnAreas: Map<Int, SpawnArea> = mutableMapOf(),
+        chests: MutableMap<Int, Chest> = mutableMapOf()
     ): EditableDungeon
     
     fun createEditable(
@@ -47,6 +49,7 @@ interface DungeonFactory {
         startingLocation: Vector3i,
         triggers: Map<Int, Trigger>,
         activeAreas: Map<Int, ActiveArea>,
+        spawnAreas: Map<Int, SpawnArea>,
         chests: Map<Int, Chest>,
         @Assisted("unlockableSeriesId") unlockableSeriesId: Int? = null,
         @Assisted("unlockableId") unlockableId: Int? = null

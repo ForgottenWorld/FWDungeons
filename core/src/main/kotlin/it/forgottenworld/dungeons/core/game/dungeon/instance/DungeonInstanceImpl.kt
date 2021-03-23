@@ -12,16 +12,16 @@ import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.respawn.RespawnData
-import it.forgottenworld.dungeons.core.game.respawn.RespawnData.Companion.currentWarpbackData
+import it.forgottenworld.dungeons.core.game.respawn.RespawnData.Companion.currentRespawnData
 import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
@@ -89,8 +89,11 @@ class DungeonInstanceImpl @AssistedInject constructor(
     }
 
     override var leader: UUID? = null
+
     override var partyKey = ""
+
     override val instanceObjectives = mutableListOf<CombatObjective>()
+
     override val players = mutableListOf<UUID>()
 
     override var isLocked = false
@@ -103,6 +106,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         private set
 
     private val playerTriggers = mutableMapOf<UUID, Int>()
+
     private val proccedTriggers = mutableSetOf<Int>()
 
     private val playerRespawnData = mutableMapOf<UUID, RespawnData>()
@@ -226,7 +230,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
     }
 
     private fun preparePlayer(player: Player) {
-        playerRespawnData[player.uniqueId] = player.currentWarpbackData
+        playerRespawnData[player.uniqueId] = player.currentRespawnData
         player.gameMode = GameMode.ADVENTURE
         val startingLocation = startingPostion.locationInWorld(configuration.dungeonWorld)
         player.teleport(startingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN)
@@ -279,6 +283,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     override fun onPlayerLeave(player: Player) {
         if (isInGame) {
+            player.gameMode = playerRespawnData[player.uniqueId]!!.gameMode
             player.health = 0.0
             return
         }
@@ -358,8 +363,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         if (oldTrigger?.id == newTrigger?.id) return
         oldTrigger?.let { onPlayerExitTrigger(player, it) }
         if (newTrigger != null) {
-            onPlayerEnterTrigger(player, newTrigger)
             playerTriggers[player.uniqueId] = newTrigger.id
+            onPlayerEnterTrigger(player, newTrigger)
         } else {
             playerTriggers.remove(player.uniqueId)
         }
@@ -369,7 +374,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         if (!isInGame) return
         val loc = player.location
         val oldTrigger = playerTriggers[player.uniqueId]
-            ?.let { dungeon.triggers[it] }
+            ?.let(dungeon.triggers::get)
         checkTriggers(
             player,
             loc.blockX,
@@ -384,8 +389,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         onAllKilled: (DungeonInstance) -> Unit
     ) {
         val mobUuids = mobs.mapNotNull {
-            val aa = dungeon.activeAreas[it.activeAreaId] ?: error("Active area not found")
-            spawnMob(it.isMythic, it.mob, aa.getRandomLocationOnFloor(this))
+            val sa = dungeon.spawnAreas[it.spawnAreaId] ?: error("Spawn area not found")
+            spawnMob(it.isMythic, it.mob, sa.getRandomLocationOnFloor(this))
         }.toMutableList()
         val obj = combatObjectiveFactory.create(this, mobUuids, onAllKilled)
         mobUuids.forEach {

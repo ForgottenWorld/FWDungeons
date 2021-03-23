@@ -9,6 +9,7 @@ import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestLabel
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestList
 import it.forgottenworld.dungeons.core.command.edit.chest.CmdChestRemove
 import it.forgottenworld.dungeons.core.command.edit.dungeon.*
+import it.forgottenworld.dungeons.core.command.edit.spawnarea.*
 import it.forgottenworld.dungeons.core.command.edit.trigger.*
 import it.forgottenworld.dungeons.core.command.edit.unlockables.CmdUnlockablesBindPlate
 import it.forgottenworld.dungeons.core.command.edit.unlockables.CmdUnlockablesLookupPlate
@@ -22,6 +23,13 @@ class FWDungeonsEditCommand @Inject constructor(
     cmdActiveAreaWand: CmdActiveAreaWand,
     cmdActiveAreaList: CmdActiveAreaList,
     cmdActiveAreaHl: CmdActiveAreaHl,
+    cmdSpawnAreaPos1: CmdSpawnAreaPos1,
+    cmdSpawnAreaPos2: CmdSpawnAreaPos2,
+    cmdSpawnAreaUnmake: CmdSpawnAreaUnmake,
+    cmdSpawnAreaLabel: CmdSpawnAreaLabel,
+    cmdSpawnAreaWand: CmdSpawnAreaWand,
+    cmdSpawnAreaList: CmdSpawnAreaList,
+    cmdSpawnAreaHl: CmdSpawnAreaHl,
     cmdTriggerPos1: CmdTriggerPos1,
     cmdTriggerPos2: CmdTriggerPos2,
     cmdTriggerUnmake: CmdTriggerUnmake,
@@ -29,7 +37,6 @@ class FWDungeonsEditCommand @Inject constructor(
     cmdTriggerWand: CmdTriggerWand,
     cmdTriggerList: CmdTriggerList,
     cmdTriggerHl: CmdTriggerHl,
-    cmdTriggerCode: CmdTriggerCode,
     cmdChestAdd: CmdChestAdd,
     cmdChestRemove: CmdChestRemove,
     cmdChestLabel: CmdChestLabel,
@@ -69,6 +76,16 @@ class FWDungeonsEditCommand @Inject constructor(
         }.bindTo("activearea", "aa")
 
         branchingCommand {
+            "pos1" += cmdSpawnAreaPos1
+            "pos2" += cmdSpawnAreaPos2
+            "unmake" += cmdSpawnAreaUnmake
+            "label" += cmdSpawnAreaLabel
+            "wand" += cmdSpawnAreaWand
+            "list" += cmdSpawnAreaList
+            "hl" += cmdSpawnAreaHl
+        }.bindTo("spawnarea", "sa")
+
+        branchingCommand {
             "pos1" += cmdTriggerPos1
             "pos2" += cmdTriggerPos2
             "unmake" += cmdTriggerUnmake
@@ -76,7 +93,6 @@ class FWDungeonsEditCommand @Inject constructor(
             "wand" += cmdTriggerWand
             "list" += cmdTriggerList
             "hl" += cmdTriggerHl
-            "code" += cmdTriggerCode
         }.bindTo("trigger", "t")
 
         branchingCommand {

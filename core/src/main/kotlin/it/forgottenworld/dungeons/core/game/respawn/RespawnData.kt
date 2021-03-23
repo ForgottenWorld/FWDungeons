@@ -12,6 +12,7 @@ data class RespawnData(
     val worldId: UUID,
     val position: Vector3i
 ) {
+
     val location get() = position.locationInWorld(Bukkit.getWorld(worldId))
 
     fun useWithPlayer(player: Player) {
@@ -20,7 +21,7 @@ data class RespawnData(
     }
 
     companion object {
-        val Player.currentWarpbackData: RespawnData
+        val Player.currentRespawnData: RespawnData
             get() {
                 val loc = location
                 return RespawnData(

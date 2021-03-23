@@ -7,7 +7,6 @@ interface TriggerFactory {
     fun create(
         id: Int,
         box: Box,
-        effectCode: List<String> = listOf(),
         requiresWholeParty: Boolean = false,
         label: String? = null
     ): Trigger

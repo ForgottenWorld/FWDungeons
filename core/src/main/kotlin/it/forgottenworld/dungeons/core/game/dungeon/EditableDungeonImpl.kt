@@ -9,6 +9,7 @@ import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -16,11 +17,12 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerFactory
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -46,9 +48,11 @@ class EditableDungeonImpl @AssistedInject constructor(
     @Assisted override var finalInstanceLocations: MutableList<Vector3i> = mutableListOf(),
     @Assisted triggers: Map<Int, Trigger> = mutableMapOf(),
     @Assisted activeAreas: Map<Int, ActiveArea> = mutableMapOf(),
+    @Assisted spawnAreas: Map<Int, SpawnArea> = mutableMapOf(),
     @Assisted override val chests: MutableMap<Int, Chest> = mutableMapOf(),
     private val activeAreaFactory: ActiveAreaFactory,
     private val triggerFactory: TriggerFactory,
+    private val spawnAreaFactory: SpawnAreaFactory,
     private val plugin: FWDungeonsPlugin,
     private val configuration: Configuration,
     private val namespacedKeys: NamespacedKeys,
@@ -64,6 +68,7 @@ class EditableDungeonImpl @AssistedInject constructor(
         @Assisted dungeon: Dungeon,
         activeAreaFactory: ActiveAreaFactory,
         triggerFactory: TriggerFactory,
+        spawnAreaFactory: SpawnAreaFactory,
         plugin: FWDungeonsPlugin,
         configuration: Configuration,
         namespacedKeys: NamespacedKeys,
@@ -89,9 +94,11 @@ class EditableDungeonImpl @AssistedInject constructor(
             .toMutableList(),
         dungeon.triggers,
         dungeon.activeAreas,
+        dungeon.spawnAreas,
         dungeon.chests.toMutableMap(),
         activeAreaFactory,
         triggerFactory,
+        spawnAreaFactory,
         plugin,
         configuration,
         namespacedKeys,
@@ -123,15 +130,23 @@ class EditableDungeonImpl @AssistedInject constructor(
             updateActiveAreaParticleSpammers(value.values)
         }
 
+    override var spawnAreas = spawnAreas
+        private set(value) {
+            field = value
+            updateSpawnAreaParticleSpammers(value.values)
+        }
+
     override val dungeonBoxBuilder = Box.Builder()
     override val triggerBoxBuilder = Box.Builder()
     override val activeAreaBoxBuilder = Box.Builder()
+    override val spawnAreaBoxBuilder = Box.Builder()
 
     override val hasTestOrigin get() = this::testOrigin.isInitialized
 
     private var hlFrames = false
     private var triggerParticleSpammer: ParticleSpammer? = null
     private var activeAreaParticleSpammer: ParticleSpammer? = null
+    private var spawnAreaParticleSpammer: ParticleSpammer? = null
 
     override fun finalize(): FinalDungeon {
         if (id == EditableDungeon.NEW_DUNGEON_TEMP_ID) {
@@ -170,17 +185,20 @@ class EditableDungeonImpl @AssistedInject constructor(
         when (type) {
             InteractiveRegion.Type.TRIGGER -> labelTrigger(label, id)
             InteractiveRegion.Type.ACTIVE_AREA -> labelActiveArea(label, id)
+            InteractiveRegion.Type.SPAWN_AREA -> labelSpawnArea(label, id)
         }
     }
 
     override fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) = when (type) {
         InteractiveRegion.Type.TRIGGER -> unmakeTrigger(ieId)
         InteractiveRegion.Type.ACTIVE_AREA -> unmakeActiveArea(ieId)
+        InteractiveRegion.Type.SPAWN_AREA -> unmakeSpawnArea(ieId)
     }
 
     override fun newInteractiveRegion(type: InteractiveRegion.Type, box: Box) = when (type) {
         InteractiveRegion.Type.TRIGGER -> newTrigger(box)
         InteractiveRegion.Type.ACTIVE_AREA -> newActiveArea(box)
+        InteractiveRegion.Type.SPAWN_AREA -> newSpawnArea(box)
     }
 
     private fun newActiveArea(box: Box): Int {
@@ -241,6 +259,57 @@ class EditableDungeonImpl @AssistedInject constructor(
         }
     }
 
+    private fun newSpawnArea(box: Box): Int {
+        val id = spawnAreas.keys.firstGap()
+        val world = configuration.dungeonWorld
+        val heightMap = Array(box.width) { x ->
+            IntArray(box.depth) { z ->
+                for (y in 0..box.height) {
+                    val (oX,oY,oZ) = box.origin + Vector3i(x,y,z)
+
+                    val firstFree = !world
+                        .getBlockAt(oX, oY, oZ)
+                        .boundingBox
+                        .contains(oX + 0.5, oY + 0.5, oZ + 0.5)
+
+                    val secondFree = firstFree && !world
+                        .getBlockAt(oX, oY + 1, oZ)
+                        .boundingBox
+                        .contains(oX + 0.5, oY + 1.5, oZ + 0.5)
+
+                    if (secondFree) return@IntArray y
+                }
+                -1
+            }
+        }
+
+        val spawnArea = spawnAreaFactory.create(
+            id,
+            box.withContainerOriginZero(testOrigin),
+            heightMap
+        )
+
+        highlightNewInteractiveRegion(spawnArea)
+        spawnAreas = spawnAreas.plus(id to spawnArea)
+        return id
+    }
+
+    private fun unmakeSpawnArea(saId: Int?) =
+        if (saId == null) {
+            spawnAreas.keys.last().also { spawnAreas = spawnAreas.minus(it) }
+        } else {
+            spawnAreas = spawnAreas - saId
+            saId
+        }
+
+    private fun labelSpawnArea(label: String, id: Int) {
+        if (id == -1) {
+            spawnAreas.values.lastOrNull()?.label = label
+        } else {
+            spawnAreas[id]?.label = label
+        }
+    }
+
     private fun newTrigger(box: Box): Int {
         val id = triggers.keys.firstGap()
         val trigger = triggerFactory.create(id, box.withContainerOriginZero(testOrigin))
@@ -292,6 +361,7 @@ class EditableDungeonImpl @AssistedInject constructor(
         if (startingLocation == null) append(Strings.WIM_STARTING_LOCATION)
         if (triggers.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_TRIGGER)
         if (activeAreas.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_ACTIVE_AREA)
+        if (spawnAreas.isEmpty()) append(Strings.WIM_AT_LEAST_ONE_SPAWN_AREA)
     }.toString().dropLast(2)
 
     private fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
@@ -311,6 +381,12 @@ class EditableDungeonImpl @AssistedInject constructor(
         activeAreaParticleSpammer?.stop()
         if (!hlFrames) return
         activeAreaParticleSpammer = getFrameParticleSpammer(Particle.DRIP_WATER, newActiveAreas)
+    }
+
+    private fun updateSpawnAreaParticleSpammers(newSpawnAreas: Collection<SpawnArea>) {
+        spawnAreaParticleSpammer?.stop()
+        if (!hlFrames) return
+        spawnAreaParticleSpammer = getFrameParticleSpammer(Particle.DRIPPING_OBSIDIAN_TEAR, newSpawnAreas)
     }
 
     private fun getFrameParticleSpammer(
@@ -334,6 +410,7 @@ class EditableDungeonImpl @AssistedInject constructor(
         if (!hlFrames) return
         updateTriggerParticleSpammers(triggers.values)
         updateActiveAreaParticleSpammers(activeAreas.values)
+        updateSpawnAreaParticleSpammers(spawnAreas.values)
     }
 
     private fun stopParticleSpammers() {
@@ -341,6 +418,8 @@ class EditableDungeonImpl @AssistedInject constructor(
         triggerParticleSpammer = null
         activeAreaParticleSpammer?.stop()
         activeAreaParticleSpammer = null
+        spawnAreaParticleSpammer?.stop()
+        spawnAreaParticleSpammer = null
     }
 
     override fun toggleEditorHighlights() {
@@ -369,10 +448,21 @@ class EditableDungeonImpl @AssistedInject constructor(
             .get(namespacedKeys.activeAreaTool, PersistentDataType.SHORT)
             ?.toShort() == 1.toShort()
 
-        if (!isTriggerWand && !isActiveAreaWand) return
+        val isSpawnAreaWand = !isActiveAreaWand && persistentDataContainer
+            .get(namespacedKeys.spawnAreaTool, PersistentDataType.SHORT)
+            ?.toShort() == 1.toShort()
+
+        if (!isTriggerWand && !isActiveAreaWand && !isSpawnAreaWand) return
         event.isCancelled = true
 
-        val cmd = "fwde ${if (isTriggerWand) "trigger" else "activearea"} pos$posNo"
+        val cmd = "fwde ${
+            when {
+                isTriggerWand -> "trigger"
+                isActiveAreaWand -> "activearea"
+                isSpawnAreaWand -> "spawnarea"
+                else -> return
+            }
+        } pos$posNo"
 
         event.player.performCommand(cmd)
     }

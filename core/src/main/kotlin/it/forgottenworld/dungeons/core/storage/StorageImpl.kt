@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.core.config
+package it.forgottenworld.dungeons.core.storage
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -6,6 +6,7 @@ import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
@@ -19,6 +20,7 @@ import it.forgottenworld.dungeons.core.game.chest.ChestStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceStorageStrategy
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaStorageStrategy
+import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaStorageStrategy
 import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerStorageStrategy
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableSeriesStorageStrategy
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableStorageStrategy
@@ -37,12 +39,14 @@ class StorageImpl @Inject constructor(
     dungeonInstanceStorageStrategy: DungeonInstanceStorageStrategy,
     boxStorageStrategy: BoxStorageStrategy,
     vector3iStorageStrategy: Vector3iStorageStrategy,
+    spawnAreaStorageStrategy: SpawnAreaStorageStrategy,
     private val plugin: FWDungeonsPlugin
 ) : Storage {
 
     private val storageStragies = mapOf<KClass<*>, Storage.StorageStrategy<*>>(
         FinalDungeon::class to finalDungeonStorageStrategy,
         ActiveArea::class to activeAreaStorageStrategy,
+        SpawnArea::class to spawnAreaStorageStrategy,
         Trigger::class to triggerStorageStrategy,
         Chest::class to chestStorageStrategy,
         Unlockable::class to unlockableStorageStrategy,
@@ -73,12 +77,42 @@ class StorageImpl @Inject constructor(
         if (!exists()) createNewFile()
     }
 
-    override val dungeonFiles get() = dungeonsDirectory
-        .listFiles()!!
-        .filter { it.extension == "yml" }
+    private var _dungeonDataFolders: Map<Int, File>? = null
 
-    override fun getFileForDungeon(dungeon: FinalDungeon) =
-        File(dungeonsDirectory,"${dungeon.id}.yml")
+    override val dungeonDataFolders: Map<Int, File>
+        get() {
+            _dungeonDataFolders?.let { return it }
+            _dungeonDataFolders = dungeonsDirectory
+                .listFiles()!!
+                .filter { file -> file.isDirectory &&
+                    file.name.startsWith("dungeon_") &&
+                    file.listFiles()?.all {
+                        it.name == "config.yml" || it.extension == "dgs"
+                    } == true
+                }.associateBy {
+                    it.name.removePrefix("dungeon_").toInt()
+                }
+            return _dungeonDataFolders!!
+        }
+
+    override fun resetDungeonFolders() {
+        _dungeonDataFolders = null
+    }
+
+    override fun getConfigFileForDungeon(dungeon: FinalDungeon): File {
+        val folder = dungeonDataFolders[dungeon.id] ?: run {
+            val newFolder = File(dungeonsDirectory, "dungeon_${dungeon.id}")
+            newFolder.mkdir()
+            resetDungeonFolders()
+            newFolder
+        }
+        return File(folder,"config.yml")
+    }
+
+    override fun getScriptFilesForDungeon(dungeon: FinalDungeon) = dungeonDataFolders[dungeon.id]
+        ?.listFiles()
+        ?.filter { it.extension == "dgs" }
+        ?: listOf()
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Storage.Storable> load(klass: KClass<T>, config: ConfigurationSection): T =

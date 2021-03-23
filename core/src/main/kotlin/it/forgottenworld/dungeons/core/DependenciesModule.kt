@@ -11,16 +11,22 @@ import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.config.StorageImpl
-import it.forgottenworld.dungeons.core.game.dungeon.*
+import it.forgottenworld.dungeons.core.storage.StorageImpl
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonFactory
+import it.forgottenworld.dungeons.core.game.dungeon.DungeonManagerImpl
+import it.forgottenworld.dungeons.core.game.dungeon.EditableDungeonImpl
+import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonImpl
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaImpl
+import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaFactory
+import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaImpl
 import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerImpl
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
@@ -51,6 +57,12 @@ class DependenciesModule(private val plugin: FWDungeonsPlugin) : AbstractModule(
             FactoryModuleBuilder()
                 .implement(ActiveArea::class.java, ActiveAreaImpl::class.java)
                 .build(ActiveAreaFactory::class.java)
+        )
+
+        install(
+            FactoryModuleBuilder()
+                .implement(SpawnArea::class.java, SpawnAreaImpl::class.java)
+                .build(SpawnAreaFactory::class.java)
         )
 
         install(

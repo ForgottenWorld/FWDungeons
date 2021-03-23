@@ -2,8 +2,8 @@ package it.forgottenworld.dungeons.core.game.detection
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.core.config.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -60,7 +60,8 @@ class BypassAttemptHandler @Inject constructor(
     private val bannedPotionEffects = setOf(
         PotionEffectType.JUMP,
         PotionEffectType.SPEED,
-        PotionEffectType.LEVITATION
+        PotionEffectType.LEVITATION,
+        PotionEffectType.SLOW_FALLING
     )
 
     private val checkedCauses = setOf(

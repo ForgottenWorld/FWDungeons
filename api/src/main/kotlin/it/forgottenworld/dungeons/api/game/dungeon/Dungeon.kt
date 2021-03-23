@@ -2,6 +2,7 @@ package it.forgottenworld.dungeons.api.game.dungeon
 
 import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -19,6 +20,7 @@ interface Dungeon : Storage.Storable {
     val startingLocation: Vector3i?
     val triggers: Map<Int, Trigger>
     val activeAreas: Map<Int, ActiveArea>
+    val spawnAreas: Map<Int, SpawnArea>
     val chests: Map<Int, Chest>
 
     enum class Difficulty {

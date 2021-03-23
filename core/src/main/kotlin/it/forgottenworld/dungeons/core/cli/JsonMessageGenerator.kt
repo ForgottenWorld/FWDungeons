@@ -1,7 +1,7 @@
 package it.forgottenworld.dungeons.core.cli
 
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.jsonMessage
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent

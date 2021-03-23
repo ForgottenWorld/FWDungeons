@@ -3,8 +3,8 @@ package it.forgottenworld.dungeons.core.integrations
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import it.forgottenworld.echelonapi.FWEchelon
@@ -35,7 +35,8 @@ class FWEchelonUtils @Inject constructor(
 
         sendConsoleMessage(" -- FWEchelon §2is present")
 
-        FWEchelon.api
+        FWEchelon
+            .api
             .mutexActivityService
             .registerMutexActivity(FWDungeonsMutexActivity())
 

@@ -4,16 +4,16 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.ACTIVE_AREA
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.TRIGGER
+import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.*
 import it.forgottenworld.dungeons.api.math.Vector3i
-import it.forgottenworld.dungeons.core.config.Configuration
-import it.forgottenworld.dungeons.core.config.Strings
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
 import it.forgottenworld.dungeons.core.utils.ParticleSpammer
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -29,12 +29,14 @@ class InteractiveRegionCommandHelper @Inject constructor(
     private val Type.singular
         get() = when (this) {
             ACTIVE_AREA -> "active area"
+            SPAWN_AREA -> "spawn area"
             TRIGGER -> "trigger"
         }
 
     private val Type.plural
         get() = when (this) {
             ACTIVE_AREA -> Strings.ACTIVE_AREAS
+            SPAWN_AREA -> Strings.SPAWN_AREAS
             TRIGGER -> Strings.TRIGGERS
         }
 
@@ -66,10 +68,10 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        val builder = if (type == TRIGGER) {
-            dungeon.triggerBoxBuilder
-        } else {
-            dungeon.activeAreaBoxBuilder
+        val builder = when (type) {
+            TRIGGER -> dungeon.triggerBoxBuilder
+            ACTIVE_AREA -> dungeon.activeAreaBoxBuilder
+            SPAWN_AREA -> dungeon.spawnAreaBoxBuilder
         }
 
         if (posNo == 1) {
@@ -83,7 +85,11 @@ class InteractiveRegionCommandHelper @Inject constructor(
             sender.sendPrefixedMessage(
                 Strings.NTH_POS_SET_PICK_ANOTHER,
                 if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                if (type == TRIGGER) "t" else "aa",
+                when (type) {
+                    TRIGGER -> "t"
+                    ACTIVE_AREA -> "aa"
+                    SPAWN_AREA -> "sa"
+                },
                 if (posNo == 1) 2 else 1
             )
             return
@@ -111,7 +117,10 @@ class InteractiveRegionCommandHelper @Inject constructor(
 
         if (type == TRIGGER &&
             dungeon.triggers.isEmpty() ||
-            type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
+            type == ACTIVE_AREA &&
+            dungeon.activeAreas.isEmpty() ||
+            type == SPAWN_AREA &&
+            dungeon.spawnAreas.isEmpty()
         ) {
             sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
             return
@@ -131,8 +140,12 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        if (type == TRIGGER && dungeon.triggers.isEmpty() ||
-            type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
+        if (type == TRIGGER &&
+            dungeon.triggers.isEmpty() ||
+            type == ACTIVE_AREA &&
+            dungeon.activeAreas.isEmpty() ||
+            type == SPAWN_AREA &&
+            dungeon.spawnAreas.isEmpty()
         ) {
             sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
             return
@@ -152,14 +165,22 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        if (type == TRIGGER && dungeon.triggers.isEmpty() ||
-            type == ACTIVE_AREA && dungeon.activeAreas.isEmpty()
+        if (type == TRIGGER &&
+            dungeon.triggers.isEmpty() ||
+            type == ACTIVE_AREA &&
+            dungeon.activeAreas.isEmpty() ||
+            type == SPAWN_AREA &&
+            dungeon.spawnAreas.isEmpty()
         ) {
             sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
             return
         }
 
-        val regions = if (type == TRIGGER) dungeon.triggers else dungeon.activeAreas
+        val regions = when (type) {
+            TRIGGER -> dungeon.triggers
+            ACTIVE_AREA -> dungeon.activeAreas
+            SPAWN_AREA -> dungeon.spawnAreas
+        }
         if (!dungeon.hasTestOrigin) return
         val region = regions[ieId] ?: return
 
@@ -179,8 +200,22 @@ class InteractiveRegionCommandHelper @Inject constructor(
             sender.sendPrefixedMessage(Strings.MAIN_HAND_MUST_BE_EMPTY)
             return
         }
-        val material = if (type == TRIGGER) Material.GOLDEN_HOE else Material.GOLDEN_SHOVEL
-        val nsk = if (type == TRIGGER) namespacedKeys.triggerTool else namespacedKeys.activeAreaTool
+        val material: Material
+        val nsk: NamespacedKey
+        when (type) {
+            TRIGGER -> {
+                material = Material.GOLDEN_HOE
+                nsk = namespacedKeys.triggerTool
+            }
+            ACTIVE_AREA -> {
+                material = Material.GOLDEN_SHOVEL
+                nsk = namespacedKeys.activeAreaTool
+            }
+            SPAWN_AREA -> {
+                material = Material.CARROT_ON_A_STICK
+                nsk = namespacedKeys.spawnAreaTool
+            }
+        }
         val itemStack = ItemStack(material, 1).apply {
             itemMeta = itemMeta.apply {
                 persistentDataContainer.set(nsk, PersistentDataType.SHORT, 1)

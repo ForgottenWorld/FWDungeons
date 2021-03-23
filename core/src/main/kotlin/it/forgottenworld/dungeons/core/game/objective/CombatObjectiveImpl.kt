@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
-import org.bukkit.Bukkit.getEntity
+import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import java.util.*
 
@@ -20,8 +20,7 @@ class CombatObjectiveImpl @Inject constructor(
     override fun onMobKilled(uuid: UUID) {
         mobsToKill.remove(uuid)
         combatObjectiveManager.setEntityCombatObjective(uuid, null)
-        if (mobsToKill.isNotEmpty()) return
-        if (aborting) return
+        if (mobsToKill.isNotEmpty() || aborting) return
         onAllKilled(instance)
         instance.instanceObjectives.remove(this)
     }
@@ -29,7 +28,7 @@ class CombatObjectiveImpl @Inject constructor(
     override fun abort() {
         aborting = true
         mobsToKill
-            .map { getEntity(it) }
+            .map(Bukkit::getEntity)
             .filterIsInstance<LivingEntity>()
             .forEach { it.health = 0.0 }
     }

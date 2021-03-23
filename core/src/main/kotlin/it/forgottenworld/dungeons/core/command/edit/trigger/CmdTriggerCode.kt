@@ -1,13 +1,6 @@
-package it.forgottenworld.dungeons.core.command.edit.trigger
+// package it.forgottenworld.dungeons.core.command.edit.trigger
 
-import com.google.inject.Inject
-import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.config.Strings
-import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.scripting.CodeParser
-import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
-import org.bukkit.entity.Player
-
+/*
 class CmdTriggerCode @Inject constructor(
     private val codeParser: CodeParser,
     private val dungeonManager: DungeonManager
@@ -36,4 +29,4 @@ class CmdTriggerCode @Inject constructor(
 
         return true
     }
-}
+}*/
