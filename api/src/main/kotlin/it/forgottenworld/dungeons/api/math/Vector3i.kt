@@ -44,6 +44,12 @@ data class Vector3i(
         max(z, other.z)
     )
 
+    operator fun plus(other: Vector3i) = Vector3i(
+        x + other.x,
+        y + other.y,
+        z + other.z
+    )
+
     fun withRefSystemOrigin(
         oldOrigin: Vector3i,
         newOrigin: Vector3i

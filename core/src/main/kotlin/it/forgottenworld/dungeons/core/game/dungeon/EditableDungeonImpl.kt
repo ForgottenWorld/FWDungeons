@@ -17,12 +17,12 @@ import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
-import it.forgottenworld.dungeons.core.storage.Configuration
-import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaFactory
 import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerFactory
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -265,17 +265,19 @@ class EditableDungeonImpl @AssistedInject constructor(
         val heightMap = Array(box.width) { x ->
             IntArray(box.depth) { z ->
                 for (y in 0..box.height) {
-                    if (world.getBlockAt(
-                            box.origin.x + x,
-                            box.origin.y + y,
-                            box.origin.z + z
-                        ).isPassable &&
-                        world.getBlockAt(
-                            box.origin.x + x,
-                            box.origin.y + y + 1,
-                            box.origin.z + z
-                        ).isPassable
-                    ) return@IntArray y
+                    val (oX,oY,oZ) = box.origin + Vector3i(x,y,z)
+
+                    val firstFree = !world
+                        .getBlockAt(oX, oY, oZ)
+                        .boundingBox
+                        .contains(oX + 0.5, oY + 0.5, oZ + 0.5)
+
+                    val secondFree = firstFree && !world
+                        .getBlockAt(oX, oY + 1, oZ)
+                        .boundingBox
+                        .contains(oX + 0.5, oY + 1.5, oZ + 0.5)
+
+                    if (secondFree) return@IntArray y
                 }
                 -1
             }

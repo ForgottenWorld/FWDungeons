@@ -56,13 +56,13 @@ class DungeonListGuiGenerator @Inject constructor(
         if (page > 0) {
             +pageClickable("<<<<", page - 1)
         } else {
-            +"§8======="
+            +"§8========"
         }
         +"§8====================================="
         if (page < dungeonManager.finalDungeonCount - 1) {
             +pageClickable(">>>>", page + 1)
         } else {
-            +"§8======="
+            +"§8========"
         }
     }
 

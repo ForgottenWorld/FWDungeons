@@ -23,18 +23,6 @@ class DungeonElementGuiGenerator {
         +"§c X "
         +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${interactiveEl.id}")
         +"§f]"
-        /*
-        if (interactiveEl is Trigger) {
-            +" §f["
-            if (interactiveEl.effectCode.isEmpty()) {
-                +"§7 NO CODE "
-            } else {
-                +"§d SHOW CODE "
-                +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde trigger code ${interactiveEl.id}")
-            }
-            +"§f]"
-        }
-        */
         +"\n"
     }
 
@@ -68,7 +56,7 @@ class DungeonElementGuiGenerator {
             +pageClickable(">>>>", page + 1, type)
             +"§8 ]="
         } else {
-            +"§8======="
+            +"§8========"
         }
     }
 

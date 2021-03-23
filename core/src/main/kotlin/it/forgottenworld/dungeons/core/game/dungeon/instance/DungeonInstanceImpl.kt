@@ -12,8 +12,6 @@ import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
-import it.forgottenworld.dungeons.core.storage.Configuration
-import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
@@ -22,6 +20,8 @@ import it.forgottenworld.dungeons.core.game.respawn.RespawnData.Companion.curren
 import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
+import it.forgottenworld.dungeons.core.storage.Configuration
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
 import kotlinx.coroutines.delay
 import org.bukkit.Bukkit
@@ -283,6 +283,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     override fun onPlayerLeave(player: Player) {
         if (isInGame) {
+            player.gameMode = playerRespawnData[player.uniqueId]!!.gameMode
             player.health = 0.0
             return
         }
@@ -362,8 +363,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
         if (oldTrigger?.id == newTrigger?.id) return
         oldTrigger?.let { onPlayerExitTrigger(player, it) }
         if (newTrigger != null) {
-            onPlayerEnterTrigger(player, newTrigger)
             playerTriggers[player.uniqueId] = newTrigger.id
+            onPlayerEnterTrigger(player, newTrigger)
         } else {
             playerTriggers.remove(player.uniqueId)
         }
