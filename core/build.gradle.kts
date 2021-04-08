@@ -15,7 +15,9 @@ dependencies {
     compileOnly(Libs.paper)
     compileOnly(Libs.skedule)
     compileOnly(Libs.coroutinesCore)
-    compileOnly(Libs.mythicMobs)
+    compileOnly(Libs.mythicMobs) {
+        exclude("net.kyori.adventure.text")
+    }
     compileOnly(Libs.easyRanking)
     compileOnly(Libs.fwEchelonApi)
     compileOnly(Libs.vault)

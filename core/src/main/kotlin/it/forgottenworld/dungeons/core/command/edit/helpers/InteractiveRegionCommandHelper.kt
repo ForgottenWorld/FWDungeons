@@ -8,10 +8,10 @@ import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.T
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.storage.Strings
-import it.forgottenworld.dungeons.core.utils.NamespacedKeys
-import it.forgottenworld.dungeons.core.utils.ParticleSpammer
-import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
-import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
+import it.forgottenworld.dungeons.core.utils.*
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -80,16 +80,18 @@ class InteractiveRegionCommandHelper @Inject constructor(
             builder.pos2(Vector3i.ofBlock(block))
         }
 
+        val cmd = when (type) {
+            TRIGGER -> "t"
+            ACTIVE_AREA -> "aa"
+            SPAWN_AREA -> "sa"
+        }
+
         val box = builder.build()
         if (box == null) {
             sender.sendPrefixedMessage(
                 Strings.NTH_POS_SET_PICK_ANOTHER,
                 if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                when (type) {
-                    TRIGGER -> "t"
-                    ACTIVE_AREA -> "aa"
-                    SPAWN_AREA -> "sa"
-                },
+                cmd,
                 if (posNo == 1) 2 else 1
             )
             return
@@ -97,6 +99,14 @@ class InteractiveRegionCommandHelper @Inject constructor(
 
         val id = dungeon.newInteractiveRegion(type, box)
         sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID, type.singular, id)
+        sender.sendJsonMessage {
+            +Component.text(Strings.CLICK, NamedTextColor.WHITE)
+
+            +Component.text(Strings.HERE, NamedTextColor.GOLD)
+            +ClickEvent.suggestCommand("/fwde $cmd label id:$id ")
+
+            +Strings.TO_LABEL_IT
+        }
     }
 
     fun labelInteractiveRegion(

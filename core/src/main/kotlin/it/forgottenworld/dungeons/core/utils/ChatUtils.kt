@@ -1,54 +1,78 @@
 package it.forgottenworld.dungeons.core.utils
 
 import it.forgottenworld.dungeons.core.storage.Strings
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ClickEvent
-import net.md_5.bungee.api.chat.ComponentBuilder
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 
-inline fun Player.sendJsonMessage(build: BaseComponentBuilderScope.() -> Unit) {
-    spigot().sendMessage(*jsonMessage(build))
+inline fun CommandSender.sendJsonMessage(build: BaseComponentBuilderScope.() -> Unit) {
+    (this as Audience).sendMessage(jsonMessage(build))
 }
 
-fun Player.sendJsonMessage(chatComponent: Array<out BaseComponent>) {
-    spigot().sendMessage(*chatComponent)
+fun CommandSender.sendJsonMessage(component: Component) {
+    (this as Audience).sendMessage(component)
 }
 
-inline fun jsonMessage(build: BaseComponentBuilderScope.() -> Unit): Array<BaseComponent> {
-    val builder = ComponentBuilder()
-    BaseComponentBuilderScope(builder).build()
-    return builder.create()
+inline fun jsonMessage(build: BaseComponentBuilderScope.() -> Unit): Component {
+    val scope = BaseComponentBuilderScope()
+    scope.build()
+    return scope.createComponent()
 }
 
-class BaseComponentBuilderScope(
-    private val componentBuilder: ComponentBuilder
-) {
+class BaseComponentBuilderScope {
+    private var component = Component.empty()
+
     operator fun ClickEvent.unaryPlus() {
-        componentBuilder.event(this)
+        component = component.clickEvent(this)
     }
 
-    operator fun ChatColor.unaryPlus() {
-        componentBuilder.color(this)
+    operator fun TextColor.unaryPlus() {
+        component = component.color(this)
     }
 
     operator fun String.unaryPlus() {
-        componentBuilder.append(this)
+        component = component.append(Component.text(this))
     }
 
-    operator fun Array<out BaseComponent>.unaryPlus() {
-        componentBuilder.append(this)
+    operator fun Component.unaryPlus() {
+        component = component.append(this)
     }
+
+    fun createComponent() = component
+}
+
+fun Audience.sendPrefixedMessage(message: String) {
+    sendMessage(
+        TextComponent.ofChildren(
+            Component.text(Strings.CHAT_PREFIX),
+            Component.text(message)
+        )
+    )
+}
+
+fun Audience.sendPrefixedMessage(message: String, vararg params: Any?) {
+    sendMessage(
+        TextComponent.ofChildren(
+            Component.text(Strings.CHAT_PREFIX),
+            Component.text(message.format(*params))
+        )
+    )
 }
 
 fun CommandSender.sendPrefixedMessage(message: String) {
-    sendMessage("${Strings.CHAT_PREFIX}$message")
+    (this as Audience).sendPrefixedMessage(message)
 }
 
 fun CommandSender.sendPrefixedMessage(message: String, vararg params: Any?) {
-    sendMessage("${Strings.CHAT_PREFIX}${message.format(*params)}")
+    (this as Audience).sendPrefixedMessage(message, *params)
+}
+
+fun Collection<CommandSender>.sendPrefixedMessage(message: String) {
+    Audience.audience(map { it as Audience }).sendPrefixedMessage(message)
 }
 
 fun sendConsoleMessage(message: String) {

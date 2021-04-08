@@ -7,8 +7,8 @@ import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.jsonMessage
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ClickEvent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 
 @Singleton
@@ -31,15 +31,12 @@ class DungeonListGuiGenerator @Inject constructor(
             else -> Strings.JOIN
         }
         +when {
-            locked -> ChatColor.GOLD
-            full || inGame -> ChatColor.RED
-            else -> ChatColor.GREEN
+            locked -> NamedTextColor.GOLD
+            full || inGame -> NamedTextColor.RED
+            else -> NamedTextColor.GREEN
         }
         if (!full && !locked && !inGame) {
-            +ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/fwdungeons join ${instance.dungeon.id} ${instance.id}"
-            )
+            +ClickEvent.runCommand("/fwdungeons join ${instance.dungeon.id} ${instance.id}")
         }
         +" §f]"
     }
@@ -47,8 +44,8 @@ class DungeonListGuiGenerator @Inject constructor(
     private fun pageClickable(text: String, page: Int) = jsonMessage {
         +"§8=[ "
         +text
-        +ChatColor.AQUA
-        +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons list $page")
+        +NamedTextColor.AQUA
+        +ClickEvent.runCommand("/fwdungeons list $page")
         +" §8]="
     }
 
@@ -71,9 +68,9 @@ class DungeonListGuiGenerator @Inject constructor(
     private fun coloredDifficulty(difficulty: Dungeon.Difficulty) = jsonMessage {
         +difficulty.toString().toUpperCase()
         +when (difficulty) {
-            Dungeon.Difficulty.EASY -> ChatColor.DARK_GREEN
-            Dungeon.Difficulty.MEDIUM -> ChatColor.GOLD
-            Dungeon.Difficulty.HARD -> ChatColor.DARK_RED
+            Dungeon.Difficulty.EASY -> NamedTextColor.DARK_GREEN
+            Dungeon.Difficulty.MEDIUM -> NamedTextColor.GOLD
+            Dungeon.Difficulty.HARD -> NamedTextColor.DARK_RED
         }
     }
 

@@ -204,12 +204,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
             }
         } else {
             player.sendPrefixedMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
-            players.forEach {
-                Bukkit.getPlayer(it)?.sendPrefixedMessage(
-                    Strings.PLAYER_JOINED_DUNGEON_PARTY,
-                    player.name
-                )
-            }
+            audience.sendPrefixedMessage(Strings.PLAYER_JOINED_DUNGEON_PARTY, player.name)
         }
 
         players.add(player.uniqueId)
@@ -299,18 +294,11 @@ class DungeonInstanceImpl @AssistedInject constructor(
         player.sendPrefixedMessage(Strings.YOU_DIED_IN_THE_DUNGEON)
         respawnManager.setPlayerRespawnData(player.uniqueId, playerRespawnData[player.uniqueId])
         onPlayerRemoved(player)
-        for (uuid in players) {
-            Bukkit.getPlayer(uuid)?.sendPrefixedMessage(
-                Strings.PLAYER_DIED_IN_DUNGEON,
-                player.name
-            )
-        }
+        audience.sendPrefixedMessage(Strings.PLAYER_DIED_IN_DUNGEON, player.name)
     }
 
     override fun onFinishTriggered() {
-        for (uuid in players) {
-            Bukkit.getPlayer(uuid)?.sendPrefixedMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS)
-        }
+        audience.sendPrefixedMessage(Strings.YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS)
         launch {
             delay(5000)
             onInstanceFinish(true)

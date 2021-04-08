@@ -219,4 +219,6 @@ object Strings {
     val YOU_WILL_BE_TPED_SHORTLY by resourceString()
     val YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS by resourceString()
     val YOU_WISH_YOU_COULD by resourceString()
+    val CLICK by resourceString()
+    val TO_LABEL_IT by resourceString()
 }

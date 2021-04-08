@@ -5,8 +5,9 @@ import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.jsonMessage
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ClickEvent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import kotlin.math.floor
 
 @Singleton
@@ -16,25 +17,23 @@ class DungeonElementGuiGenerator {
         interactiveEl: InteractiveRegion,
         type: String
     ) = jsonMessage {
-        +"§f  ["
-        +"§a HL "
-        +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type hl ${interactiveEl.id}")
-        +"§f] ["
-        +"§c X "
-        +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde $type unmake ${interactiveEl.id}")
-        +"§f]"
-        +"\n"
+        +Component.text("  [", NamedTextColor.WHITE)
+        +Component
+            .text(" HL ", NamedTextColor.GREEN)
+            .clickEvent(ClickEvent.runCommand("/fwde $type hl ${interactiveEl.id}"))
+        +Component.text("] [", NamedTextColor.WHITE)
+        +Component
+            .text(" X ", NamedTextColor.RED)
+            .clickEvent(ClickEvent.runCommand("/fwde $type unmake ${interactiveEl.id}"))
+        +Component.text("]\n", NamedTextColor.WHITE)
     }
 
     private fun pageClickable(
         text: String,
         page: Int,
         type: String
-    ) = jsonMessage {
-        +text
-        +ChatColor.AQUA
-        +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeonsedit $type list $page")
-    }
+    ) = Component.text(text, NamedTextColor.AQUA)
+        .clickEvent(ClickEvent.runCommand("/fwdungeonsedit $type list $page"))
 
     private fun paginator(
         page: Int,
@@ -78,7 +77,7 @@ class DungeonElementGuiGenerator {
 
         for ((k, v) in activeAreas) {
             +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
-            +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde aa label id:${v.id} ")
+            +ClickEvent.suggestCommand("/fwde aa label id:${v.id} ")
             +interactiveRegionClickables(v, "aa")
         }
 
@@ -104,7 +103,7 @@ class DungeonElementGuiGenerator {
 
         for ((k, v) in spawnAreas) {
             +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
-            +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde sa label id:${v.id} ")
+            +ClickEvent.suggestCommand("/fwde sa label id:${v.id} ")
             +interactiveRegionClickables(v, "sa")
         }
 
@@ -130,12 +129,11 @@ class DungeonElementGuiGenerator {
 
         for ((k, v) in chests) {
             +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
-            +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde c label id:${v.id} ")
+            +ClickEvent.suggestCommand("/fwde c label id:${v.id} ")
             +"§f  ["
             +"§c X "
-            +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwde c remove ${v.id}")
-            +"§f]"
-            +"\n"
+            +ClickEvent.runCommand("/fwde c remove ${v.id}")
+            +"§f]\n"
         }
 
         +"\n".repeat(ITEMS_PER_PAGE - dungeon.activeAreas.size)
@@ -160,7 +158,7 @@ class DungeonElementGuiGenerator {
 
         for ((k, v) in triggers) {
             +"§7>>> §3#$k: §f${v.label ?: "NO LABEL"}"
-            +ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/fwde t label id:${v.id} ")
+            +ClickEvent.suggestCommand("/fwde t label id:${v.id} ")
             +interactiveRegionClickables(v, "t")
         }
 

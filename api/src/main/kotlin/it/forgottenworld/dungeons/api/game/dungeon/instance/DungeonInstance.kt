@@ -5,6 +5,8 @@ import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
+import net.kyori.adventure.audience.Audience
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -28,9 +30,11 @@ interface DungeonInstance : Storage.Storable {
 
     val isTpSafe: Boolean
 
-    fun attachNewObjective(mobs: List<MobSpawnData>, onAllKilled: (DungeonInstance) -> Unit)
-
     val instanceObjectives: MutableList<CombatObjective>
+
+    val audience: Audience get() = Audience.audience(players.mapNotNull { Bukkit.getPlayer(it) as? Audience })
+
+    fun attachNewObjective(mobs: List<MobSpawnData>, onAllKilled: (DungeonInstance) -> Unit)
 
     fun onInstanceFinish(givePoints: Boolean)
 

@@ -3,8 +3,8 @@ package it.forgottenworld.dungeons.core.cli
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.jsonMessage
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ClickEvent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 
 @Singleton
 class JsonMessageGenerator {
@@ -17,27 +17,24 @@ class JsonMessageGenerator {
     ) = jsonMessage {
         +"${Strings.CHAT_PREFIX}${Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(senderName)} "
         +Strings.HERE
-        +ChatColor.GREEN
-        +ClickEvent(
-            ClickEvent.Action.RUN_COMMAND,
-            "/fwdungeons join $dungeonId $instanceId $partyKey"
-        )
+        +NamedTextColor.GREEN
+        +ClickEvent.runCommand("/fwdungeons join $dungeonId $instanceId $partyKey")
         +" §f${Strings.TO_ACCEPT}"
     }
 
     val lockLink by lazy {
         jsonMessage {
             +Strings.HERE
-            +ChatColor.GOLD
-            +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons lock")
+            +NamedTextColor.GOLD
+            +ClickEvent.runCommand("/fwdungeons lock")
         }
     }
 
     val unlockLink by lazy {
         jsonMessage {
             +Strings.HERE
-            +ChatColor.GREEN
-            +ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fwdungeons unlock")
+            +NamedTextColor.GREEN
+            +ClickEvent.runCommand("/fwdungeons unlock")
         }
     }
 

@@ -9,18 +9,31 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 
 interface Dungeon : Storage.Storable {
+
     val id: Int
+
     val name: String
+
     val description: String
+
     val difficulty: Difficulty
+
     val points: Int
+
     val minPlayers: Int
+
     val maxPlayers: Int
+
     val box: Box?
+
     val startingLocation: Vector3i?
+
     val triggers: Map<Int, Trigger>
+
     val activeAreas: Map<Int, ActiveArea>
+
     val spawnAreas: Map<Int, SpawnArea>
+
     val chests: Map<Int, Chest>
 
     enum class Difficulty {

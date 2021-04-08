@@ -25,8 +25,11 @@ class DungeonManagerImpl @Inject constructor(
 ) : DungeonManager {
 
     private val finalDungeons = mutableMapOf<Int, FinalDungeon>()
+
     private val playerEditableDungeons = mutableMapOf<UUID, EditableDungeon>()
+
     private val dungeonInstances = mutableMapOf<Int, MutableMap<Int, DungeonInstance>>()
+
     private val playerInstances = mutableMapOf<UUID, DungeonInstance>()
 
     override val finalDungeonCount get() = finalDungeons.size
