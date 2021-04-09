@@ -44,7 +44,10 @@ class NestableGrid3iToNi(
             )
         )
         nested.add(nestedGrid)
-        values[index1][index2][index3] = intArrayOf(-nested.size)
+        val actualX = (index1 - origin.x) / cellSize
+        val actualY = (index2 - origin.y) / cellSize
+        val actualZ = (index3 - origin.z) / cellSize
+        values[actualX][actualY][actualZ] = intArrayOf(1 - nested.size)
         return nestedGrid
     }
 
@@ -58,7 +61,7 @@ class NestableGrid3iToNi(
         val actualZ = (index3 - origin.z) / cellSize
         val current = values[actualX][actualY][actualZ]
         if (current == null || current[0] >= 0) return current
-        return nested[-current[0]][actualX,actualY,actualZ]
+        return nested[-current[0]][index1,index2,index3]
     }
 
     operator fun set(
@@ -74,7 +77,7 @@ class NestableGrid3iToNi(
         if (current == null || current[0] >= 0){
             values[actualX][actualY][actualZ] = value
         } else {
-            nested[-current[0]][actualX,actualY,actualZ] = value
+            nested[-current[0]][index1,index2,index3] = value
         }
     }
 }

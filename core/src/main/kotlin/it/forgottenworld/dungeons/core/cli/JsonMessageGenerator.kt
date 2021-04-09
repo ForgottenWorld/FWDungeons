@@ -2,7 +2,8 @@ package it.forgottenworld.dungeons.core.cli
 
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.core.storage.Strings
-import it.forgottenworld.dungeons.core.utils.jsonMessage
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 
@@ -14,28 +15,25 @@ class JsonMessageGenerator {
         dungeonId: Int,
         instanceId: Int,
         partyKey: String
-    ) = jsonMessage {
-        +"${Strings.CHAT_PREFIX}${Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(senderName)} "
-        +Strings.HERE
-        +NamedTextColor.GREEN
-        +ClickEvent.runCommand("/fwdungeons join $dungeonId $instanceId $partyKey")
-        +" §f${Strings.TO_ACCEPT}"
-    }
+    ) = TextComponent.ofChildren(
+        Component.text(Strings.CHAT_PREFIX),
+        Component.text(
+            Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(senderName),
+            NamedTextColor.WHITE
+        ),
+        Component.text(Strings.HERE, NamedTextColor.GREEN)
+            .clickEvent(ClickEvent.runCommand("/fwdungeons join $dungeonId $instanceId $partyKey")),
+        Component.text(Strings.TO_ACCEPT, NamedTextColor.WHITE)
+    )
 
     val lockLink by lazy {
-        jsonMessage {
-            +Strings.HERE
-            +NamedTextColor.GOLD
-            +ClickEvent.runCommand("/fwdungeons lock")
-        }
+        Component.text(Strings.HERE, NamedTextColor.GOLD)
+            .clickEvent(ClickEvent.runCommand("/fwdungeons lock"))
     }
 
     val unlockLink by lazy {
-        jsonMessage {
-            +Strings.HERE
-            +NamedTextColor.GREEN
-            +ClickEvent.runCommand("/fwdungeons unlock")
-        }
+        Component.text(Strings.HERE, NamedTextColor.GREEN)
+            .clickEvent(ClickEvent.runCommand("/fwdungeons unlock"))
     }
 
 }

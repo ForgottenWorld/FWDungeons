@@ -23,6 +23,7 @@ class CmdActiveAreaHl @Inject constructor(
             InteractiveRegion.Type.ACTIVE_AREA,
             id
         )
+
         return true
     }
 }

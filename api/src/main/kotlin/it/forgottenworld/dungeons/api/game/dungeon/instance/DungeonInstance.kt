@@ -32,7 +32,7 @@ interface DungeonInstance : Storage.Storable {
 
     val instanceObjectives: MutableList<CombatObjective>
 
-    val audience: Audience get() = Audience.audience(players.mapNotNull { Bukkit.getPlayer(it) as? Audience })
+    val audience: Audience get() = Audience.audience(players.mapNotNull { Bukkit.getPlayer(it) })
 
     fun attachNewObjective(mobs: List<MobSpawnData>, onAllKilled: (DungeonInstance) -> Unit)
 

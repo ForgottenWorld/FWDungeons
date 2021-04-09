@@ -5,8 +5,9 @@ import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.storage.Strings
-import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.entity.Player
 
 class CmdDungeonUnlockParty @Inject constructor(
@@ -22,15 +23,24 @@ class CmdDungeonUnlockParty @Inject constructor(
         }
 
         when {
-            !instance.isLocked -> sender.sendPrefixedMessage(Strings.DUNGEON_PARTY_ALREADY_PUBLIC)
+            !instance.isLocked -> {
+                sender.sendPrefixedMessage(Strings.DUNGEON_PARTY_ALREADY_PUBLIC)
+            }
             sender.uniqueId == instance.leader -> {
                 instance.unlock()
-                sender.sendJsonMessage {
-                    +"${Strings.CHAT_PREFIX}The dungeon party is now public, anyone can join. To make it private, click "
-                    +jsonMessageGenerator.lockLink
-                }
+                sender.sendMessage(
+                    TextComponent.ofChildren(
+                        Component.text(Strings.CHAT_PREFIX),
+                        Component.text(
+                            "The dungeon party is now public, anyone can join. To make it private, click "
+                        ),
+                        jsonMessageGenerator.lockLink
+                    )
+                )
             }
-            else -> sender.sendPrefixedMessage(Strings.ONLY_LEADER_MAY_OPEN_PARTY)
+            else -> {
+                sender.sendPrefixedMessage(Strings.ONLY_LEADER_MAY_OPEN_PARTY)
+            }
         }
 
         return true

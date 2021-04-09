@@ -24,6 +24,8 @@ import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
 import kotlinx.coroutines.delay
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -198,10 +200,13 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
         if (players.isEmpty()) {
             leader = player.uniqueId
-            player.sendJsonMessage {
-                +"${Strings.CHAT_PREFIX}${Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK} "
-                +jsonMessageGenerator.lockLink
-            }
+            player.sendMessage(
+                TextComponent.ofChildren(
+                    Component.text(Strings.CHAT_PREFIX),
+                    Component.text(Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK),
+                    jsonMessageGenerator.lockLink
+                )
+            )
         } else {
             player.sendPrefixedMessage(Strings.YOU_JOINED_DUNGEON_PARTY)
             audience.sendPrefixedMessage(Strings.PLAYER_JOINED_DUNGEON_PARTY, player.name)

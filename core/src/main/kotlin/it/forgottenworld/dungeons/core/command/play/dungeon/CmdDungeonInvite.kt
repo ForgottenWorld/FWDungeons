@@ -6,7 +6,6 @@ import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
-import it.forgottenworld.dungeons.core.utils.sendJsonMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
@@ -36,7 +35,7 @@ class CmdDungeonInvite @Inject constructor(
             return true
         }
 
-        toPlayer.sendJsonMessage(
+        toPlayer.sendMessage(
             jsonMessageGenerator.invitation(
                 sender.name,
                 instance.dungeon.id,

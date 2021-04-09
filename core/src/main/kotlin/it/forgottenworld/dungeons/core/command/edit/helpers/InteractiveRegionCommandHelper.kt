@@ -10,6 +10,7 @@ import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -99,14 +100,14 @@ class InteractiveRegionCommandHelper @Inject constructor(
 
         val id = dungeon.newInteractiveRegion(type, box)
         sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID, type.singular, id)
-        sender.sendJsonMessage {
-            +Component.text(Strings.CLICK, NamedTextColor.WHITE)
-
-            +Component.text(Strings.HERE, NamedTextColor.GOLD)
-            +ClickEvent.suggestCommand("/fwde $cmd label id:$id ")
-
-            +Strings.TO_LABEL_IT
-        }
+        sender.sendMessage(
+            TextComponent.ofChildren(
+                Component.text(Strings.CLICK, NamedTextColor.WHITE),
+                Component.text(Strings.HERE, NamedTextColor.GOLD)
+                    .clickEvent(ClickEvent.suggestCommand("/fwde $cmd label id:$id ")),
+                Component.text(Strings.TO_LABEL_IT)
+            )
+        )
     }
 
     fun labelInteractiveRegion(
@@ -125,14 +126,19 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        if (type == TRIGGER &&
-            dungeon.triggers.isEmpty() ||
-            type == ACTIVE_AREA &&
-            dungeon.activeAreas.isEmpty() ||
-            type == SPAWN_AREA &&
-            dungeon.spawnAreas.isEmpty()
-        ) {
+        val collection = when (type) {
+            TRIGGER -> dungeon.triggers
+            ACTIVE_AREA -> dungeon.activeAreas
+            SPAWN_AREA -> dungeon.spawnAreas
+        }
+
+        if (collection.isEmpty()) {
             sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
+            return
+        }
+
+        if (collection.values.any { it.label.equals(label, ignoreCase = true) }) {
+            sender.sendPrefixedMessage(Strings.LABEL_IS_TAKEN)
             return
         }
 

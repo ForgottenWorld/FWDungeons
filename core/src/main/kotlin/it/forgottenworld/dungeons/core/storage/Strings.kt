@@ -124,6 +124,7 @@ object Strings {
     val INVITE_SENT by resourceString()
     val IN_DUNGEON by resourceString()
     val JOIN by resourceString()
+    val LABEL_IS_TAKEN by resourceString()
     val LABEL_CANNOT_BE_EMPTY by resourceString()
     val LEADERBOARD_DESCR by resourceString()
     val LEADERBOARD_POINTS by resourceString()
