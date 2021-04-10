@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
+import kotlin.math.abs
 
 class BukkitEventListener @Inject constructor(
     private val bypassAttemptHandler: BypassAttemptHandler,
@@ -35,9 +36,9 @@ class BukkitEventListener @Inject constructor(
 
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
-        if (event.from.x == event.to.x &&
-            event.from.y == event.to.y &&
-            event.from.z == event.to.z
+        if (abs(event.from.x - event.to.x) < 0.1 &&
+            abs(event.from.y - event.to.y) < 0.1 &&
+            abs(event.from.z - event.to.z) < 0.1
         ) return
         dungeonManager.getPlayerInstance(event.player.uniqueId)?.onPlayerMove(event.player)
     }

@@ -1,6 +1,6 @@
-package it.forgottenworld.dungeons.core.game.chest
+package it.forgottenworld.dungeons.core.game.dungeon.subelement.chest
 
-import it.forgottenworld.dungeons.api.game.chest.Chest
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
 import it.forgottenworld.dungeons.api.math.Vector3i
 import org.bukkit.Material
 import org.bukkit.World

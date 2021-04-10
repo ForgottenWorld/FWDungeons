@@ -1,4 +1,4 @@
-package it.forgottenworld.dungeons.api.game.interactiveregion
+package it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion
 
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.storage.Storage

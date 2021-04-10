@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.scripting
 
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 
 @Singleton
 class ScriptParser {

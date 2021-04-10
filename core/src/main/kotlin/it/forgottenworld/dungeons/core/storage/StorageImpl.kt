@@ -2,12 +2,12 @@ package it.forgottenworld.dungeons.core.storage
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import it.forgottenworld.dungeons.api.game.chest.Chest
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
-import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
-import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.SpawnArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.unlockables.Unlockable
 import it.forgottenworld.dungeons.api.game.unlockables.UnlockableSeries
 import it.forgottenworld.dungeons.api.math.Box
@@ -16,12 +16,12 @@ import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.math.Vector3iStorageStrategy
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
-import it.forgottenworld.dungeons.core.game.chest.ChestStorageStrategy
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.chest.ChestStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.FinalDungeonStorageStrategy
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceStorageStrategy
-import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaStorageStrategy
-import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaStorageStrategy
-import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerStorageStrategy
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.activearea.ActiveAreaStorageStrategy
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.spawnarea.SpawnAreaStorageStrategy
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.trigger.TriggerStorageStrategy
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableSeriesStorageStrategy
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableStorageStrategy
 import org.bukkit.configuration.ConfigurationSection

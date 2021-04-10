@@ -1,12 +1,12 @@
 package it.forgottenworld.dungeons.core.game.dungeon
 
 import com.google.inject.Inject
-import it.forgottenworld.dungeons.api.game.chest.Chest
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
-import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.SpawnArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage

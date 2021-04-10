@@ -3,13 +3,11 @@ package it.forgottenworld.dungeons.core.command.edit.chest
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.cli.DungeonElementGuiGenerator
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdChestList @Inject constructor(
-    private val dungeonElementGuiGenerator: DungeonElementGuiGenerator,
     private val dungeonManager: DungeonManager
 ) : PlayerCommand() {
 
@@ -20,8 +18,7 @@ class CmdChestList @Inject constructor(
         }
 
         val page = args.getOrNull(0)?.toIntOrNull() ?: 0
-        val message = dungeonElementGuiGenerator.showChests(dungeon, page)
-        sender.sendMessage(message)
+        dungeon.showChestsGuiToPlayer(sender, page)
         return true
     }
 }

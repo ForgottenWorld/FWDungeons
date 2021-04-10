@@ -2,25 +2,29 @@ package it.forgottenworld.dungeons.core.game.dungeon
 
 import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
-import it.forgottenworld.dungeons.api.game.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.interactiveregion.ActiveArea
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
-import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.ActiveArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.InteractiveRegion
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.SpawnArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.FWDungeonsPlugin
+import it.forgottenworld.dungeons.core.cli.ActiveAreaPaginatedGui
+import it.forgottenworld.dungeons.core.cli.ChestsPaginatedGui
+import it.forgottenworld.dungeons.core.cli.SpawnAreaPaginatedGui
+import it.forgottenworld.dungeons.core.cli.TriggerPaginatedGui
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.activearea.ActiveAreaFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea.SpawnAreaFactory
-import it.forgottenworld.dungeons.core.game.interactiveregion.trigger.TriggerFactory
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.activearea.ActiveAreaFactory
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.spawnarea.SpawnAreaFactory
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.trigger.TriggerFactory
 import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.*
@@ -148,6 +152,11 @@ class EditableDungeonImpl @AssistedInject constructor(
     private var activeAreaParticleSpammer: ParticleSpammer? = null
     private var spawnAreaParticleSpammer: ParticleSpammer? = null
 
+    private val triggersGui = TriggerPaginatedGui(this)
+    private val activeAreasGui = ActiveAreaPaginatedGui(this)
+    private val spawnAreasGui = SpawnAreaPaginatedGui(this)
+    private val chestsGui = ChestsPaginatedGui(this)
+
     override fun finalize(): FinalDungeon {
         if (id == EditableDungeon.NEW_DUNGEON_TEMP_ID) {
             id = dungeonManager.getFirstAvailableFinalDungeonId()
@@ -187,6 +196,24 @@ class EditableDungeonImpl @AssistedInject constructor(
             InteractiveRegion.Type.ACTIVE_AREA -> labelActiveArea(label, id)
             InteractiveRegion.Type.SPAWN_AREA -> labelSpawnArea(label, id)
         }
+    }
+
+    override fun showChestsGuiToPlayer(player: Player, page: Int) {
+        player.sendMessage(chestsGui.get(page))
+    }
+
+    override fun showInteractiveRegionGuiToPlayer(
+        player: Player,
+        type: InteractiveRegion.Type,
+        page: Int
+    ) {
+        player.sendMessage(
+            when (type) {
+                InteractiveRegion.Type.TRIGGER -> triggersGui.get(page)
+                InteractiveRegion.Type.ACTIVE_AREA -> activeAreasGui.get(page)
+                InteractiveRegion.Type.SPAWN_AREA -> spawnAreasGui.get(page)
+            }
+        )
     }
 
     override fun unmakeInteractiveRegion(type: InteractiveRegion.Type, ieId: Int?) = when (type) {
@@ -365,10 +392,14 @@ class EditableDungeonImpl @AssistedInject constructor(
     }.toString().dropLast(2)
 
     private fun highlightNewInteractiveRegion(interactiveRegion: InteractiveRegion) {
-        ParticleSpammer.highlightBox(
-            interactiveRegion.box.withContainerOrigin(Vector3i.ZERO, testOrigin),
-            configuration.dungeonWorld
-        )
+        val locs = interactiveRegion.box
+            .withContainerOrigin(Vector3i.ZERO, testOrigin)
+            .getCenterOfAllBlocks()
+
+        ParticleSpammer.builder().particle(Particle.COMPOSTER)
+            .locations(locs)
+            .world(configuration.dungeonWorld)
+            .oneShot(20)
     }
 
     private fun updateTriggerParticleSpammers(newTriggers: Collection<Trigger>) {
@@ -393,17 +424,17 @@ class EditableDungeonImpl @AssistedInject constructor(
         particle: Particle,
         regions: Collection<InteractiveRegion>
     ): ParticleSpammer {
+
         val frameBlocks = regions.flatMap {
             val box = it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin)
             it.box.getFrame(box)
         }
-        return ParticleSpammer(
-            particle,
-            1,
-            500,
-            frameBlocks,
-            configuration.dungeonWorld
-        )
+
+        return ParticleSpammer.builder()
+            .particle(particle)
+            .locations(frameBlocks)
+            .world(configuration.dungeonWorld)
+            .build()
     }
 
     private fun updateParticleSpammers() {

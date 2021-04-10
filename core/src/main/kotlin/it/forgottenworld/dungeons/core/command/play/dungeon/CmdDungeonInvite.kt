@@ -2,15 +2,17 @@ package it.forgottenworld.dungeons.core.command.play.dungeon
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
-import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
+import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 class CmdDungeonInvite @Inject constructor(
-    private val jsonMessageGenerator: JsonMessageGenerator,
     private val dungeonManager: DungeonManager
 ) : PlayerCommand() {
 
@@ -36,11 +38,21 @@ class CmdDungeonInvite @Inject constructor(
         }
 
         toPlayer.sendMessage(
-            jsonMessageGenerator.invitation(
-                sender.name,
-                instance.dungeon.id,
-                instance.id,
-                instance.partyKey
+            TextComponent.ofChildren(
+                Component.text(Strings.CHAT_PREFIX),
+                Component.text(
+                    Strings.PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK.format(sender.name),
+                    NamedTextColor.WHITE
+                ),
+                Component.text(Strings.HERE, NamedTextColor.GREEN)
+                    .clickEvent(
+                        ClickEvent.runCommand(
+                            "/fwdungeons join ${instance.dungeon.id} ${instance.id} ${
+                                instance.partyKey
+                            }"
+                        )
+                    ),
+                Component.text(Strings.TO_ACCEPT, NamedTextColor.WHITE)
             )
         )
 

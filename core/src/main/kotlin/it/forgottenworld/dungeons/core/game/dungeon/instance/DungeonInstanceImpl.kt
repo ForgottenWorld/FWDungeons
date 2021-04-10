@@ -6,13 +6,11 @@ import io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.game.objective.CombatObjective
 import it.forgottenworld.dungeons.api.game.objective.MobSpawnData
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.core.cli.JsonMessageGenerator
-import it.forgottenworld.dungeons.core.game.detection.TriggerChecker
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveFactory
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.respawn.RespawnData
@@ -22,10 +20,15 @@ import it.forgottenworld.dungeons.core.integrations.EasyRankingUtils
 import it.forgottenworld.dungeons.core.integrations.FWEchelonUtils
 import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.storage.Strings
-import it.forgottenworld.dungeons.core.utils.*
+import it.forgottenworld.dungeons.core.utils.RandomStringGenerator
+import it.forgottenworld.dungeons.core.utils.firstGap
+import it.forgottenworld.dungeons.core.utils.launch
+import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -43,8 +46,6 @@ class DungeonInstanceImpl @AssistedInject constructor(
     private val configuration: Configuration,
     private val easyRankingUtils: EasyRankingUtils,
     private val fwEchelonUtils: FWEchelonUtils,
-    private val jsonMessageGenerator: JsonMessageGenerator,
-    private val triggerChecker: TriggerChecker,
     private val randomStringGenerator: RandomStringGenerator,
     private val combatObjectiveFactory: CombatObjectiveFactory,
     private val combatObjectiveManager: CombatObjectiveManager,
@@ -60,8 +61,6 @@ class DungeonInstanceImpl @AssistedInject constructor(
         configuration: Configuration,
         easyRankingUtils: EasyRankingUtils,
         fwEchelonUtils: FWEchelonUtils,
-        jsonMessageGenerator: JsonMessageGenerator,
-        triggerChecker: TriggerChecker,
         randomStringGenerator: RandomStringGenerator,
         combatObjectiveFactory: CombatObjectiveFactory,
         combatObjectiveManager: CombatObjectiveManager,
@@ -75,8 +74,6 @@ class DungeonInstanceImpl @AssistedInject constructor(
         configuration,
         easyRankingUtils,
         fwEchelonUtils,
-        jsonMessageGenerator,
-        triggerChecker,
         randomStringGenerator,
         combatObjectiveFactory,
         combatObjectiveManager,
@@ -204,7 +201,8 @@ class DungeonInstanceImpl @AssistedInject constructor(
                 TextComponent.ofChildren(
                     Component.text(Strings.CHAT_PREFIX),
                     Component.text(Strings.DUNGEON_PARTY_CREATED_TO_CLOSE_CLICK),
-                    jsonMessageGenerator.lockLink
+                    Component.text(Strings.HERE, NamedTextColor.GOLD)
+                        .clickEvent(ClickEvent.runCommand("/fwdungeons lock"))
                 )
             )
         } else {
@@ -345,19 +343,30 @@ class DungeonInstanceImpl @AssistedInject constructor(
         z: Int,
         oldTrigger: Trigger?
     ) {
-        val newTrigger = triggerChecker.checkPositionAgainstTriggers(
-            dungeon.triggerGrid,
-            x - origin.x,
-            y - origin.y,
-            z - origin.z,
-            dungeon.triggers
-        )
+        var found: Trigger? = null
 
-        if (oldTrigger?.id == newTrigger?.id) return
+        val oX = x - origin.x
+        val oY = y - origin.y
+        val oZ = z - origin.z
+
+        val triggersInCell = dungeon.triggerGrid[oX,oY,oZ]
+        if (triggersInCell != null) {
+            for (id in triggersInCell) {
+                val trig = dungeon.triggers[id]!!
+                if (trig.containsXYZ(oX, oY, oZ)) {
+                    found = trig
+                    continue
+                }
+            }
+        }
+
+        if (oldTrigger?.id == found?.id) return
+
         oldTrigger?.let { onPlayerExitTrigger(player, it) }
-        if (newTrigger != null) {
-            playerTriggers[player.uniqueId] = newTrigger.id
-            onPlayerEnterTrigger(player, newTrigger)
+
+        if (found != null) {
+            playerTriggers[player.uniqueId] = found.id
+            onPlayerEnterTrigger(player, found)
         } else {
             playerTriggers.remove(player.uniqueId)
         }

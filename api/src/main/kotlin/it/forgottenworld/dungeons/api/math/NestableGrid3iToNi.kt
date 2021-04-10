@@ -24,7 +24,13 @@ class NestableGrid3iToNi(
         for (x in values.indices) {
             for (y in values[0].indices) {
                 for (z in values[0][0].indices) {
-                    res.add(Vector3i(x * cellSize, y * cellSize, z * cellSize))
+                    res.add(
+                        Vector3i(
+                            origin.x + x * cellSize,
+                            origin.y + y * cellSize,
+                            origin.z + z * cellSize
+                        )
+                    )
                 }
             }
         }
@@ -37,17 +43,13 @@ class NestableGrid3iToNi(
             cellSize,
             cellSize,
             cellSize / 2,
-            Vector3i(
-                index1,
-                index2,
-                index3
-            )
+            Vector3i(index1, index2, index3)
         )
         nested.add(nestedGrid)
         val actualX = (index1 - origin.x) / cellSize
         val actualY = (index2 - origin.y) / cellSize
         val actualZ = (index3 - origin.z) / cellSize
-        values[actualX][actualY][actualZ] = intArrayOf(1 - nested.size)
+        values[actualX][actualY][actualZ] = intArrayOf(-nested.size)
         return nestedGrid
     }
 
@@ -61,7 +63,7 @@ class NestableGrid3iToNi(
         val actualZ = (index3 - origin.z) / cellSize
         val current = values[actualX][actualY][actualZ]
         if (current == null || current[0] >= 0) return current
-        return nested[-current[0]][index1,index2,index3]
+        return nested[-current[0] - 1][index1,index2,index3]
     }
 
     operator fun set(
@@ -73,11 +75,6 @@ class NestableGrid3iToNi(
         val actualX = (index1 - origin.x) / cellSize
         val actualY = (index2 - origin.y) / cellSize
         val actualZ = (index3 - origin.z) / cellSize
-        val current = values[actualX][actualY][actualZ]
-        if (current == null || current[0] >= 0){
-            values[actualX][actualY][actualZ] = value
-        } else {
-            nested[-current[0]][index1,index2,index3] = value
-        }
+        values[actualX][actualY][actualZ] = value
     }
 }

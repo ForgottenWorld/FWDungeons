@@ -3,13 +3,12 @@ package it.forgottenworld.dungeons.core.command.edit.spawnarea
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.core.cli.DungeonElementGuiGenerator
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 
 class CmdSpawnAreaList @Inject constructor(
-    private val dungeonElementGuiGenerator: DungeonElementGuiGenerator,
     private val dungeonManager: DungeonManager
 ) : PlayerCommand() {
 
@@ -20,8 +19,7 @@ class CmdSpawnAreaList @Inject constructor(
         }
 
         val page = args.getOrNull(0)?.toIntOrNull() ?: 0
-        val message = dungeonElementGuiGenerator.showSpawnAreas(dungeon, page)
-        sender.sendMessage(message)
+        dungeon.showInteractiveRegionGuiToPlayer(sender, InteractiveRegion.Type.SPAWN_AREA, page)
         return true
     }
 }

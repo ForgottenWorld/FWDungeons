@@ -164,6 +164,7 @@ object Strings {
     val OUTSIDE_OF_DUNGEON_BOX by resourceString()
     val PARTY_HAS_ALREADY_ENTERED_DUNGEON by resourceString()
     val PARTY_NOW_PRIVATE_INVITE_WITH_OPEN_WITH by resourceString()
+    val PARTY_NOW_PUBLIC by resourceString()
     val PLAYERS by resourceString()
     val PLAYER_DIED_IN_DUNGEON by resourceString()
     val PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK by resourceString()
