@@ -2,25 +2,21 @@ package it.forgottenworld.dungeons.core.game.dungeon
 
 import com.google.inject.assistedinject.Assisted
 import com.google.inject.assistedinject.AssistedInject
-import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.Dungeon
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.game.dungeon.EditableDungeon
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
 import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.ActiveArea
 import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.api.storage.Storage
-import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
-import it.forgottenworld.dungeons.api.storage.edit
-import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.game.detection.TriggerGridFactory
 import it.forgottenworld.dungeons.core.game.dungeon.instance.DungeonInstanceFactory
 import it.forgottenworld.dungeons.core.scripting.ScriptParser
 import it.forgottenworld.dungeons.core.storage.Strings
-import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
 import org.bukkit.entity.Player
 import javax.annotation.Nullable
@@ -122,13 +118,8 @@ class FinalDungeonImpl @AssistedInject constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     override fun import(at: Vector3i): Boolean {
         if (dungeonManager.getDungeonInstances(this).isNotEmpty()) return false
-        val file = storage.intancesFile
-        val inst = dungeonInstanceFactory.create(this, at)
-        yaml {
-            load(file)
-            edit { storage.save(inst, section("$id")) }
-            launchAsync { save(file) }
-        }
+        dungeonInstanceFactory.create(this, at)
+        dungeonManager.saveInstancesToStorage()
         return true
     }
 }

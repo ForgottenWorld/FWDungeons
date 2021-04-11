@@ -10,6 +10,7 @@ import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
+import it.forgottenworld.dungeons.api.storage.edit
 import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.yaml
 import it.forgottenworld.dungeons.core.cli.DungeonPaginatedGui
@@ -148,6 +149,22 @@ class DungeonManagerImpl @Inject constructor(
                     )
                     disableDungeon(dungeonId)
                 }
+            }
+        }
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override fun saveInstancesToStorage() {
+        yaml {
+            edit {
+                for ((dungeonId, dungeon) in finalDungeons) {
+                    section("$dungeonId") {
+                        for ((id, inst) in getDungeonInstances(dungeon)) {
+                            storage.save(inst, section("$id"))
+                        }
+                    }
+                }
+                launchAsync { save(storage.intancesFile) }
             }
         }
     }

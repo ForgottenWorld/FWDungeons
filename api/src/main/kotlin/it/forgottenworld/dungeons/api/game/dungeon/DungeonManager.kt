@@ -48,5 +48,7 @@ interface DungeonManager {
 
     fun loadInstancesFromStorage()
 
+    fun saveInstancesToStorage()
+
     fun saveDungeonToStorage(dungeon: FinalDungeon)
 }
