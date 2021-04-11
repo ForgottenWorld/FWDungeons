@@ -426,7 +426,7 @@ class EditableDungeonImpl @AssistedInject constructor(
     ): ParticleSpammer {
 
         val frameBlocks = regions.flatMap {
-            val box = it.box.origin.withRefSystemOrigin(Vector3i.ZERO, testOrigin)
+            val box = it.box.origin.translatePlane(Vector3i.ZERO, testOrigin)
             it.box.getFrame(box)
         }
 

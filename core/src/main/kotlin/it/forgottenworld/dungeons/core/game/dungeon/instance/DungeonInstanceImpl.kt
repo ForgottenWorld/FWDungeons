@@ -112,7 +112,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
 
     private val startingPostion = dungeon
         .startingLocation
-        .withRefSystemOrigin(Vector3i.ZERO, origin)
+        .translatePlane(Vector3i.ZERO, origin)
 
     private fun resetActiveAreas() {
         for (aa in dungeon.activeAreas.values) {
@@ -146,7 +146,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         for (c in dungeon.chests.values) {
             c.clearActualChest(
                 configuration.dungeonWorld,
-                c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
+                c.position.translatePlane(Vector3i.ZERO, origin)
             )
         }
 
@@ -221,7 +221,7 @@ class DungeonInstanceImpl @AssistedInject constructor(
         for (c in dungeon.chests.values) {
             c.fillActualChest(
                 configuration.dungeonWorld,
-                c.position.withRefSystemOrigin(Vector3i.ZERO, origin)
+                c.position.translatePlane(Vector3i.ZERO, origin)
             )
         }
         isTpSafe = false

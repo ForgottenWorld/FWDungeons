@@ -50,7 +50,7 @@ data class Vector3i(
         z + other.z
     )
 
-    fun withRefSystemOrigin(
+    fun translatePlane(
         oldOrigin: Vector3i,
         newOrigin: Vector3i
     ) = Vector3i(

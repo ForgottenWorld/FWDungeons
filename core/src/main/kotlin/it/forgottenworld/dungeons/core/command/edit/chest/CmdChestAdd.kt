@@ -29,7 +29,7 @@ class CmdChestAdd @Inject constructor(
         if (!dungeon.hasTestOrigin) return true
 
         val id = dungeon.chests.keys.firstGap()
-        val loc = Vector3i.ofLocation(block.location).withRefSystemOrigin(Vector3i.ZERO, dungeon.testOrigin)
+        val loc = Vector3i.ofLocation(block.location).translatePlane(dungeon.testOrigin, Vector3i.ZERO)
         dungeon.chests[id] = ChestImpl(id, loc)
         sender.sendPrefixedMessage(Strings.CHEST_ADDED_SUCCESFULLY)
         return true

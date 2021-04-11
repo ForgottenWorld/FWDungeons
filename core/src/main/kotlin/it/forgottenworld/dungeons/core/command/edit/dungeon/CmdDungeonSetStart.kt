@@ -30,7 +30,7 @@ class CmdDungeonSetStart @Inject constructor(
 
         dungeon.startingLocation = Vector3i
             .ofLocation(sender.location)
-            .withRefSystemOrigin(dungeon.testOrigin, Vector3i.ZERO)
+            .translatePlane(dungeon.testOrigin, Vector3i.ZERO)
 
         sender.sendPrefixedMessage(Strings.DUNGEON_STARTPOS_SET)
 
