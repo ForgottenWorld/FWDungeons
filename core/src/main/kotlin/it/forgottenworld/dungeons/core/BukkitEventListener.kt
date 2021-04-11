@@ -1,14 +1,16 @@
 package it.forgottenworld.dungeons.core
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.core.game.detection.BypassAttemptHandler
 import it.forgottenworld.dungeons.core.game.objective.CombatObjectiveManager
 import it.forgottenworld.dungeons.core.game.respawn.RespawnManager
 import it.forgottenworld.dungeons.core.game.unlockables.UnlockableManager
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityPotionEffectEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
@@ -51,7 +53,7 @@ class BukkitEventListener @Inject constructor(
     }
 
     @EventHandler
-    fun onEntityDeath(event: EntityDeathEvent) {
+    fun onEntityRemoveFromWorld(event: EntityRemoveFromWorldEvent) {
         combatObjectiveManager
             .getEntityCombatObjective(event.entity.uniqueId)
             ?.onMobKilled(event.entity.uniqueId)
@@ -71,5 +73,15 @@ class BukkitEventListener @Inject constructor(
     @EventHandler
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
         respawnManager.onPlayerRespawn(event)
+    }
+
+    @EventHandler
+    fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
+        if (event.damager !is Player || event.entity !is Player) return
+        val attackerInstance = dungeonManager.getPlayerInstance(event.damager.uniqueId) ?: return
+        val attackedInstance = dungeonManager.getPlayerInstance(event.entity.uniqueId)
+        if (attackedInstance === attackerInstance) {
+            event.isCancelled = true
+        }
     }
 }
