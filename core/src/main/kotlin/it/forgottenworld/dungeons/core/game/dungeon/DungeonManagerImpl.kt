@@ -12,10 +12,12 @@ import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
 import it.forgottenworld.dungeons.api.storage.read
 import it.forgottenworld.dungeons.api.storage.yaml
+import it.forgottenworld.dungeons.core.cli.DungeonPaginatedGui
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.launchAsync
 import it.forgottenworld.dungeons.core.utils.sendConsoleMessage
+import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
 
@@ -25,9 +27,15 @@ class DungeonManagerImpl @Inject constructor(
 ) : DungeonManager {
 
     private val finalDungeons = mutableMapOf<Int, FinalDungeon>()
+
     private val playerEditableDungeons = mutableMapOf<UUID, EditableDungeon>()
+
     private val dungeonInstances = mutableMapOf<Int, MutableMap<Int, DungeonInstance>>()
+
     private val playerInstances = mutableMapOf<UUID, DungeonInstance>()
+
+    private val dungeonListGui = DungeonPaginatedGui(this)
+
 
     override val finalDungeonCount get() = finalDungeons.size
 
@@ -51,6 +59,10 @@ class DungeonManagerImpl @Inject constructor(
     override fun getAllFinalDungeons() = finalDungeons.values
 
     override fun getAllActiveFinalDungeons() = finalDungeons.values.filter { it.isActive }
+
+    override fun showDungeonListToPlayer(player: Player, page: Int) {
+        player.sendMessage(dungeonListGui.get(page))
+    }
 
     override fun registerFinalDungeon(dungeon: FinalDungeon) {
         finalDungeons[dungeon.id] = dungeon

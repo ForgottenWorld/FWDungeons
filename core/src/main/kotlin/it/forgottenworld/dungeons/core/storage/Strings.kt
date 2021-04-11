@@ -124,6 +124,7 @@ object Strings {
     val INVITE_SENT by resourceString()
     val IN_DUNGEON by resourceString()
     val JOIN by resourceString()
+    val LABEL_IS_TAKEN by resourceString()
     val LABEL_CANNOT_BE_EMPTY by resourceString()
     val LEADERBOARD_DESCR by resourceString()
     val LEADERBOARD_POINTS by resourceString()
@@ -163,6 +164,7 @@ object Strings {
     val OUTSIDE_OF_DUNGEON_BOX by resourceString()
     val PARTY_HAS_ALREADY_ENTERED_DUNGEON by resourceString()
     val PARTY_NOW_PRIVATE_INVITE_WITH_OPEN_WITH by resourceString()
+    val PARTY_NOW_PUBLIC by resourceString()
     val PLAYERS by resourceString()
     val PLAYER_DIED_IN_DUNGEON by resourceString()
     val PLAYER_INVITED_YOU_TO_JOIN_PARTY_CLICK by resourceString()
@@ -219,4 +221,6 @@ object Strings {
     val YOU_WILL_BE_TPED_SHORTLY by resourceString()
     val YOU_WILL_EXIT_THE_DUNGEON_IN_5_SECS by resourceString()
     val YOU_WISH_YOU_COULD by resourceString()
+    val CLICK by resourceString()
+    val TO_LABEL_IT by resourceString()
 }

@@ -4,8 +4,8 @@ import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
 import it.forgottenworld.dungeons.api.math.Vector3i
+import it.forgottenworld.dungeons.core.game.dungeon.subelement.chest.ChestImpl
 import it.forgottenworld.dungeons.core.storage.Strings
-import it.forgottenworld.dungeons.core.game.chest.ChestImpl
 import it.forgottenworld.dungeons.core.utils.firstGap
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
@@ -26,8 +26,11 @@ class CmdChestAdd @Inject constructor(
             return true
         }
 
+        if (!dungeon.hasTestOrigin) return true
+
         val id = dungeon.chests.keys.firstGap()
-        dungeon.chests[id] = ChestImpl(id, Vector3i.ofLocation(block.location))
+        val loc = Vector3i.ofLocation(block.location).translatePlane(dungeon.testOrigin, Vector3i.ZERO)
+        dungeon.chests[id] = ChestImpl(id, loc)
         sender.sendPrefixedMessage(Strings.CHEST_ADDED_SUCCESFULLY)
         return true
     }

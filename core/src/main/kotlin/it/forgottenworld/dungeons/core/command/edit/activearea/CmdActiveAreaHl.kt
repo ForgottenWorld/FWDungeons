@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.command.edit.activearea
 
 import com.google.inject.Inject
 import it.forgottenworld.dungeons.api.command.PlayerCommand
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.core.command.edit.helpers.InteractiveRegionCommandHelper
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
@@ -23,6 +23,7 @@ class CmdActiveAreaHl @Inject constructor(
             InteractiveRegion.Type.ACTIVE_AREA,
             id
         )
+
         return true
     }
 }

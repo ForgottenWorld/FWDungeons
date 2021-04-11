@@ -1,9 +1,10 @@
 package it.forgottenworld.dungeons.api.game.dungeon
 
-import it.forgottenworld.dungeons.api.game.chest.Chest
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.InteractiveRegion
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3i
+import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 
 interface EditableDungeon : Dungeon {
@@ -63,4 +64,7 @@ interface EditableDungeon : Dungeon {
     companion object {
         const val NEW_DUNGEON_TEMP_ID = -69420
     }
+
+    fun showInteractiveRegionGuiToPlayer(player: Player, type: InteractiveRegion.Type, page: Int)
+    fun showChestsGuiToPlayer(player: Player, page: Int)
 }

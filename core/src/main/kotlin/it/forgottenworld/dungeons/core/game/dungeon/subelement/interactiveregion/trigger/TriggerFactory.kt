@@ -1,6 +1,6 @@
-package it.forgottenworld.dungeons.core.game.interactiveregion.trigger
+package it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.trigger
 
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 
 interface TriggerFactory {

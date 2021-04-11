@@ -1,6 +1,6 @@
-package it.forgottenworld.dungeons.core.game.chest
+package it.forgottenworld.dungeons.core.game.dungeon.subelement.chest
 
-import it.forgottenworld.dungeons.api.game.chest.Chest
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.chest.Chest
 import it.forgottenworld.dungeons.api.storage.Storage
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.load
 import it.forgottenworld.dungeons.api.storage.Storage.Companion.save
@@ -14,10 +14,8 @@ class ChestStorageStrategy : Storage.StorageStrategy<Chest> {
     override fun toStorage(obj: Chest, config: ConfigurationSection, storage: Storage) {
         config.edit {
             "id" to obj.id
-            storage.save(
-                obj.position,
-                section("position")
-            )
+            storage.save(obj.position, section("position"))
+            obj.label?.let { "label" to it }
             "minItems" to obj.minItems
             "maxItems" to obj.maxItems
             section("chances") {

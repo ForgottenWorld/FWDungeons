@@ -1,9 +1,9 @@
-package it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea
+package it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.spawnarea
 
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
-import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.Vector3d
 import it.forgottenworld.dungeons.api.storage.Storage

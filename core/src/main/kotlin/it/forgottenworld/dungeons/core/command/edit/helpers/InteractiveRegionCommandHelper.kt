@@ -3,17 +3,22 @@ package it.forgottenworld.dungeons.core.command.edit.helpers
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.DungeonManager
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type
-import it.forgottenworld.dungeons.api.game.interactiveregion.InteractiveRegion.Type.*
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.InteractiveRegion.Type
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.InteractiveRegion.Type.*
 import it.forgottenworld.dungeons.api.math.Vector3i
 import it.forgottenworld.dungeons.core.storage.Configuration
 import it.forgottenworld.dungeons.core.storage.Strings
 import it.forgottenworld.dungeons.core.utils.NamespacedKeys
-import it.forgottenworld.dungeons.core.utils.ParticleSpammer
+import it.forgottenworld.dungeons.core.utils.ParticleSpammer.Companion.builder
 import it.forgottenworld.dungeons.core.utils.getTargetSolidBlock
 import it.forgottenworld.dungeons.core.utils.sendPrefixedMessage
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Particle
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -80,16 +85,18 @@ class InteractiveRegionCommandHelper @Inject constructor(
             builder.pos2(Vector3i.ofBlock(block))
         }
 
+        val cmd = when (type) {
+            TRIGGER -> "t"
+            ACTIVE_AREA -> "aa"
+            SPAWN_AREA -> "sa"
+        }
+
         val box = builder.build()
         if (box == null) {
             sender.sendPrefixedMessage(
                 Strings.NTH_POS_SET_PICK_ANOTHER,
                 if (posNo == 1) Strings.FIRST else Strings.SECOND,
-                when (type) {
-                    TRIGGER -> "t"
-                    ACTIVE_AREA -> "aa"
-                    SPAWN_AREA -> "sa"
-                },
+                cmd,
                 if (posNo == 1) 2 else 1
             )
             return
@@ -97,6 +104,14 @@ class InteractiveRegionCommandHelper @Inject constructor(
 
         val id = dungeon.newInteractiveRegion(type, box)
         sender.sendPrefixedMessage(Strings.CREATED_IE_WITH_ID, type.singular, id)
+        sender.sendMessage(
+            TextComponent.ofChildren(
+                Component.text(Strings.CLICK, NamedTextColor.WHITE),
+                Component.text(Strings.HERE, NamedTextColor.GOLD)
+                    .clickEvent(ClickEvent.suggestCommand("/fwde $cmd label id:$id ")),
+                Component.text(Strings.TO_LABEL_IT)
+            )
+        )
     }
 
     fun labelInteractiveRegion(
@@ -115,14 +130,19 @@ class InteractiveRegionCommandHelper @Inject constructor(
             return
         }
 
-        if (type == TRIGGER &&
-            dungeon.triggers.isEmpty() ||
-            type == ACTIVE_AREA &&
-            dungeon.activeAreas.isEmpty() ||
-            type == SPAWN_AREA &&
-            dungeon.spawnAreas.isEmpty()
-        ) {
+        val collection = when (type) {
+            TRIGGER -> dungeon.triggers
+            ACTIVE_AREA -> dungeon.activeAreas
+            SPAWN_AREA -> dungeon.spawnAreas
+        }
+
+        if (collection.isEmpty()) {
             sender.sendPrefixedMessage(Strings.THIS_DUNGEON_HAS_NO_IE_YET, type.plural)
+            return
+        }
+
+        if (collection.values.any { it.label.equals(label, ignoreCase = true) }) {
+            sender.sendPrefixedMessage(Strings.LABEL_IS_TAKEN)
             return
         }
 
@@ -184,10 +204,14 @@ class InteractiveRegionCommandHelper @Inject constructor(
         if (!dungeon.hasTestOrigin) return
         val region = regions[ieId] ?: return
 
-        ParticleSpammer.highlightBox(
-            region.box.withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin),
-            configuration.dungeonWorld
-        )
+        val locs = region.box
+            .withContainerOrigin(Vector3i.ZERO, dungeon.testOrigin)
+            .getCenterOfAllBlocks()
+
+        builder().particle(Particle.COMPOSTER)
+            .locations(locs)
+            .world(configuration.dungeonWorld)
+            .oneShot(20)
 
         sender.sendPrefixedMessage(Strings.HIGHLIGHTED_IE_WITH_ID, type.plural, ieId)
     }

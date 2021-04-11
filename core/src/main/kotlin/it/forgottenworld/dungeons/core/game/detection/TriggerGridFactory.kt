@@ -2,7 +2,7 @@ package it.forgottenworld.dungeons.core.game.detection
 
 import com.google.inject.Singleton
 import it.forgottenworld.dungeons.api.game.dungeon.FinalDungeon
-import it.forgottenworld.dungeons.api.game.interactiveregion.Trigger
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.Trigger
 import it.forgottenworld.dungeons.api.math.Box
 import it.forgottenworld.dungeons.api.math.NestableGrid3iToNi
 import it.forgottenworld.dungeons.api.math.Vector3i
@@ -30,8 +30,8 @@ class TriggerGridFactory {
         val boxes = indices.associateWith { it.cubeWithSide(grid.cellSize) }
         val vectorMap = mutableMapOf<Vector3i, IntArray>()
         for ((id, trig) in triggers) {
-            for (ind in indices) {
-                if (trig.box.intersects(boxes[ind]!!)) {
+            for ((ind, box) in boxes) {
+                if (trig.box.intersects(box)) {
                     vectorMap[ind] = vectorMap[ind]?.plus(id) ?: intArrayOf(id)
                 }
             }

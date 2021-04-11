@@ -1,6 +1,6 @@
-package it.forgottenworld.dungeons.core.game.interactiveregion.spawnarea
+package it.forgottenworld.dungeons.core.game.dungeon.subelement.interactiveregion.spawnarea
 
-import it.forgottenworld.dungeons.api.game.interactiveregion.SpawnArea
+import it.forgottenworld.dungeons.api.game.dungeon.subelement.interactiveregion.SpawnArea
 import it.forgottenworld.dungeons.api.math.Box
 
 interface SpawnAreaFactory {

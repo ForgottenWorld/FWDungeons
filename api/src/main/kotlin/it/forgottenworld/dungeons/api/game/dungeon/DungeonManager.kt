@@ -1,6 +1,7 @@
 package it.forgottenworld.dungeons.api.game.dungeon
 
 import it.forgottenworld.dungeons.api.game.dungeon.instance.DungeonInstance
+import org.bukkit.entity.Player
 import java.util.*
 
 interface DungeonManager {
@@ -15,9 +16,11 @@ interface DungeonManager {
 
     fun disableDungeon(id: Int): Boolean
 
-    fun getAllFinalDungeons(): MutableCollection<FinalDungeon>
+    fun getAllFinalDungeons(): Collection<FinalDungeon>
 
     fun getAllActiveFinalDungeons(): List<FinalDungeon>
+
+    fun showDungeonListToPlayer(player: Player, page: Int)
 
     fun registerFinalDungeon(dungeon: FinalDungeon)
 
